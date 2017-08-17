@@ -196,6 +196,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="FTServer.cpp" />
+    <ClCompile Include="FTSInstance.cpp" />
     <ClCompile Include="FTSInstance_Index.cpp" />
     <ClCompile Include="FTSInstance_Log.cpp" />
     <ClCompile Include="FTSInstance_Save.cpp" />

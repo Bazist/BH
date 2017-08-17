@@ -167,7 +167,7 @@
             // lbInstanceInfo
             // 
             this.lbInstanceInfo.AutoSize = true;
-            this.lbInstanceInfo.Location = new System.Drawing.Point(816, 17);
+            this.lbInstanceInfo.Location = new System.Drawing.Point(774, 9);
             this.lbInstanceInfo.Name = "lbInstanceInfo";
             this.lbInstanceInfo.Size = new System.Drawing.Size(33, 13);
             this.lbInstanceInfo.TabIndex = 10;

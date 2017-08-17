@@ -26,6 +26,13 @@ namespace FTSearchNet
             Text = 2
         };
 
+        public enum MemoryMode : UInt32
+        {
+            InMemory = 1,
+            HDD = 2,
+            HDDBuffered = 3
+        }
+
         #endregion
 
         #region Structs
@@ -156,8 +163,6 @@ namespace FTSearchNet
             public System.UInt32 MaxLenWord;
             public System.UInt32 AutoStemmingOn;
 
-            public System.UInt32 MaxSizeBuffer;
-
             public System.UInt32 WordsHeaderBase;
 
             public System.UInt32 DocumentNameSize;
@@ -177,8 +182,7 @@ namespace FTSearchNet
             [MarshalAs(UnmanagedType.I1)]
             public System.Boolean IsCustomPath;
 
-            [MarshalAs(UnmanagedType.I1)]
-            public System.Boolean InMemoryMode;
+            public System.UInt32 MemoryMode;
 
             [MarshalAs(UnmanagedType.I1)]
             public System.Boolean IsUseUkranianAlphabet;
@@ -218,6 +222,8 @@ namespace FTSearchNet
             public System.UInt32 DocumentNameSize;
 
             public IntPtr LastErrorMessage;
+
+            [MarshalAs(UnmanagedType.I1)]
             public System.Boolean HasError;
 
             public System.UInt32 ControlValue;
@@ -326,15 +332,15 @@ namespace FTSearchNet
         #region DLL Import
 
 #if DEBUG
-        const string DLL_PATH = @"C:\FTS\BlackHole\FTSearch\x64\Debug\FTSearch.dll";
+        const string DLL_PATH = @"C:\FTS\BH\FTSearch\x64\Debug\FTSearch.dll";
 #else
-        const string DLL_PATH = @"C:\FTS\BlackHole\FTSearch\x64\Release\FTSearch.dll";
+        const string DLL_PATH = @"C:\FTS\BH\FTSearch\x64\Release\FTSearch.dll";
 #endif
 
         //[DllImport(DLL_PATH, EntryPoint = "startDefaultInstance", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         //private static unsafe extern void startDefaultInstanceDLL(byte* path,
         //                                                          System.UInt32 instance,
-        //                                                          bool inMemoryMode,
+        //                                                          MemoryMode memoryMode,
         //                                                          System.UInt32 autoStemmingOn,
         //                                                          System.UInt32 minLenWord,
         //                                                          System.UInt32 maxLenWord,
@@ -415,7 +421,7 @@ namespace FTSearchNet
         #region Methods
 
         public unsafe void StartInstance(string path,
-                                         bool inMemoryMode,
+                                         MemoryMode memoryMode,
                                          uint autoStemmingOn,
                                          uint minLenWord,
                                          uint maxLenWord,
@@ -433,7 +439,7 @@ namespace FTSearchNet
             configuration.IndexPath = indexPath;
 
             configuration.InstanceNumber = InstanceNumber;
-            configuration.InMemoryMode = inMemoryMode;
+            configuration.MemoryMode = (System.UInt32)memoryMode;
             configuration.AutoStemmingOn = autoStemmingOn;
             configuration.MinLenWord = minLenWord;
             configuration.MaxLenWord = maxLenWord;
@@ -443,7 +449,6 @@ namespace FTSearchNet
             configuration.IsUseRussianAlphabet = true;
             configuration.IsUseUkranianAlphabet = true;
             configuration.IsUseEnglishAlphabet = true;
-            configuration.MaxSizeBuffer = 10000000;
             configuration.WordsHeaderBase = 24;
             configuration.LimitTopResults = 100;
             configuration.LimitUsedMemory = 8000000000; //8000 má by default

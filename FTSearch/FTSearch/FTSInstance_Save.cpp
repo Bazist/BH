@@ -113,14 +113,14 @@ void FTSInstance::createIndex()
 
 		pDocumentsBlock->writeBlocksToFile(pDocFile,
 											(uchar8*)pBuffer,
-											Configuration.MaxSizeBuffer,
+											MAX_SIZE_BUFFER,
 											buffFilledLength, 
 											0,
 											0); 
 
 		pBuffer[buffFilledLength++] = 0; //null terminated
 		
-		/*if(!Configuration.InMemoryMode)
+		/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
 		{
 			pDocumentsBlock->clear();
 			pDocumentsBlockPool->releaseObject(pDocumentsBlock);
@@ -129,7 +129,7 @@ void FTSInstance::createIndex()
 		Info.CountWordsHDD++;
 	}
 
-	if (!Configuration.InMemoryMode)
+	if (Configuration.MemoryMode != IN_MEMORY_MODE)
 	{
 		pDocumentsBlockPool->releaseObjects();
 	}
@@ -189,7 +189,7 @@ void FTSInstance::createIndex()
 
 	documentsName.writeBlocksToFile(pDocNameFile,
 									(uchar8*)pBuffer,
-									Configuration.MaxSizeBuffer,
+									MAX_SIZE_BUFFER,
 									buffFilledLength);
 
 	//save dictionary pages
@@ -203,7 +203,7 @@ void FTSInstance::createIndex()
 
 	//rollback changes in ram
 	
-	if(Configuration.InMemoryMode)
+	if(Configuration.MemoryMode == IN_MEMORY_MODE)
 	{
 		//rollback update
 		for(uint32 i=0; i < Info.CountWordsRAM; i++)
@@ -234,7 +234,7 @@ void FTSInstance::createIndex()
 	pDocFile->flush();
 
 	//destroy
-	memset(pBuffer, 0, Configuration.MaxSizeBuffer);
+	memset(pBuffer, 0, MAX_SIZE_BUFFER);
 
 	HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 }
@@ -297,7 +297,7 @@ void FTSInstance::updateIndex()
 	pDocFileTemp->setPosition(docHeaderSize);
 
 	//========================================================
-	pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
+	pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 	uchar8* pDestBuffer = (uchar8*)pBuffer;
 	
 	ulong64 sourceFilePosition = docHeaderSize; //version + unique identifier + info
@@ -305,7 +305,7 @@ void FTSInstance::updateIndex()
 	uint32 sourceBuffLength = 0;
 
 	uint32 destBuffPosition = 0;
-	uint32 destBuffLength = Configuration.MaxSizeBuffer;
+	uint32 destBuffLength = MAX_SIZE_BUFFER;
 
 	//get data from ram
 	printf("Get keys from RAM...\n");
@@ -335,7 +335,7 @@ void FTSInstance::updateIndex()
 	}
 
 	//========================================================
-	if(Configuration.InMemoryMode)
+	if(Configuration.MemoryMode == IN_MEMORY_MODE)
 	{
 		haWordsHDD.open();
 	}
@@ -345,7 +345,7 @@ void FTSInstance::updateIndex()
 	}
 
 	//get data by portions from HDD
-	pKeysAndValuesHDD = HArrayFixPair::CreateArray(Configuration.MaxSizeBuffer, countKeySegments);
+	pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 
 	uint32 currKeyRAM = 0;
 
@@ -391,13 +391,13 @@ void FTSInstance::updateIndex()
 		bool isBufferNotEnough = false;
 
 		uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
-															  Configuration.MaxSizeBuffer, 
+															  MAX_SIZE_BUFFER, 
 															  startHeaderHDD,
 															  isBufferNotEnough);
 
 		if(isBufferNotEnough)
 		{
-			logError("The buffer Configuration.MaxSizeBuffer is not enough to get portion from HDD.");
+			logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 			goto destroy;
 		}
 
@@ -502,14 +502,14 @@ void FTSInstance::updateIndex()
 				//Save blocks from RAM
 				pDocumentsBlock->writeBlocksToFile(pDocFileTemp, 
 												   pDestBuffer, 
-												   Configuration.MaxSizeBuffer, 
+												   MAX_SIZE_BUFFER, 
 												   destBuffPosition,
 												   0,
 												   lastDocNumber); 
 		
 				pDestBuffer[destBuffPosition++] = 0; //null terminated
 		
-				/*if(!Configuration.InMemoryMode)
+				/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
 				{
 					pDocumentsBlock->clear();
 					pDocumentsBlockPool->releaseObject(pDocumentsBlock);
@@ -562,7 +562,7 @@ void FTSInstance::updateIndex()
 									  sourceBuffLength, 
 									  destBuffPosition, 
 									  destBuffLength,
-									  Configuration.MaxSizeBuffer,
+									  MAX_SIZE_BUFFER,
 									  0,
 									  lastDocNumber,
 									  Info.LastNameIDRAM);
@@ -576,14 +576,14 @@ void FTSInstance::updateIndex()
 				//B. Save blocks from RAM
 				pDocumentsBlock->writeBlocksToFile(pDocFileTemp, 
 												   pDestBuffer, 
-												   Configuration.MaxSizeBuffer, 
+												   MAX_SIZE_BUFFER, 
 												   destBuffPosition,
 												   0,
 												   lastDocNumber); 
 		
 				pDestBuffer[destBuffPosition++] = 0; //null terminated
 		
-				/*if(!Configuration.InMemoryMode)
+				/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
 				{
 					pDocumentsBlock->clear();
 					pDocumentsBlockPool->releaseObject(pDocumentsBlock);
@@ -630,7 +630,7 @@ void FTSInstance::updateIndex()
 									  sourceBuffLength, 
 									  destBuffPosition, 
 									  destBuffLength,
-									  Configuration.MaxSizeBuffer,
+									  MAX_SIZE_BUFFER,
 									  0,
 									  lastDocNumber,
 									  Info.LastNameIDRAM);
@@ -650,7 +650,7 @@ void FTSInstance::updateIndex()
 		printf("\n");
 	}
 
-	if (!Configuration.InMemoryMode)
+	if (Configuration.MemoryMode != IN_MEMORY_MODE)
 	{
 		pDocumentsBlockPool->releaseObjects();
 	}
@@ -690,7 +690,7 @@ void FTSInstance::updateIndex()
 	//B. Save blocks from RAM
 	documentsName.writeBlocksToFile(pDocNameFileTemp,
 									pDestBuffer,
-									Configuration.MaxSizeBuffer,
+									MAX_SIZE_BUFFER,
 									destBuffPosition);
 
 	pDocNameFileTemp->flush();
@@ -698,7 +698,7 @@ void FTSInstance::updateIndex()
 	//save info
 	haWordsHDDTemp.flush();
 
-	if(!Configuration.InMemoryMode)
+	if(Configuration.MemoryMode != IN_MEMORY_MODE)
 	{
 		haWordsRAM.clear();
 		
@@ -758,7 +758,7 @@ destroy:
 	//open new
 	haWordsHDD.open();
 
-	memset(pBuffer, 0, Configuration.MaxSizeBuffer);
+	memset(pBuffer, 0, MAX_SIZE_BUFFER);
 
 	if(pKeysAndValuesRAM)
 	{
@@ -899,8 +899,8 @@ void FTSInstance::importIndex(const char* importPath)
 	pDocFileTemp->setPosition(docHeaderSize);
 
 	//========================================================
-	pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
-	pSourceBufferImport = new uchar8[Configuration.MaxSizeBuffer];
+	pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
+	pSourceBufferImport = new uchar8[MAX_SIZE_BUFFER];
 
 	uchar8* pDestBuffer = (uchar8*)pBuffer;
 	
@@ -913,15 +913,15 @@ void FTSInstance::importIndex(const char* importPath)
 	uint32 sourceBuffLengthImport = 0;
 
 	uint32 destBuffPosition = 0;
-	uint32 destBuffLength = Configuration.MaxSizeBuffer;
+	uint32 destBuffLength = MAX_SIZE_BUFFER;
 
 	//get data by portions from HDD
 	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
 
-	pKeysAndValuesHDD = HArrayFixPair::CreateArray(Configuration.MaxSizeBuffer, countKeySegments);
+	pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 
 	//get data from import hdd
-	pKeysAndValuesHDDImport = HArrayFixPair::CreateArray(Configuration.MaxSizeBuffer, countKeySegments);
+	pKeysAndValuesHDDImport = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 	
 	uint32 currKeyHDD = MAX_INT;
 	uint32 currKeyHDDImport = MAX_INT;
@@ -987,13 +987,13 @@ void FTSInstance::importIndex(const char* importPath)
 
 			currKeyHDD = 0;
 			countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
-															  Configuration.MaxSizeBuffer, 
+															  MAX_SIZE_BUFFER, 
 															  startHeaderHDD,
 															  isBufferNotEnough);
 
 			if(isBufferNotEnough)
 			{
-				logError("The buffer Configuration.MaxSizeBuffer is not enough to get portion from HDD.");
+				logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 				goto destroy;
 			}
 
@@ -1018,13 +1018,13 @@ void FTSInstance::importIndex(const char* importPath)
 
 			currKeyHDDImport = 0;
 			countHDDImport = haWordsHDDImport.getKeysAndValuesByPortions(pKeysAndValuesHDDImport,
-																		Configuration.MaxSizeBuffer, 
+																		MAX_SIZE_BUFFER, 
 																		startHeaderHDDImport,
 																		isBufferNotEnough);
 
 			if(isBufferNotEnough)
 			{
-				logError("The buffer Configuration.MaxSizeBuffer is not enough to get portion from HDD.");
+				logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 				goto destroy;
 			}
 		}
@@ -1103,7 +1103,7 @@ void FTSInstance::importIndex(const char* importPath)
 								  sourceBuffLengthImport, 
 								  destBuffPosition, 
 								  destBuffLength,
-								  Configuration.MaxSizeBuffer,
+								  MAX_SIZE_BUFFER,
 								  baseDocNumber,
 								  lastDocNumber,
 								  Info.LastNameIDHDD + infoImport.LastNameIDHDD - docHeaderSize);
@@ -1155,7 +1155,7 @@ void FTSInstance::importIndex(const char* importPath)
 								  sourceBuffLength, 
 								  destBuffPosition, 
 								  destBuffLength,
-								  Configuration.MaxSizeBuffer,
+								  MAX_SIZE_BUFFER,
 								  0,
 								  lastDocNumber,
 								  Info.LastNameIDHDD);
@@ -1182,7 +1182,7 @@ void FTSInstance::importIndex(const char* importPath)
 								  sourceBuffLengthImport, 
 								  destBuffPosition, 
 								  destBuffLength,
-								  Configuration.MaxSizeBuffer,
+								  MAX_SIZE_BUFFER,
 								  baseDocNumber,
 								  lastDocNumber,
 								  Info.LastNameIDHDD + infoImport.LastNameIDHDD - docHeaderSize);
@@ -1236,7 +1236,7 @@ void FTSInstance::importIndex(const char* importPath)
 								  sourceBuffLength, 
 								  destBuffPosition, 
 								  destBuffLength,
-								  Configuration.MaxSizeBuffer,
+								  MAX_SIZE_BUFFER,
 								  0,
 								  lastDocNumber,
 								  Info.LastNameIDHDD);
@@ -1294,7 +1294,7 @@ void FTSInstance::importIndex(const char* importPath)
 	//save info
 	haWordsHDDTemp.flush();
 
-	if(!Configuration.InMemoryMode)
+	if(Configuration.MemoryMode != IN_MEMORY_MODE)
 	{
 		Info.CountWordsRAM = 0;
 	}
@@ -1361,7 +1361,7 @@ destroy:
 	//open new
 	haWordsHDD.open();
 
-	memset(pBuffer, 0, Configuration.MaxSizeBuffer);
+	memset(pBuffer, 0, MAX_SIZE_BUFFER);
 
 	if(pKeysAndValuesHDD)
 	{
@@ -1397,11 +1397,12 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 	closeDocNameIndex();
 
 	//dictionary
-	if(Configuration.InMemoryMode)
+	if(Configuration.MemoryMode == IN_MEMORY_MODE ||
+	   Configuration.MemoryMode == HDD_MEMORY_MODE)
 	{
 		haWordsHDD.openOrCreate();
 	}
-	else
+	else //if(Configuration.MemoryMode == HDD_BUFFERED_MEMORY_MODE)
 	{
 		haWordsHDD.openOrCreate(BIN_FILE_BUFFER_SIZE); //1 gb on all
 	}
@@ -1412,7 +1413,7 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 		openIndex(onlyCheckIndex);
 	}
 
-	if(Configuration.InMemoryMode)
+	if(Configuration.MemoryMode == IN_MEMORY_MODE)
 	{
 		closeDicIndex();
 
@@ -1483,7 +1484,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 		
 		//haWordsRAM
 		//reinit haWordsRAM
-		if(Configuration.InMemoryMode)
+		if(Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
 			//load data to ram from hdd pages
 			haWordsHDD.close();
@@ -1550,7 +1551,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 														sourceFilePosition,
 														sourceBuffPosition,
 														sourceBuffLength,
-														Configuration.MaxSizeBuffer,
+														MAX_SIZE_BUFFER,
 														Info.LastNameIDRAM,
 														isFormatCorrupted);
 
@@ -1601,7 +1602,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 										&documentsName,
 										sourceFilePosition,
 										pSourceBuffer,
-										Configuration.MaxSizeBuffer);
+										MAX_SIZE_BUFFER);
 			
 			////get top words
 			//for(uint32 i = 0; i < Info.CountWordsRAM; i++)
@@ -1637,7 +1638,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 			destroy1:
 
-			memset(pBuffer, 0, Configuration.MaxSizeBuffer);
+			memset(pBuffer, 0, MAX_SIZE_BUFFER);
 						
 			HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 
@@ -1656,7 +1657,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 				//get data by portions from HDD
 				uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
-				HArrayFixPair* pKeysAndValuesHDD = HArrayFixPair::CreateArray(Configuration.MaxSizeBuffer, countKeySegments);
+				HArrayFixPair* pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 
 				uint32 currKeyRAM = 0;
 
@@ -1672,13 +1673,13 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 					bool isBufferNotEnough = false;
 
 					uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
-																			Configuration.MaxSizeBuffer,
+																			MAX_SIZE_BUFFER,
 																			startHeaderHDD,
 																			isBufferNotEnough);
 
 					if (isBufferNotEnough)
 					{
-						logError("The buffer Configuration.MaxSizeBuffer is not enough to get portion from HDD.");
+						logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 						goto destroy2;
 					}
 
@@ -1717,7 +1718,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 																sourceFilePosition,
 																sourceBuffPosition,
 																sourceBuffLength,
-																Configuration.MaxSizeBuffer,
+																MAX_SIZE_BUFFER,
 																Info.LastNameIDRAM,
 																isFormatCorrupted);
 
@@ -1879,7 +1880,7 @@ void FTSInstance::saveIndex()
 
 	closeDocNameIndex();
 
-	if(Configuration.InMemoryMode)
+	if(Configuration.MemoryMode == IN_MEMORY_MODE)
 	{
 		createIndex();
 

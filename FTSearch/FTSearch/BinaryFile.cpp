@@ -27,6 +27,7 @@ void BinaryFile::init(const char* fileName,
 	m_isOverwrite = isOverwrite;
 	m_file = 0;
 	m_countReads = 0;
+	m_fileSize = 0;
 
 	if(bufferSize)
 	{
@@ -58,8 +59,17 @@ bool BinaryFile::open()
 		r = fopen_s(&m_file, m_fileName, "r+b");
 	else
 		r = fopen_s(&m_file, m_fileName, "w+b");
-	
-	return (r==0);
+
+	if (r == 0)
+	{
+		m_fileSize = getFileSize();
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool BinaryFile::clear()
@@ -99,6 +109,20 @@ uint32 BinaryFile::read(void* pData, ulong64 position, uint32 length)
 
 uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 {
+	if (!m_maxCountPages)
+	{
+		return read(pData, position, length);
+	}
+
+	if (position + length > m_fileSize)
+	{
+		ulong64 allocateSize = m_fileSize - position - length;
+
+		allocate(allocateSize, m_fileSize);
+
+		m_fileSize += allocateSize;
+	}
+
 	//return read(pData, position, length);
 	
 	ulong64 page1 = (position >> BIN_FILE_RIGHT_BITS);
@@ -247,6 +271,20 @@ uint32 BinaryFile::write(const void* pData, ulong64 position, uint32 length)
 
 uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 length)
 {
+	if (!m_maxCountPages)
+	{
+		return write(pData, position, length);
+	}
+
+	if (position + length > m_fileSize)
+	{
+		ulong64 allocateSize = m_fileSize - position - length;
+
+		allocate(allocateSize, m_fileSize);
+
+		m_fileSize += allocateSize;
+	}
+
 	//write(pData, position, length);
 	//return;
 

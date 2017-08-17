@@ -37,7 +37,7 @@ void FTSInstance::calcMatchDocuments(const char* word,
 	}
 
 	//Read from HDD
-	if(!Configuration.InMemoryMode 
+	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
 		/*uint32 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
@@ -58,7 +58,7 @@ void FTSInstance::calcMatchDocuments(const char* word,
 												sourceFilePosition,
 												sourceBuffPosition,
 												sourceBuffLength,
-												Configuration.MaxSizeBuffer,
+												MAX_SIZE_BUFFER,
 												Info.LastNameIDRAM,
 												isFormatCorrupted);
 
@@ -114,7 +114,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 	}
 
 	//Read from HDD
-	if(!Configuration.InMemoryMode 
+	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
 		ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
@@ -125,7 +125,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 			uint32 id;
 			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-			uchar8* pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
+			uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 			
 			uint32 sourceBuffPosition = 0;
 			uint32 sourceBuffLength = 0;
@@ -136,7 +136,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 												sourceFilePosition,
 												sourceBuffPosition,
 												sourceBuffLength,
-												Configuration.MaxSizeBuffer,
+												MAX_SIZE_BUFFER,
 												Info.LastNameIDRAM,
 												isFormatCorrupted);
 			delete[] pSourceBuffer;
@@ -317,9 +317,9 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 
 	printf("Count docs: %d\n", countDocuments);
 
-	uchar8* pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
+	uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 
-	memset(pSourceBuffer, 0, Configuration.MaxSizeBuffer);
+	memset(pSourceBuffer, 0, MAX_SIZE_BUFFER);
 
 	ulong64 sourceFilePosition = 80;
 	uint32 sourceBuffPosition = 0;
@@ -463,7 +463,7 @@ void FTSInstance::calculateTrend(const char* phrase,
 	}
 
 	//Read from HDD
-	if(!Configuration.InMemoryMode 
+	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
 		ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
@@ -473,7 +473,7 @@ void FTSInstance::calculateTrend(const char* phrase,
 			//read docs
 			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-			uchar8* pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
+			uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 			
 			uint32 sourceBuffPosition = 0;
 			uint32 sourceBuffLength = 0;
@@ -484,7 +484,7 @@ void FTSInstance::calculateTrend(const char* phrase,
 												sourceFilePosition,
 												sourceBuffPosition,
 												sourceBuffLength,
-												Configuration.MaxSizeBuffer,
+												MAX_SIZE_BUFFER,
 												Info.LastNameIDRAM,
 												isFormatCorrupted);
 			delete[] pSourceBuffer;
@@ -527,7 +527,7 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 		}
 
 		//Read from HDD
-		if(!Configuration.InMemoryMode 
+		if(Configuration.MemoryMode != IN_MEMORY_MODE
 			&& Info.CountWordsHDD)
 		{
 			ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
@@ -537,7 +537,7 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 				//read docs
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-				uchar8* pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
+				uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 			
 				uint32 sourceBuffPosition = 0;
 				uint32 sourceBuffLength = 0;
@@ -548,7 +548,7 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 													sourceFilePosition,
 													sourceBuffPosition,
 													sourceBuffLength,
-													Configuration.MaxSizeBuffer,
+													MAX_SIZE_BUFFER,
 													Info.LastNameIDRAM,
 													isFormatCorrupted);
 				delete[] pSourceBuffer;
@@ -621,7 +621,7 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 		}
 
 		//Read from HDD
-		if(!Configuration.InMemoryMode 
+		if(Configuration.MemoryMode != IN_MEMORY_MODE
 			&& Info.CountWordsHDD)
 		{
 			ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
@@ -631,7 +631,7 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 				//read docs
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-				uchar8* pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
+				uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 		
 				uint32 sourceBuffPosition = 0;
 				uint32 sourceBuffLength = 0;
@@ -642,7 +642,7 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 													sourceFilePosition,
 													sourceBuffPosition,
 													sourceBuffLength,
-													Configuration.MaxSizeBuffer,
+													MAX_SIZE_BUFFER,
 													Info.LastNameIDRAM,
 													isFormatCorrupted);
 
@@ -842,7 +842,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 					}
 
 					//Read from HDD
-					if(!Configuration.InMemoryMode 
+					if(Configuration.MemoryMode != IN_MEMORY_MODE
 						&& Info.CountWordsHDD)
 					{
 						ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
@@ -853,7 +853,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 							uint32 id;
 							DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
 
-							uchar8* pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
+							uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 			
 							uint32 sourceBuffPosition = 0;
 							uint32 sourceBuffLength = 0;
@@ -864,7 +864,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 																sourceFilePosition,
 																sourceBuffPosition,
 																sourceBuffLength,
-																Configuration.MaxSizeBuffer,
+																MAX_SIZE_BUFFER,
 																Info.LastNameIDRAM,
 																isFormatCorrupted);
 
@@ -1337,7 +1337,7 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 			uint32 wordId = PostSelector::addSelectorWord(pSelector, dicWord.Word);
 
 			//Read from HDD
-			if(!Configuration.InMemoryMode 
+			if(Configuration.MemoryMode != IN_MEMORY_MODE
 				&& Info.CountWordsHDD)
 			{
 				ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
@@ -1347,7 +1347,7 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 					//read docs
 					DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-					uchar8* pSourceBuffer = new uchar8[Configuration.MaxSizeBuffer];
+					uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 			
 					uint32 sourceBuffPosition = 0;
 					uint32 sourceBuffLength = 0;
@@ -1358,7 +1358,7 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 														sourceFilePosition,
 														sourceBuffPosition,
 														sourceBuffLength,
-														Configuration.MaxSizeBuffer,
+														MAX_SIZE_BUFFER,
 														Info.LastNameIDRAM,
 														isFormatCorrupted);
 

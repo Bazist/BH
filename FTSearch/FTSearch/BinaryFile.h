@@ -33,6 +33,7 @@ private:
 	uint32 m_maxCountPages;
 
 	uint32 m_countReads;
+	ulong64 m_fileSize;
 
 	BinaryFilePage** pPages;
 
@@ -103,8 +104,18 @@ public:
 
 	ulong64 getFileSize()
 	{
-		_fseeki64(m_file, 0L, SEEK_END);
-		return _ftelli64(m_file);
+		if (!m_fileSize)
+		{
+			__int64 pos = _ftelli64(m_file);
+			
+			int err = _fseeki64(m_file, 0L, SEEK_END);
+
+			m_fileSize = _ftelli64(m_file);
+
+			err = _fseeki64(m_file, pos, SEEK_SET);
+		}
+
+		return m_fileSize;
 	}
 
 	static bool existsFile(const char* fileName)

@@ -207,5 +207,8 @@
     <ClCompile Include="HArrayFixRAM_scanBySelector.cpp">
       <Filter>Source Files\HArray</Filter>
     </ClCompile>
+    <ClCompile Include="FTSInstance.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

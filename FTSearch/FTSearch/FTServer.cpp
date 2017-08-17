@@ -9,6 +9,11 @@ uint32 countInstances = 0;
 
 void startInstance(FTSConfiguration configuration, bool onlyCheckIndex)
 {
+	if (!countInstances)
+	{
+		FTSInstance::initSharedResources();
+	}
+
 	instances[countInstances] = new FTSInstance();
 	instances[countInstances]->startInstance(configuration, onlyCheckIndex);
 
@@ -17,7 +22,7 @@ void startInstance(FTSConfiguration configuration, bool onlyCheckIndex)
 
 //void startDefaultInstance(const char* path,
 //						  uint32 instanceNumber,
-//						  bool inMemoryMode,
+//						  uint32 memoryMode,
 //						  uint32 autoStemmingOn,
 //						  uint32 minLenWord,
 //						  uint32 maxLenWord,
@@ -30,7 +35,7 @@ void startInstance(FTSConfiguration configuration, bool onlyCheckIndex)
 //	configuration.setIndexPath(path, instanceNumber);
 //
 //	configuration.InstanceNumber = instanceNumber;
-//	configuration.InMemoryMode = inMemoryMode;
+//	configuration.MemoryMode = memoryMode;
 //	configuration.AutoStemmingOn = autoStemmingOn;
 //	configuration.MinLenWord = minLenWord;
 //	configuration.MaxLenWord = maxLenWord;
@@ -289,5 +294,10 @@ void stopInstance(uint32 instanceNumber)
 
 			break;
 		}
+	}
+
+	if (!countInstances)
+	{
+		FTSInstance::destroySharedResources();
 	}
 }

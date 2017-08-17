@@ -4,7 +4,7 @@
 uint32 FTSInstance::indexHtmlFile(const char* name, const char* path)
 {
 	FILE* file = fopen(path, "r");
-	uint32 len = fread(pBuffer, 1, Configuration.MaxSizeBuffer, file);
+	uint32 len = fread(pBuffer, 1, MAX_SIZE_BUFFER, file);
 	fclose(file);
 
 	indexHtml(name, strlen(name), (char*)pBuffer, len);
@@ -15,7 +15,7 @@ uint32 FTSInstance::indexHtmlFile(const char* name, const char* path)
 uint32 FTSInstance::indexTextFile(const char* name, const char* path)
 {
 	FILE* file = fopen(path, "r");
-	uint32 len = fread(pBuffer, 1, Configuration.MaxSizeBuffer, file);
+	uint32 len = fread(pBuffer, 1, MAX_SIZE_BUFFER, file);
 	fclose(file);
 
 	indexText(name, strlen(name), (char*)pBuffer, len);
@@ -28,6 +28,8 @@ bool FTSInstance::indexText(const char* name,
 							char* text,
 							uint32 textLen)
 {
+	initDictionaryRAM();
+
 	//calculate relevant parameters
 	uint32 docID = Info.LastNameIDRAM;
 	uint32 relevantDocID;
@@ -144,6 +146,8 @@ bool FTSInstance::indexText(const char* name,
 
 bool FTSInstance::indexHtml(const char* name, uint32 nameLen, char* text, uint32 textLen)
 {
+	initDictionaryRAM();
+
 	bool isText = false;
 	uint32 currLen = 0;
 

@@ -194,102 +194,48 @@ public:
 	//content
 	inline void readContentCellHDD(ContentCell& valueCell, uint32 position)
 	{
-		if(position >= pActivePartition->ContentPagesSize)
-		{
-			pActivePartition->pContentPagesFile->allocate(MAX_SHORT * sizeof(ContentCell), pActivePartition->ContentPagesSize * sizeof(ContentCell));
-			pActivePartition->ContentPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pContentPagesFile->readBuffered(&valueCell, position * sizeof(ContentCell), sizeof(ContentCell));
 	}
 
 	inline void readContentCellsHDD(ContentCell* valueCells, uint32 position, uint32 count)
 	{
-		if((position + count) >= pActivePartition->ContentPagesSize)
-		{
-			pActivePartition->pContentPagesFile->allocate(MAX_SHORT * sizeof(ContentCell), pActivePartition->ContentPagesSize * sizeof(ContentCell));
-			pActivePartition->ContentPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pContentPagesFile->readBuffered(valueCells, position * sizeof(ContentCell), count * sizeof(ContentCell));
 	}
 
 	inline void writeContentCellHDD(ContentCell& valueCell, uint32 position)
 	{
-		if(position >= pActivePartition->ContentPagesSize)
-		{
-			pActivePartition->pContentPagesFile->allocate(MAX_SHORT * sizeof(ContentCell), pActivePartition->ContentPagesSize * sizeof(ContentCell));
-			pActivePartition->ContentPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pContentPagesFile->writeBuffered(&valueCell, position * sizeof(ContentCell), sizeof(ContentCell));
 	}
 
 	inline void writeContentCellsHDD(ContentCell* valueCells, uint32 position, uint32 count)
 	{
-		if((position + count) >= pActivePartition->ContentPagesSize)
-		{
-			pActivePartition->pContentPagesFile->allocate(MAX_SHORT * sizeof(ContentCell), pActivePartition->ContentPagesSize * sizeof(ContentCell));
-			pActivePartition->ContentPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pContentPagesFile->writeBuffered(valueCells, position * sizeof(ContentCell), count * sizeof(ContentCell));
 	}
 
 	//branch
 	inline void readBranchCellHDD(BranchCell& valueCell, uint32 position)
 	{
-		if(position >= pActivePartition->BranchPagesSize)
-		{
-			pActivePartition->pBranchPagesFile->allocate(MAX_SHORT * sizeof(BranchCell), pActivePartition->BranchPagesSize * sizeof(BranchCell));
-			pActivePartition->BranchPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pBranchPagesFile->readBuffered(&valueCell, position * sizeof(BranchCell), sizeof(BranchCell));
 	}
 
 	inline void writeBranchCellHDD(BranchCell& valueCell, uint32 position)
 	{
-		if(position >= pActivePartition->BranchPagesSize)
-		{
-			pActivePartition->pBranchPagesFile->allocate(MAX_SHORT * sizeof(BranchCell), pActivePartition->BranchPagesSize * sizeof(BranchCell));
-			pActivePartition->BranchPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pBranchPagesFile->writeBuffered(&valueCell, position * sizeof(BranchCell), sizeof(BranchCell));
 	}
 
 	//block
 	inline void readBlockCellHDD(BlockCell& valueCell, uint32 position)
 	{
-		if(position >= pActivePartition->BlockPagesSize)
-		{
-			pActivePartition->pBlockPagesFile->allocate(MAX_SHORT * sizeof(BlockCell), pActivePartition->BlockPagesSize * sizeof(BlockCell));
-			pActivePartition->BlockPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pBlockPagesFile->readBuffered(&valueCell, position * sizeof(BlockCell), sizeof(BlockCell));
 	}
 
 	inline void readBlockCellsHDD(BlockCell* valueCells, uint32 position, uint32 count)
 	{
-		if((position + count) >= pActivePartition->BlockPagesSize)
-		{
-			pActivePartition->pBlockPagesFile->allocate(MAX_SHORT * sizeof(BlockCell), pActivePartition->BlockPagesSize * sizeof(BlockCell));
-			pActivePartition->BlockPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pBlockPagesFile->readBuffered(valueCells, position * sizeof(BlockCell), count * sizeof(BlockCell));
 	}
 
 	inline void writeBlockCellHDD(BlockCell& valueCell, uint32 position)
 	{
-		if(position >= pActivePartition->BlockPagesSize)
-		{
-			pActivePartition->pBlockPagesFile->allocate(MAX_SHORT * sizeof(BlockCell), pActivePartition->BlockPagesSize * sizeof(BlockCell));
-			pActivePartition->BlockPagesSize += MAX_SHORT;
-		}
-
 		pActivePartition->pBlockPagesFile->writeBuffered(&valueCell, position * sizeof(BlockCell), sizeof(BlockCell));
 	}
 
@@ -470,8 +416,6 @@ public:
 
 	void flush()
 	{
-		saveInfo();
-
 		//flush files
 		if(pHeaderFile)
 		{
@@ -483,18 +427,23 @@ public:
 			if (partitions[i].pContentPagesFile)
 			{
 				partitions[i].pContentPagesFile->flush();
+				partitions[i].ContentPagesSize = partitions[i].pContentPagesFile->getFileSize() / sizeof(ContentCell);
 			}
 
 			if (partitions[i].pBranchPagesFile)
 			{
 				partitions[i].pBranchPagesFile->flush();
+				partitions[i].BranchPagesSize = partitions[i].pBranchPagesFile->getFileSize() / sizeof(BranchCell);
 			}
 
 			if (partitions[i].pBlockPagesFile)
 			{
 				partitions[i].pBlockPagesFile->flush();
+				partitions[i].BlockPagesSize = partitions[i].pBlockPagesFile->getFileSize() / sizeof(BlockCell);
 			}
 		}
+
+		saveInfo();
 	}
 
 	void saveInfo()
@@ -626,6 +575,8 @@ public:
 
 	void close()
 	{
+		flush();
+
 		if(pHeaderFile)
 		{
 			pHeaderFile->close();
@@ -634,6 +585,7 @@ public:
 
 			pHeaderFile = 0;
 		}
+
 		for (uint32 i = 0; i < countPartitions; i++)
 		{
 			if (partitions[i].pContentPagesFile)
@@ -982,7 +934,7 @@ public:
 
 			if (isBufferNotEnough)
 			{
-				sprintf(error, "The buffer Configuration.MaxSizeBuffer is not enough to get portion from HDD.");
+				sprintf(error, "The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 
 				break;
 			}

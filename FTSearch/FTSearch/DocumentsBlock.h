@@ -209,7 +209,7 @@ public:
 
 	void writeBlocksToFile(BinaryFile* pBinaryFile,
 							uchar8* pBuffer, 
-							uint32& maxLength,
+							uint32 maxLength,
 							uint32& buffFilledLength,
 							uint32 baseDocNumber,
 							uint32 lastDocNumber)

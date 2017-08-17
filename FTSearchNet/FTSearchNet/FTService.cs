@@ -18,7 +18,7 @@ namespace FTSearchNet
 
         public string Path { get; set; }
 
-        public bool InMemoryMode { get; set; }
+        public FTSearch.MemoryMode MemoryMode { get; set; }
         public uint AutoStemmingOn { get; set; }
         public uint MinLenWord { get; set; }
         public uint MaxLenWord { get; set; }
@@ -39,7 +39,7 @@ namespace FTSearchNet
 
             Instances = new List<FTSearch>();
 
-            InMemoryMode = false;
+            MemoryMode = FTSearch.MemoryMode.HDD;
             AutoStemmingOn = 12;
             MinLenWord = 3;
             MaxLenWord = 64;
@@ -83,7 +83,7 @@ namespace FTSearchNet
 
                 FTSearch fts = new FTSearch(currInstanceNumber);
 
-                fts.StartInstance(Path, InMemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
+                fts.StartInstance(Path, MemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
 
                 Instances.Add(fts);
 
@@ -102,7 +102,7 @@ namespace FTSearchNet
             {
                 FTSearch fts = new FTSearch(maxInstanceNumber + 1);
 
-                fts.StartInstance(Path, InMemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
+                fts.StartInstance(Path, MemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
 
                 Instances.Add(fts);
 
@@ -199,7 +199,7 @@ namespace FTSearchNet
 
                         FTSearch fts = new FTSearch(instanceNumber);
 
-                        fts.StartInstance(Path, InMemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
+                        fts.StartInstance(Path, MemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
 
                         fts.ImportIndex(path2);
 
@@ -241,7 +241,7 @@ namespace FTSearchNet
 
                 FTSearch fts = new FTSearch(instanceNumber);
 
-                fts.StartInstance(Path, InMemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, true, false);
+                fts.StartInstance(Path, MemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, true, false);
 
                 fts.StopInstance();
             }

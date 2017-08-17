@@ -24,6 +24,65 @@ public:
 		memset(this, 0, sizeof(FTSInstance));
 	}
 
+	static void initSharedResources()
+	{
+		pBuffer = new uchar8[MAX_SIZE_BUFFER];
+		memset(pBuffer, 0, MAX_SIZE_BUFFER);
+
+		pUsedDocNumbers = new uint32[MAX_SIZE_BUFFER];
+		pResultDocNumbers = new uint32[MAX_SIZE_BUFFER];
+
+		pBlockMemoryPool = new BlockMemoryPool(LastErrorMessage);
+		pPostSelectorPool = new PostSelectorPool(LastErrorMessage);
+		pDocumentsBlockPool = new DocumentsBlockPool(pBlockMemoryPool, pPostSelectorPool, LastErrorMessage);
+		pRelevantResultPool = new RelevantResultPool(LastErrorMessage);
+	}
+
+	static void destroySharedResources()
+	{
+		if (pBuffer)
+		{
+			delete[] pBuffer;
+			pBuffer = 0;
+		}
+
+		if (pUsedDocNumbers)
+		{
+			delete[] pUsedDocNumbers;
+			pUsedDocNumbers = 0;
+		}
+
+		if (pResultDocNumbers)
+		{
+			delete[] pResultDocNumbers;
+			pResultDocNumbers = 0;
+		}
+
+		if (pBlockMemoryPool)
+		{
+			delete pBlockMemoryPool;
+			pBlockMemoryPool = 0;
+		}
+
+		if (pDocumentsBlockPool)
+		{
+			delete pDocumentsBlockPool;
+			pDocumentsBlockPool = 0;
+		}
+
+		if (pRelevantResultPool)
+		{
+			delete pRelevantResultPool;
+			pRelevantResultPool = 0;
+		}
+
+		if (pPostSelectorPool)
+		{
+			delete pPostSelectorPool;
+			pPostSelectorPool = 0;
+		}
+	}
+
 	void startInstance(FTSConfiguration& configuration)
 	{
 		startInstance(configuration, false);
@@ -46,16 +105,16 @@ public:
 
 	uint32 getSearchPoolsMemory();
 	void logFile(const char* text);
-    
+
 	inline void getPartWords(const char* word,
-							 uint32 len, 
-							 uint32* key)
+		uint32 len,
+		uint32* key)
 	{
 
 		//Fill key
 		uint32* words = (uint32*)word;
 
-		if(len > Configuration.AutoStemmingOn)
+		if (len > Configuration.AutoStemmingOn)
 		{
 			len = Configuration.AutoStemmingOn;
 		}
@@ -64,30 +123,30 @@ public:
 		uint32 count = len >> 2; // the same count = len / 4
 
 		uint32 i;
-		for(i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			key[i] = words[i];
 		}
 
 		//rest len, clear
-		for(uint32 i = count; i < haWordsRAM.KeyLen; i++)
+		for (uint32 i = count; i < haWordsHDD.KeyLen; i++)
 		{
 			key[i] = 0;
 		}
 
 		//fill last digits
-		for(i = count << 2; i < len; i++)
+		for (i = count << 2; i < len; i++)
 		{
-			key[count] = (key[count]<<8) | (uchar8)word[i];
+			key[count] = (key[count] << 8) | (uchar8)word[i];
 		}
 	}
 
 	void searchMatch(WordRaiting& wordRaiting,
-					Dictionary& dictionary,
-					uint32 count,
-					uint32 minPage,
-					uint32 maxPage,
-					uchar8* excluded);
+		Dictionary& dictionary,
+		uint32 count,
+		uint32 minPage,
+		uint32 maxPage,
+		uchar8* excluded);
 
 	void relevantMatch(Dictionary& dictionary);
 
@@ -97,84 +156,84 @@ public:
 	}
 
 	RelevantResult* searchPhrase(const char* phrase,
-								 uint32 phraseLen,
-								 uint32 minPage,
-								 uint32 maxPage);
+		uint32 phraseLen,
+		uint32 minPage,
+		uint32 maxPage);
 
 	RelevantResult* searchHtmlSeldomWords(char* text,
-										uint32 textLen);
+		uint32 textLen);
 
 	RelevantResult* searchPhraseRel(const char* phrase,
-									uint32 phraseLen,
-									uint32 minPage,
-									uint32 maxPage);
+		uint32 phraseLen,
+		uint32 minPage,
+		uint32 maxPage);
 
 	QueryResult* searchQuery(Selector** selectors,
-							 uint32 countSelectors,
-							 uint32 minPage,
-							 uint32 maxPage,
-							 uint32 skip,
-							 bool agregateBySubject);
+		uint32 countSelectors,
+		uint32 minPage,
+		uint32 maxPage,
+		uint32 skip,
+		bool agregateBySubject);
 
 	void extractDocument(uint32 docNumber,
-						 char* docName,
-						 char* docText);
+		char* docName,
+		char* docText);
 
 	RelevantResult* searchNewMems(uint32 startDate1Year,
-								  uint32 startDate1Month,
-								  uint32 startDate2Year,
-								  uint32 startDate2Month,
-								  uint32 startDate2Day,
-								  uint32 endDate2Year,
-								  uint32 endDate2Month,
-								  uint32 endDate2Day,
-								  uint32 periodInDays);
-	
+		uint32 startDate1Month,
+		uint32 startDate2Year,
+		uint32 startDate2Month,
+		uint32 startDate2Day,
+		uint32 endDate2Year,
+		uint32 endDate2Month,
+		uint32 endDate2Day,
+		uint32 periodInDays);
+
 	void calculateTrend(const char* phrase,
-						uint32 phraseLen,
-					    uint32* points,
-					    uint32 count,
-						uint32 minPage,
-						uint32 maxPage);
-	
+		uint32 phraseLen,
+		uint32* points,
+		uint32 count,
+		uint32 minPage,
+		uint32 maxPage);
+
 	double calculateDistance(const char* word,
-							  uchar8* pLevelBuffer,
-							  uint32 countUsedDocNumbers,
-							  uint32 level,
-							  uint32 minPage,
-							  uint32 maxPage,
-							  uchar8* pSourceBuffer,
-							  ulong64& sourceFilePosition,
-							  uint32& sourceBuffPosition,
-							  uint32& sourceBuffLength);
-	
+		uchar8* pLevelBuffer,
+		uint32 countUsedDocNumbers,
+		uint32 level,
+		uint32 minPage,
+		uint32 maxPage,
+		uchar8* pSourceBuffer,
+		ulong64& sourceFilePosition,
+		uint32& sourceBuffPosition,
+		uint32& sourceBuffLength);
+
 	void FTSInstance::markMatchDocuments(const char* word,
-									 int* pWeightBuffer,
-									 uchar8* pLevelBuffer,
-									 uint32 level,
-									 uint32& countUsedDocNumbers,
-									 uint32& countTotalDocuments,
-									 uint32 minPage,
-									 uint32 maxPage);
+		int* pWeightBuffer,
+		uchar8* pLevelBuffer,
+		uint32 level,
+		uint32& countUsedDocNumbers,
+		uint32& countTotalDocuments,
+		uint32 minPage,
+		uint32 maxPage);
 
 	void FTSInstance::calcMatchDocuments(const char* word,
-									 uchar8* pLevelBuffer,
-									 uint32 level,
-									 uint32& equals,
-									 uint32& notEquals,
-									 uint32 minPage,
-									 uint32 maxPage,
-									 uchar8* pSourceBuffer,
-									 ulong64& sourceFilePosition,
-									 uint32& sourceBuffPosition,
-									 uint32& sourceBuffLength);
-	
+		uchar8* pLevelBuffer,
+		uint32 level,
+		uint32& equals,
+		uint32& notEquals,
+		uint32 minPage,
+		uint32 maxPage,
+		uchar8* pSourceBuffer,
+		ulong64& sourceFilePosition,
+		uint32& sourceBuffPosition,
+		uint32& sourceBuffLength);
+
 	void FTSInstance::searchDistances(WordRaiting& wordRaiting,
-									  Dictionary* dics,
-									  uint32 count,
-									  uint32 minPage,
-									  uint32 maxPage);
-	
+		Dictionary* dics,
+		uint32 count,
+		uint32 minPage,
+		uint32 maxPage);
+
 	void FTSInstance::buildWiki();
 
 	void releaseRelevantResult(RelevantResult* pRelevantResult)
@@ -207,8 +266,8 @@ public:
 
 	bool indexText(const char* name, uint32 nameLen, char* text, uint32 textLen);
 	bool indexText(const char* name,
-				   char* text,
-				   uint32 textLen)	
+		char* text,
+		uint32 textLen)
 	{
 		return indexText(name, strlen(name), text, textLen);
 	}
@@ -218,21 +277,21 @@ public:
 	{
 		return indexHtml(name, strlen(name), text, textLen);
 	}
-	
+
 	void getDocumentNameByID(uint32 id, char* name, uint32 sizeName)
 	{
 		uint32 docHeaderSize = getDocHeaderSize();
-		
-		if(Configuration.InMemoryMode)
+
+		if (Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
 			uint32 offset = (id - docHeaderSize) * Info.DocumentNameSize;
 			documentsName.getDocumentNameByOffset(name, offset, sizeName);
 		}
 		else
 		{
-			if(id < Info.LastNameIDRAM)
+			if (id < Info.LastNameIDRAM)
 			{
-				if(id >= Info.LastNameIDHDD)
+				if (id >= Info.LastNameIDHDD)
 				{
 					//document in ram
 					uint32 offset = (id - Info.LastNameIDHDD) * Info.DocumentNameSize;
@@ -251,52 +310,52 @@ public:
 	bool hasDocumentNameHDD(const char* name, uint32 len, uint32 sizeName)
 	{
 		uint32 offset = DOC_NAME_HEADER_SIZE;
-		
-		for(uint32 i = 0; i < Info.LastNameIDHDD; i++)
+
+		for (uint32 i = 0; i < Info.LastNameIDHDD; i++)
 		{
 			pDocNameFile->read(pBuffer, offset, sizeName);
 
 			//compare string
 			uint32 currIdx = 0;
-			for(; currIdx < len; currIdx++)
+			for (; currIdx < len; currIdx++)
 			{
-				if(name[currIdx] != pBuffer[currIdx])
+				if (name[currIdx] != pBuffer[currIdx])
 				{
 					goto EXIT;
 				}
 			}
 
 			//compare zeros
-			for(; currIdx < sizeName; currIdx++)
+			for (; currIdx < sizeName; currIdx++)
 			{
-				if(pBuffer[currIdx])
+				if (pBuffer[currIdx])
 				{
 					goto EXIT;
 				}
 			}
 
 			return true;
-			
-			EXIT:
+
+		EXIT:
 
 			offset += sizeName;
 		}
-		
+
 		return false;
 	}
 
 	bool hasDocumentName(const char* name, uint32 len)
 	{
 		uint32 docHeaderSize = getDocHeaderSize();
-		
-		if(Configuration.InMemoryMode)
+
+		if (Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
 			return documentsName.hasDocumentName(name, len, Info.DocumentNameSize);
 		}
 		else
 		{
 			return documentsName.hasDocumentName(name, len, Info.DocumentNameSize)
-				   || hasDocumentNameHDD(name, len, Info.DocumentNameSize);
+				|| hasDocumentNameHDD(name, len, Info.DocumentNameSize);
 		}
 	}
 
@@ -320,39 +379,39 @@ public:
 
 		FTSConfiguration configuration;
 		configuration.setIndexPath(path);
-		
+
 		configuration.getDocumentPath(documentPath);
 		configuration.getDocumentNamePath(documentNamePath);
 		configuration.getDocumentTempPath(documentTempPath);
 		configuration.getDocumentNameTempPath(documentNameTempPath);
 
-		if(BinaryFile::existsFile(documentPath))
-		{	
+		if (BinaryFile::existsFile(documentPath))
+		{
 			BinaryFile::deleteFile(documentPath);
 		}
 
-		if(BinaryFile::existsFile(documentNamePath))
+		if (BinaryFile::existsFile(documentNamePath))
 		{
 			BinaryFile::deleteFile(documentNamePath);
 		}
 
-		if(BinaryFile::existsFile(documentTempPath))
+		if (BinaryFile::existsFile(documentTempPath))
 		{
 			BinaryFile::deleteFile(documentTempPath);
 		}
 
-		if(BinaryFile::existsFile(documentNameTempPath))
+		if (BinaryFile::existsFile(documentNameTempPath))
 		{
 			BinaryFile::deleteFile(documentNameTempPath);
 		}
 	}
-	
+
 	void saveIndex();
-	
+
 	void importIndex(const char* path);
 
 	bool isExistsIndex();
-	
+
 	void stopInstance()
 	{
 		destroy();
@@ -361,22 +420,22 @@ public:
 	ulong64 getUsedMemory();
 	ulong64 getTotalMemory();
 	void printTotalMemory();
-	
+
 	bool checkMemory()
 	{
 		//need memory on buffer
 		uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
 		uint32 needOnBufferMemory = HArrayFixPair::calcArrayMemory(Info.CountWordsRAM, countKeySegments) +
-								  HArrayFixPair::calcArrayMemory(Configuration.MaxSizeBuffer, countKeySegments);
+			HArrayFixPair::calcArrayMemory(MAX_SIZE_BUFFER, countKeySegments);
 
-		if(getUsedMemory() + needOnBufferMemory >= Configuration.LimitUsedMemory)
+		if (getUsedMemory() + needOnBufferMemory >= Configuration.LimitUsedMemory)
 		{
 			if (Configuration.AutoSaveIndex)
 			{
-				if (Configuration.InMemoryMode)
+				if (Configuration.MemoryMode == IN_MEMORY_MODE)
 				{
 					logWarning("WARNING: Limit of used memory exceed. InMemoryMode of the server is reset.");
-					Configuration.InMemoryMode = false;
+					Configuration.MemoryMode = HDD_BUFFERED_MEMORY_MODE;
 				}
 
 				this->saveIndex();
@@ -403,21 +462,21 @@ public:
 	}
 
 private:
-	uchar8* pBuffer;
-	uint32* pUsedDocNumbers;
-	uint32* pResultDocNumbers;
-	
+	static uchar8* pBuffer;
+	static uint32* pUsedDocNumbers;
+	static uint32* pResultDocNumbers;
+
 	HArrayFixRAM haWordsRAM;
 	HArrayFixHDD haWordsHDD;
 
 	FTSInstanceInfo Info;
-	char LastErrorMessage[1024]; //last error message in instance
-	
-	BlockMemoryPool* pBlockMemoryPool;
-	DocumentsBlockPool* pDocumentsBlockPool;
-	RelevantResultPool* pRelevantResultPool;
-	PostSelectorPool* pPostSelectorPool;
-	
+	static char LastErrorMessage[1024]; //last error message in instance
+
+	static BlockMemoryPool* pBlockMemoryPool;
+	static DocumentsBlockPool* pDocumentsBlockPool;
+	static RelevantResultPool* pRelevantResultPool;
+	static PostSelectorPool* pPostSelectorPool;
+
 	DocumentsName documentsName;
 
 	BinaryFile* pDocFile;
@@ -431,69 +490,69 @@ private:
 	void initAlphabet()
 	{
 		uchar8 c = 0;
-		while(true)
+		while (true)
 		{
 			alphabet[c] = 0; //by default
 
-			if(Configuration.IsUseEnglishAlphabet)
+			if (Configuration.IsUseEnglishAlphabet)
 			{
-				if((uchar8)'a' <= c && c <= (uchar8)'z') //lower case
+				if ((uchar8)'a' <= c && c <= (uchar8)'z') //lower case
 				{
 					alphabet[c] = c;
 				}
-				else if((uchar8)'A' <= c && c <= (uchar8)'Z') //upper case
+				else if ((uchar8)'A' <= c && c <= (uchar8)'Z') //upper case
 				{
 					alphabet[c] = c + 32;
 				}
-				else if((uchar8)'@' == c || (uchar8)'_' == c || (uchar8)'-' == c) //spec
+				else if ((uchar8)'@' == c || (uchar8)'_' == c || (uchar8)'-' == c) //spec
 				{
 					alphabet[c] = c;
 				}
 			}
 
-			if(Configuration.IsUseRussianAlphabet || Configuration.IsUseUkranianAlphabet)
+			if (Configuration.IsUseRussianAlphabet || Configuration.IsUseUkranianAlphabet)
 			{
-				if(c == (uchar8)'¸' || c == (uchar8)'¨') //convert to "e"
+				if (c == (uchar8)'¸' || c == (uchar8)'¨') //convert to "e"
 				{
 					alphabet[c] = (uchar8)'å';
 				}
-				else if((uchar8)'à' <= c && c <= (uchar8)'ÿ') //lower case
+				else if ((uchar8)'à' <= c && c <= (uchar8)'ÿ') //lower case
 				{
 					alphabet[c] = c;
 				}
-				else if((uchar8)'À' <= c && c <= (uchar8)'ß') //upper case
+				else if ((uchar8)'À' <= c && c <= (uchar8)'ß') //upper case
 				{
 					alphabet[c] = c + 32;
 				}
 			}
 
-			if(Configuration.IsUseUkranianAlphabet)
+			if (Configuration.IsUseUkranianAlphabet)
 			{
-				if(c == (uchar8)'³' || c == (uchar8)'²') //convert to "e"
+				if (c == (uchar8)'³' || c == (uchar8)'²') //convert to "e"
 				{
 					alphabet[c] = (uchar8)'³';
 				}
 
-				if(c == (uchar8)'¿' || c == (uchar8)'¯') //convert to "e"
+				if (c == (uchar8)'¿' || c == (uchar8)'¯') //convert to "e"
 				{
 					alphabet[c] = (uchar8)'¿';
 				}
 
-				if(c == (uchar8)'º' || c == (uchar8)'ª') //convert to "e"
+				if (c == (uchar8)'º' || c == (uchar8)'ª') //convert to "e"
 				{
 					alphabet[c] = (uchar8)'º';
 				}
 			}
 
-			if(Configuration.IsUseNumberAlphabet)
+			if (Configuration.IsUseNumberAlphabet)
 			{
-				if((uchar8)'0' <= c && c <= (uchar8)'9') //lower case
+				if ((uchar8)'0' <= c && c <= (uchar8)'9') //lower case
 				{
 					alphabet[c] = c;
 				}
 			}
 
-			if(c < 255)
+			if (c < 255)
 				c++;
 			else
 				break;
@@ -504,92 +563,80 @@ private:
 	{
 		initAlphabet();
 
-		pBuffer = new uchar8[Configuration.MaxSizeBuffer];
-		memset(pBuffer, 0, Configuration.MaxSizeBuffer);
-
-		pUsedDocNumbers = new uint32[Configuration.MaxSizeBuffer];
-		pResultDocNumbers = new uint32[Configuration.MaxSizeBuffer];
-
 		pDocFile = 0;
 		pDocNameFile = 0;
 
 		pAllKeysAndValuesRAM = 0;
 
 		Info.init(Configuration.WordsHeaderBase,
-				  Configuration.DocmentNameSize,
-				  Configuration.RelevantLevel,
-				  Configuration.CountWordInPhrase,
-				  LastErrorMessage);
+			Configuration.DocmentNameSize,
+			Configuration.RelevantLevel,
+			Configuration.CountWordInPhrase,
+			LastErrorMessage);
 
-		this->pBlockMemoryPool = new BlockMemoryPool(Info.LastErrorMessage);
-		this->pPostSelectorPool = new PostSelectorPool(Info.LastErrorMessage);
-		this->pDocumentsBlockPool = new DocumentsBlockPool(pBlockMemoryPool, pPostSelectorPool, Info.LastErrorMessage);
-		this->pRelevantResultPool = new RelevantResultPool(Info.LastErrorMessage);
+		if (Configuration.MemoryMode == IN_MEMORY_MODE)
+		{
+			initDictionaryRAM();
+		}
 
 		char indexPath[1024];
 		Configuration.getIndexPath(indexPath);
-
-		haWordsRAM.init(indexPath,
-						"",
-						Configuration.AutoStemmingOn, 
-						4, 
-						Configuration.WordsHeaderBase);
-
+		
 		haWordsHDD.init(indexPath,
-						"",
-						Configuration.AutoStemmingOn, 
-						4, 
-						Configuration.WordsHeaderBase);
+			"",
+			Configuration.AutoStemmingOn,
+			4,
+			Configuration.WordsHeaderBase);
 	}
 
-	inline void indexWord(char* word, 
-						  uint32& len,
-						  uint32 docID);
+	inline void indexWord(char* word,
+		uint32& len,
+		uint32 docID);
 	void rebuildIndex();
-	
+
 	void moveDocFileBlocks(BinaryFile* pSourceDocFile,
-							BinaryFile* pDestDocFile,
-								
-							uchar8* pSourceBuffer,
-							uchar8* pDestBuffer,
+		BinaryFile* pDestDocFile,
 
-							ulong64& sourceFilePosition,
-							uint32& sourceBuffPosition,
-							uint32& sourceBuffLength,
+		uchar8* pSourceBuffer,
+		uchar8* pDestBuffer,
 
-							uint32& destBuffPosition,
-							uint32& destBuffLength,
-						
-							uint32 maxSizeBuffer,
-						
-							uint32 baseDocNumber,
-							uint32& lastDocNumber,
-								
-							uint32 maxLastNameID)
+		ulong64& sourceFilePosition,
+		uint32& sourceBuffPosition,
+		uint32& sourceBuffLength,
+
+		uint32& destBuffPosition,
+		uint32& destBuffLength,
+
+		uint32 maxSizeBuffer,
+
+		uint32 baseDocNumber,
+		uint32& lastDocNumber,
+
+		uint32 maxLastNameID)
 	{
 		bool isFirstIteration = true;
 
-		while(true)
+		while (true)
 		{
 			//1. Read data from file to buffer
-			if(sourceBuffLength == 0 || sourceBuffPosition + 128 >= Configuration.MaxSizeBuffer)
+			if (sourceBuffLength == 0 || sourceBuffPosition + 128 >= MAX_SIZE_BUFFER)
 			{
 				//read new data from file
 				sourceFilePosition += sourceBuffPosition;
-				sourceBuffLength = pSourceDocFile->read(pSourceBuffer, sourceFilePosition, Configuration.MaxSizeBuffer); 
+				sourceBuffLength = pSourceDocFile->read(pSourceBuffer, sourceFilePosition, MAX_SIZE_BUFFER);
 
 				sourceBuffPosition = 0;
 
-				if(!sourceBuffLength)
+				if (!sourceBuffLength)
 				{
 					return;
 				}
 			}
 
 			//2. Write data to file from buffer
-			if(destBuffPosition + 128 >= destBuffLength)
+			if (destBuffPosition + 128 >= destBuffLength)
 			{
-				pDestDocFile->write(pDestBuffer, destBuffPosition); 
+				pDestDocFile->write(pDestBuffer, destBuffPosition);
 
 				destBuffPosition = 0;
 			}
@@ -597,60 +644,60 @@ private:
 			//3. Create header
 			uchar8 header = pSourceBuffer[sourceBuffPosition++];
 
-			uint32 leftHeaderPart  = (header>>6);
-			uint32 rightHeaderPart = (header&0x3F);
+			uint32 leftHeaderPart = (header >> 6);
+			uint32 rightHeaderPart = (header & 0x3F);
 
 			uint32 deltaDocNumber = 0;
 
-			if(isFirstIteration)
+			if (isFirstIteration)
 			{
 				//read old number
-				if(leftHeaderPart == 2)
+				if (leftHeaderPart == 2)
 				{
 					deltaDocNumber = baseDocNumber + rightHeaderPart - lastDocNumber;
-					
+
 					rightHeaderPart = 1; //reset, because is coded one number
 				}
 				else
 				{
 					uint32 sizeNumber = sourceBuffPosition + leftHeaderPart + 1;
-		
+
 					uint32 firstDocNumber = 0;
-					while(sourceBuffPosition<sizeNumber)
+					while (sourceBuffPosition < sizeNumber)
 					{
-						firstDocNumber = (firstDocNumber<<8) | pSourceBuffer[sourceBuffPosition++];
+						firstDocNumber = (firstDocNumber << 8) | pSourceBuffer[sourceBuffPosition++];
 					}
 
 					deltaDocNumber = baseDocNumber + firstDocNumber - lastDocNumber;
 				}
 
 				//save new number
-				if(deltaDocNumber < 64)
+				if (deltaDocNumber < 64)
 				{
-					pDestBuffer[destBuffPosition++] = (2<<6) | deltaDocNumber;
+					pDestBuffer[destBuffPosition++] = (2 << 6) | deltaDocNumber;
 				}
-				else if(deltaDocNumber < MAX_CHAR)
+				else if (deltaDocNumber < MAX_CHAR)
 				{
 					pDestBuffer[destBuffPosition++] = rightHeaderPart;
 					pDestBuffer[destBuffPosition++] = deltaDocNumber;
 
 					deltaDocNumber += (rightHeaderPart - 1);
 				}
-				else if(deltaDocNumber < MAX_SHORT)
+				else if (deltaDocNumber < MAX_SHORT)
 				{
-					pDestBuffer[destBuffPosition++] = (1<<6) | rightHeaderPart;
-					pDestBuffer[destBuffPosition++] = (deltaDocNumber>>8);
-					pDestBuffer[destBuffPosition++] = (deltaDocNumber&0xFF);
+					pDestBuffer[destBuffPosition++] = (1 << 6) | rightHeaderPart;
+					pDestBuffer[destBuffPosition++] = (deltaDocNumber >> 8);
+					pDestBuffer[destBuffPosition++] = (deltaDocNumber & 0xFF);
 
 					deltaDocNumber += (rightHeaderPart - 1);
 				}
 				else
 				{
-					pDestBuffer[destBuffPosition++] = (3<<6) | rightHeaderPart;
-					pDestBuffer[destBuffPosition++] = (deltaDocNumber>>24);
-					pDestBuffer[destBuffPosition++] = (deltaDocNumber<<8>>24);
-					pDestBuffer[destBuffPosition++] = (deltaDocNumber<<16>>24);
-					pDestBuffer[destBuffPosition++] = (deltaDocNumber&0xFF);
+					pDestBuffer[destBuffPosition++] = (3 << 6) | rightHeaderPart;
+					pDestBuffer[destBuffPosition++] = (deltaDocNumber >> 24);
+					pDestBuffer[destBuffPosition++] = (deltaDocNumber << 8 >> 24);
+					pDestBuffer[destBuffPosition++] = (deltaDocNumber << 16 >> 24);
+					pDestBuffer[destBuffPosition++] = (deltaDocNumber & 0xFF);
 
 					deltaDocNumber += (rightHeaderPart - 1);
 				}
@@ -660,7 +707,7 @@ private:
 			else
 			{
 				//read old header
-				if(leftHeaderPart == 2)
+				if (leftHeaderPart == 2)
 				{
 					pDestBuffer[destBuffPosition++] = header;
 
@@ -672,10 +719,10 @@ private:
 
 					//read document number
 					uint32 sizeNumber = sourceBuffPosition + leftHeaderPart + 1;
-					while(sourceBuffPosition < sizeNumber)
+					while (sourceBuffPosition < sizeNumber)
 					{
 						uchar8 byte = (uchar8)pSourceBuffer[sourceBuffPosition++];
-						deltaDocNumber = (deltaDocNumber<<8) | byte;
+						deltaDocNumber = (deltaDocNumber << 8) | byte;
 						pDestBuffer[destBuffPosition++] = byte;
 					}
 
@@ -684,37 +731,37 @@ private:
 			}
 
 			lastDocNumber += deltaDocNumber;
-			
-			if(lastDocNumber > maxLastNameID)
+
+			if (lastDocNumber > maxLastNameID)
 			{
 				logError("Format corrupted !");
 				return;
 			}
 
-			if(!pSourceBuffer[sourceBuffPosition]) //is last
+			if (!pSourceBuffer[sourceBuffPosition]) //is last
 			{
 				//pDestBuffer[destBuffPosition++] = 0;
 				sourceBuffPosition++; //with null terminated
 				return;
 			}
 		}
-		
+
 		return;
 	}
 
 	void moveDocNameFileBlocks(BinaryFile* pSourceDocNameFile,
-							   BinaryFile* pDestDocNameFile,
-							   ulong64& sourceFilePosition,
-							   uchar8* pBuffer,
-							   uint32 maxSizeBuffer)
+		BinaryFile* pDestDocNameFile,
+		ulong64& sourceFilePosition,
+		uchar8* pBuffer,
+		uint32 maxSizeBuffer)
 	{
-		while(true)
+		while (true)
 		{
-			uint32 buffLength = pSourceDocNameFile->read(pBuffer, sourceFilePosition, maxSizeBuffer); 
+			uint32 buffLength = pSourceDocNameFile->read(pBuffer, sourceFilePosition, maxSizeBuffer);
 
-			pDestDocNameFile->write(pBuffer, buffLength); 
-			
-			if(buffLength == maxSizeBuffer)
+			pDestDocNameFile->write(pBuffer, buffLength);
+
+			if (buffLength == maxSizeBuffer)
 			{
 				sourceFilePosition += buffLength;
 			}
@@ -723,23 +770,23 @@ private:
 				break;
 			}
 		}
-		
+
 		return;
 	}
 
 	void moveDocNameFileBlocksToRAM(BinaryFile* pSourceDocNameFile,
-									DocumentsName* pDocumentsName,
-								    ulong64& sourceFilePosition,
-									uchar8* pBuffer,
-									uint32 maxSizeBuffer)
+		DocumentsName* pDocumentsName,
+		ulong64& sourceFilePosition,
+		uchar8* pBuffer,
+		uint32 maxSizeBuffer)
 	{
-		while(true)
+		while (true)
 		{
-			uint32 buffLength = pSourceDocNameFile->read(pBuffer, sourceFilePosition, maxSizeBuffer); 
+			uint32 buffLength = pSourceDocNameFile->read(pBuffer, sourceFilePosition, maxSizeBuffer);
 
-			documentsName.addBytes(pBuffer, buffLength); 
-			
-			if(buffLength == maxSizeBuffer)
+			documentsName.addBytes(pBuffer, buffLength);
+
+			if (buffLength == maxSizeBuffer)
 			{
 				sourceFilePosition += buffLength;
 			}
@@ -748,7 +795,7 @@ private:
 				break;
 			}
 		}
-		
+
 		return;
 	}
 
@@ -760,11 +807,11 @@ private:
 	void logWarning(const char* text, uint32 param);
 	void logWarning(const char* text);
 	void checkKeyAndValue(const char* text,
-						  ulong64 prevKey,
-						  ulong64 currKey,
-						  uint32 currValue,
-						  uint32 maxValue);
-	
+		ulong64 prevKey,
+		ulong64 currKey,
+		uint32 currValue,
+		uint32 maxValue);
+
 	//=========================== SAVE ==================================
 	uint32 getRecoveryIndexState();
 	void recoveryIndex();
@@ -772,7 +819,7 @@ private:
 
 	void createIndex();
 	void updateIndex();
-	
+
 	void openIndex(bool onlyCheckIndex);
 	void openOrCreateIndex(bool onlyCheckIndex);
 
@@ -780,14 +827,14 @@ private:
 
 	void openDocIndex()
 	{
-		if(!pDocFile)
+		if (!pDocFile)
 		{
 			char documentPath[1024];
 
 			Configuration.getDocumentPath(documentPath);
 
 			pDocFile = new BinaryFile(documentPath, true, false);
-			if(!pDocFile->open())
+			if (!pDocFile->open())
 			{
 				pDocFile = 0;
 			}
@@ -796,14 +843,14 @@ private:
 
 	void openDocNameIndex()
 	{
-		if(!pDocNameFile)
+		if (!pDocNameFile)
 		{
 			char documentNamePath[1024];
 
 			Configuration.getDocumentNamePath(documentNamePath);
 
 			pDocNameFile = new BinaryFile(documentNamePath, true, false);
-			if(!pDocNameFile->open())
+			if (!pDocNameFile->open())
 			{
 				pDocNameFile = 0;
 			}
@@ -817,7 +864,7 @@ private:
 
 	void closeDocIndex()
 	{
-		if(pDocFile)
+		if (pDocFile)
 		{
 			pDocFile->close();
 
@@ -829,13 +876,28 @@ private:
 
 	void closeDocNameIndex()
 	{
-		if(pDocNameFile)
+		if (pDocNameFile)
 		{
 			pDocNameFile->close();
 
 			delete pDocNameFile;
 
 			pDocNameFile = 0;
+		}
+	}
+
+	void initDictionaryRAM()
+	{
+		if (!haWordsRAM.pHeader)
+		{
+			char indexPath[1024];
+			Configuration.getIndexPath(indexPath);
+
+			haWordsRAM.init(indexPath,
+				"",
+				Configuration.AutoStemmingOn,
+				4,
+				Configuration.WordsHeaderBase);
 		}
 	}
 
@@ -848,48 +910,6 @@ private:
 		closeDocNameIndex();
 
 		haWordsRAM.destroy();
-		haWordsHDD.destroy();
-
-		if(pBuffer)
-		{
-			delete[] pBuffer;
-			pBuffer = 0;
-		}
-
-		if(pUsedDocNumbers)
-		{
-			delete[] pUsedDocNumbers;
-			pUsedDocNumbers = 0;
-		}
-
-		if(pResultDocNumbers)
-		{
-			delete[] pResultDocNumbers;
-			pResultDocNumbers = 0;
-		}
-
-		if(pBlockMemoryPool)
-		{
-			delete pBlockMemoryPool;
-			pBlockMemoryPool = 0;
-		}
-
-		if(pDocumentsBlockPool)
-		{
-			delete pDocumentsBlockPool;
-			pDocumentsBlockPool = 0;
-		}
-
-		if(pRelevantResultPool)
-		{
-			delete pRelevantResultPool;
-			pRelevantResultPool = 0;
-		}
-
-		if(pPostSelectorPool)
-		{
-			delete pPostSelectorPool;
-			pPostSelectorPool = 0;
-		}
+		haWordsHDD.destroy();		
 	}
 };

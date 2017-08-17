@@ -10,8 +10,6 @@ public:
 		MaxLenWord = 64;
 		AutoStemmingOn = 8; //change HArrayFixPair
 
-		MaxSizeBuffer = 10000000;
-		
 		WordsHeaderBase = 24;
 		DocmentNameSize = 64;
 
@@ -23,7 +21,7 @@ public:
 		LimitTopResults = 100;
 		LimitUsedMemory = 8000000000; //8000 má by default
 
-		InMemoryMode = false;
+		MemoryMode = 2;
 
 		RelevantLevel = 0;
 
@@ -106,8 +104,6 @@ public:
 	uint32 MaxLenWord;
 	uint32 AutoStemmingOn;
 
-	uint32 MaxSizeBuffer;
-	
 	uint32 WordsHeaderBase;
 	
 	uint32 DocmentNameSize;
@@ -127,8 +123,11 @@ public:
 
 	bool IsCustomPath;
 	
-	bool InMemoryMode;
-
+	//const uint32 IN_MEMORY_MODE = 1;
+	//const uint32 HDD_MEMORY_MODE = 2;
+	//const uint32 HDD_BUFFERED_MEMORY_MODE = 3;
+	uint32 MemoryMode;
+	
 	bool IsUseUkranianAlphabet;
 	bool IsUseRussianAlphabet;
 	bool IsUseEnglishAlphabet;

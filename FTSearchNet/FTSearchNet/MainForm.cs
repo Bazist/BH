@@ -625,7 +625,11 @@ namespace FTSearchNet
         private void button2_Click(object sender, EventArgs e)
         {
             if (!fts.IsStarted)
+            {
+                fts.MemoryMode = FTSearch.MemoryMode.HDD;
+
                 fts.Start();
+            }
 
             this.UpdateInstanceInfo(fts);
 

@@ -61,4 +61,8 @@ const uint32 DOC_NAME_HEADER_SIZE = 8;
 const uint32 MIN_RELEVANT_BLOCK = 64;
 
 const uint32 BIN_FILE_BUFFER_SIZE = 1024 * 1024 * 1024;
+const uint32 MAX_SIZE_BUFFER = 10 * 1024 * 1024; //10mb
 
+const uint32 IN_MEMORY_MODE = 1;
+const uint32 HDD_MEMORY_MODE = 2;
+const uint32 HDD_BUFFERED_MEMORY_MODE = 3;
