@@ -27,7 +27,7 @@ namespace FTSearchNet
         private Stopwatch indexedTime = new Stopwatch();
         private Stopwatch totalTime = new Stopwatch();
 
-        private const string FTS_PATH = @"H:\FTS_Merged";
+        private const string FTS_PATH = @"C:\FTS";
         
         private FTService fts = new FTService(FTS_PATH);
 
@@ -346,7 +346,7 @@ namespace FTSearchNet
             DirectoryInfo di = new DirectoryInfo(currPath);
             foreach (DirectoryInfo subDi in di.GetDirectories("*", SearchOption.AllDirectories))
             {
-                res = res | IndexFiles(fts, rootPath, subDi.FullName);
+                res |= IndexFiles(fts, rootPath, subDi.FullName);
             }
 
             foreach (FileInfo fi in di.GetFiles())
@@ -396,7 +396,7 @@ namespace FTSearchNet
 
                         readTime.Stop();
 
-                        this.IndexFile(fi.FullName, text);
+                        res |= this.IndexFile(fi.FullName, text);
                     }
                     else
                     {

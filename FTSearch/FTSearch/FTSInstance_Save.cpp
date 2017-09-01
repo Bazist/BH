@@ -1396,6 +1396,12 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 
 	closeDocNameIndex();
 
+	char indexPath[1024];
+	Configuration.getIndexPath(indexPath);
+
+	//create if not exists
+	BinaryFile::createDirectory(indexPath);
+
 	//dictionary
 	if(Configuration.MemoryMode == IN_MEMORY_MODE ||
 	   Configuration.MemoryMode == HDD_MEMORY_MODE)

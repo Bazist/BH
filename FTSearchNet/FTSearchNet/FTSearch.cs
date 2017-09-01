@@ -394,9 +394,11 @@ namespace FTSearchNet
         private static extern void clearInstanceDLL(System.UInt32 instanceNumber);
 
         [DllImport(DLL_PATH, EntryPoint = "indexText", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private unsafe static extern bool indexTextDLL(System.UInt32 instanceNumber, byte* name, System.UInt32 nameLen, byte* text, System.UInt32 textLen);
 
         [DllImport(DLL_PATH, EntryPoint = "indexHtml", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private unsafe static extern bool indexHtmlDLL(System.UInt32 instanceNumber, byte* name, System.UInt32 nameLen, byte* text, System.UInt32 textLen);
 
         [DllImport(DLL_PATH, EntryPoint = "saveIndex", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
@@ -406,6 +408,7 @@ namespace FTSearchNet
         private unsafe static extern void importIndexDLL(System.UInt32 instanceNumber, byte* importPath, bool isDeleteImportedIndex);
 
         [DllImport(DLL_PATH, EntryPoint = "saveIndex", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private unsafe static extern bool isNameExistsDLL(System.UInt32 instanceNumber, byte* name, System.UInt32 nameLen);
 
 
