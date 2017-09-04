@@ -5,16 +5,52 @@ VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTSearchWeb", "FTSearchWeb\FTSearchWeb.csproj", "{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FTSearch", "..\FTSearch\FTSearch\FTSearch.vcxproj", "{69A1675E-C3BB-4E6A-9E40-094F383A5D26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTSearchNet", "..\FTSearchNet\FTSearchNet\FTSearchNet.csproj", "{0CAEF305-E916-423F-A67A-8EAF9780D1FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Debug|x64.Build.0 = Debug|Any CPU
+		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Debug|x86.Build.0 = Debug|Any CPU
 		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Release|x64.ActiveCfg = Release|Any CPU
+		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Release|x64.Build.0 = Release|Any CPU
+		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Release|x86.ActiveCfg = Release|Any CPU
+		{AF4ADD23-9FBF-4A86-A09F-B36889384FB6}.Release|x86.Build.0 = Release|Any CPU
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Debug|x64.ActiveCfg = Debug|x64
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Debug|x64.Build.0 = Debug|x64
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Debug|x86.ActiveCfg = Debug|Win32
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Debug|x86.Build.0 = Debug|Win32
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Release|Any CPU.ActiveCfg = Release|Win32
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Release|x64.ActiveCfg = Release|x64
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Release|x64.Build.0 = Release|x64
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Release|x86.ActiveCfg = Release|Win32
+		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Release|x86.Build.0 = Release|Win32
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Debug|x64.ActiveCfg = Debug|x64
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Debug|x64.Build.0 = Debug|x64
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Debug|x86.ActiveCfg = Debug|x86
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Debug|x86.Build.0 = Debug|x86
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Release|Any CPU.ActiveCfg = Release|x86
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Release|x64.ActiveCfg = Release|x64
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Release|x64.Build.0 = Release|x64
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Release|x86.ActiveCfg = Release|x86
+		{0CAEF305-E916-423F-A67A-8EAF9780D1FC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
