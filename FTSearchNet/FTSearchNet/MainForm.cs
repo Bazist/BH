@@ -29,7 +29,7 @@ namespace FTSearchNet
 
         private const string FTS_PATH = @"C:\FTS";
         
-        private FTService fts = new FTService(FTS_PATH);
+        private FTService fts = new FTService();
 
         private void UpdateScanSpeed()
         {
@@ -600,7 +600,7 @@ namespace FTSearchNet
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            InitReadConsole();
+            //InitReadConsole();
 
             //ThreadPool.QueueUserWorkItem(x =>
             //           {
@@ -610,6 +610,10 @@ namespace FTSearchNet
             //                   Thread.Sleep(3000);
             //               }
             //           });
+
+            fts.SetConfiguration(fts.GetDefaultConfiguration());
+
+            FTService.StartWebservice();
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -624,9 +628,11 @@ namespace FTSearchNet
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (!fts.IsStarted)
+            if (!fts.IsStarted())
             {
-                fts.MemoryMode = FTSearch.MemoryMode.HDD;
+                var conf = fts.GetConfiguration();
+                conf.MemoryMode = (uint)FTSearch.MemoryMode.HDD;
+                fts.SetConfiguration(conf);
 
                 fts.Start();
             }

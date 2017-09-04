@@ -5,15 +5,14 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Net;
+using System.ServiceModel;
 
 namespace FTSearchNet
 {
     public class FTSearch
     {
-
-        public FTSearch(System.UInt32 instanceNumber)
+        public FTSearch()
         {
-            InstanceNumber = instanceNumber;
         }
 
         private System.UInt32 InstanceNumber { get; set; }
@@ -423,17 +422,9 @@ namespace FTSearchNet
 
         #region Methods
 
-        public unsafe void StartInstance(string path,
-                                         MemoryMode memoryMode,
-                                         uint autoStemmingOn,
-                                         uint minLenWord,
-                                         uint maxLenWord,
-                                         uint documentNameSize,
-                                         uint countWordInPhrase,
-                                         bool isUseNumberAlphabet,
-                                         bool onlyCheckIndex,
-                                         bool autoSaveIndex)
+        public unsafe void StartInstance(ConfigurationDLL configuration)
         {
+            /*
             ConfigurationDLL configuration = new ConfigurationDLL();
 
             byte[] indexPath = new byte[1024];
@@ -459,8 +450,11 @@ namespace FTSearchNet
             configuration.IsCreateNewInstanceOnUpdate = false;
             configuration.IsCustomPath = false;
             configuration.AutoSaveIndex = autoSaveIndex;
+            */
 
-            startInstanceDLL(configuration, onlyCheckIndex);
+            InstanceNumber = configuration.InstanceNumber;
+
+            startInstanceDLL(configuration, false);
         }
 
         public void StopInstance()
@@ -991,7 +985,7 @@ namespace FTSearchNet
 
             return PageContent;
         }
-
+        
         #endregion
     }
 }

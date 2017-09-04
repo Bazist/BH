@@ -55,6 +55,10 @@ namespace FTSearchWeb
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            BH.FTServiceClient fts = new BH.FTServiceClient();
+            
+            fts.StartAsync(0);
         }
     }
 }

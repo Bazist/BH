@@ -11,50 +11,50 @@ namespace FTSearchNet
     [ServiceContract]
     public class FTService
     {
-        public List<FTSearch> Instances = new List<FTSearch>();
-        public long MaxSizeActiveInstance = 10L * 1024 * 1024 * 1024;
+        #region Members
 
-        public FTSearch ActiveInstance = null;
+        private List<FTSearch> Instances = new List<FTSearch>();
 
-        public string Path { get; set; }
+        private long MaxSizeActiveInstance = 10L * 1024 * 1024 * 1024;
 
-        public FTSearch.MemoryMode MemoryMode { get; set; }
-        public uint AutoStemmingOn { get; set; }
-        public uint MinLenWord { get; set; }
-        public uint MaxLenWord { get; set; }
-        public uint DocumentNameSize { get; set; }
-        public uint CountWordInPhrase { get; set; }
-        public bool IsUseNumberAlphabet { get; set; }
-        public bool IsStarted
+        private FTSearch ActiveInstance = null;
+
+        private FTSearch.ConfigurationDLL _configuration;
+
+        private static ServiceHost _host;
+        private static FTSearch _ftSearch;
+        
+        #endregion
+
+        #region Constructors
+
+        public FTService()
         {
-            get
-            {
-                return Instances.Count > 0;
-            }
-        }
-
-        public FTService(string path)
-        {
-            Path = path;
-
             Instances = new List<FTSearch>();
 
-            MemoryMode = FTSearch.MemoryMode.HDD;
-            AutoStemmingOn = 12;
-            MinLenWord = 3;
-            MaxLenWord = 64;
-            DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
-            CountWordInPhrase = 1;
-            IsUseNumberAlphabet = true;
+            _configuration = GetDefaultConfiguration();
         }
 
-        private FTSearch.ConfigurationDLL Configuration { get; set; }
+        #endregion
+
+        #region Methods
+
+        [OperationContract]
+        public bool IsStarted()
+        {
+            return Instances.Count > 0;
+        }
+
+        private string GetPath()
+        {
+            return Encoding.ASCII.GetString(GetConfiguration().IndexPath);
+        }
 
         private Tuple<string, long>[] GetInstances(int instanceNumber = 0)
         {
             string template = "Instance" + (instanceNumber > 0 ? instanceNumber.ToString() : string.Empty);
 
-            var dirs = Directory.GetDirectories(Path).Where(x => x.Contains(template)).ToArray();
+            var dirs = Directory.GetDirectories(GetPath()).Where(x => x.Contains(template)).ToArray();
 
             var dirsLen = dirs.Select(x => new Tuple<string, long>(x, Directory.GetFiles(x).Sum(y => new FileInfo(y).Length)));
 
@@ -64,9 +64,56 @@ namespace FTSearchNet
         }
 
         [OperationContract]
+        public FTSearch.ConfigurationDLL GetConfiguration()
+        {
+            return _configuration;
+        }
+
+        [OperationContract]
+        public FTSearch.ConfigurationDLL GetDefaultConfiguration()
+        {
+            FTSearch.ConfigurationDLL conf = new FTSearch.ConfigurationDLL();
+
+            string path = @"C:\FTS";
+
+            byte[] indexPath = new byte[1024];
+            Array.Copy(Encoding.ASCII.GetBytes(path), indexPath, path.Length);
+
+            conf.IndexPath = indexPath;
+
+            conf.MemoryMode = (uint)FTSearch.MemoryMode.HDD;
+            conf.AutoStemmingOn = 12;
+            conf.MinLenWord = 3;
+            conf.MaxLenWord = 64;
+            conf.DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
+            conf.CountWordInPhrase = 1;
+            conf.IsUseNumberAlphabet = true;
+            
+            conf.InstanceNumber = 1;
+            conf.IsUseRussianAlphabet = true;
+            conf.IsUseUkranianAlphabet = true;
+            conf.IsUseEnglishAlphabet = true;
+            conf.WordsHeaderBase = 24;
+            conf.LimitTopResults = 100;
+            conf.LimitUsedMemory = 8000000000; //8000 má by default
+            conf.RelevantLevel = 0;
+            conf.IsCreateNewInstanceOnUpdate = false;
+            conf.IsCustomPath = false;
+            conf.AutoSaveIndex = false;
+
+            return conf;
+        }
+
+        [OperationContract]
+        public void SetConfiguration(FTSearch.ConfigurationDLL configuration)
+        {
+            _configuration = configuration;
+        }
+
+        [OperationContract]
         public void Start(int instanceNumber = 0)
         {
-            if (IsStarted)
+            if (IsStarted())
                 Stop();
 
             var dirsLenSort = GetInstances(instanceNumber);
@@ -81,9 +128,13 @@ namespace FTSearchNet
 
                 UInt32 currInstanceNumber = uint.Parse(instance);
 
-                FTSearch fts = new FTSearch(currInstanceNumber);
+                FTSearch fts = new FTSearch();
 
-                fts.StartInstance(Path, MemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
+                var conf = GetConfiguration();
+
+                conf.InstanceNumber = currInstanceNumber;
+                
+                fts.StartInstance(conf);
 
                 Instances.Add(fts);
 
@@ -100,9 +151,13 @@ namespace FTSearchNet
 
             if (ActiveInstance == null)
             {
-                FTSearch fts = new FTSearch(maxInstanceNumber + 1);
+                FTSearch fts = new FTSearch();
 
-                fts.StartInstance(Path, MemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
+                var conf = GetConfiguration();
+
+                conf.InstanceNumber = maxInstanceNumber + 1;
+
+                fts.StartInstance(conf);
 
                 Instances.Add(fts);
 
@@ -197,9 +252,13 @@ namespace FTSearchNet
 
                         UInt32 instanceNumber = uint.Parse(instance);
 
-                        FTSearch fts = new FTSearch(instanceNumber);
+                        FTSearch fts = new FTSearch();
 
-                        fts.StartInstance(Path, MemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, false, false);
+                        var conf = GetConfiguration();
+
+                        conf.InstanceNumber = instanceNumber;
+
+                        fts.StartInstance(conf);
 
                         fts.ImportIndex(path2);
 
@@ -239,17 +298,19 @@ namespace FTSearchNet
 
                 UInt32 instanceNumber = uint.Parse(instance);
 
-                FTSearch fts = new FTSearch(instanceNumber);
+                FTSearch fts = new FTSearch();
 
-                fts.StartInstance(Path, MemoryMode, AutoStemmingOn, MinLenWord, MaxLenWord, DocumentNameSize, CountWordInPhrase, IsUseNumberAlphabet, true, false);
+                var conf = GetConfiguration();
+
+                conf.InstanceNumber = instanceNumber;
+                //conf.OnlyCheckIndex = false;
+
+                fts.StartInstance(conf);
 
                 fts.StopInstance();
             }
         }
-
-        private static ServiceHost _host;
-        public static FTSearch _ftSearch;
-
+        
         public static void StartWebservice()
         {
             Type serviceType = typeof(FTService);
@@ -263,5 +324,7 @@ namespace FTSearchNet
             _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
             _host.Open();
         }
+
+        #endregion
     }
 }
