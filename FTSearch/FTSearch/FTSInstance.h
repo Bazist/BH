@@ -152,13 +152,14 @@ public:
 
 	RelevantResult* searchPhrase(const char* phrase)
 	{
-		return searchPhrase(phrase, strlen(phrase), 0, MAX_INT);
+		return searchPhrase(phrase, strlen(phrase), 0, MAX_INT, 0);
 	}
 
 	RelevantResult* searchPhrase(const char* phrase,
 		uint32 phraseLen,
 		uint32 minPage,
-		uint32 maxPage);
+		uint32 maxPage,
+		uint32 skip);
 
 	RelevantResult* searchHtmlSeldomWords(char* text,
 		uint32 textLen);

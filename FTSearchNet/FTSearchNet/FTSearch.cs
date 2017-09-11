@@ -253,6 +253,7 @@ namespace FTSearchNet
             public RelevantResultNameDLL[] Matches;
 
             public System.UInt32 CountMatches;
+            public System.UInt32 FullCountMatches;
         }
 
         public struct MatchPositionsDLL
@@ -364,7 +365,7 @@ namespace FTSearchNet
         private static extern IntPtr getInfoDLL(System.UInt32 instanceNumber);
 
         [DllImport(DLL_PATH, EntryPoint = "searchPhrase", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static unsafe extern IntPtr searchPhraseDLL(System.UInt32 instanceNumber, byte* phrase, System.UInt32 phraseLen, System.UInt32 minPage, System.UInt32 maxPage);
+        private static unsafe extern IntPtr searchPhraseDLL(System.UInt32 instanceNumber, byte* phrase, System.UInt32 phraseLen, System.UInt32 minPage, System.UInt32 maxPage, uint skip);
 
         [DllImport(DLL_PATH, EntryPoint = "searchPhraseRel", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static unsafe extern IntPtr searchPhraseRelDLL(System.UInt32 instanceNumber, byte* phrase, System.UInt32 phraseLen, System.UInt32 minPage, System.UInt32 maxPage);
@@ -671,7 +672,7 @@ namespace FTSearchNet
 
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase), pName = nameBytes)
             {
-                IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage);
+                IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage, 0);
 
                 RelevantResultDLL relevantResultDLL = (RelevantResultDLL)Marshal.PtrToStructure(pRelevantResult, typeof(RelevantResultDLL));
 
@@ -689,15 +690,23 @@ namespace FTSearchNet
             return results;
         }
 
-        public unsafe List<Result> SearchPhrase(string phrase, uint minPage, uint maxPage)
+        public class SearchResult
         {
-            List<Result> results = new List<Result>();
+            public List<Result> Results = new List<Result>();
+            public uint FullCountMatches = 0;
+        }
+
+        public unsafe SearchResult SearchPhrase(string phrase, uint minPage, uint maxPage, uint skip)
+        {
+            SearchResult sr = new SearchResult();
             
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase))
             {
-                IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage);
+                IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage, skip);
 
                 RelevantResultDLL relevantResultDLL = (RelevantResultDLL)Marshal.PtrToStructure(pRelevantResult, typeof(RelevantResultDLL));
+
+                sr.FullCountMatches = relevantResultDLL.FullCountMatches;
 
                 for (uint i = 0; i < relevantResultDLL.CountMatches; i++)
                 {
@@ -731,7 +740,7 @@ namespace FTSearchNet
                     //    }
                     //}
 
-                    results.Add(result);
+                    sr.Results.Add(result);
                 }
 
                 //if (false)
@@ -748,7 +757,7 @@ namespace FTSearchNet
                 //Marshal.Release(pRelevantResult);
             }
 
-            return results;
+            return sr;
         }
 
         public unsafe void ImportIndex(string importPath, bool isDeleteImportedIndex = true)

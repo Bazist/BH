@@ -54,7 +54,8 @@ public:
 		RelevantResult* pRelevantResult = pFreeRelevantResultLists[page][index];
 		pRelevantResult->MatchWords[0] = 0;
 		pRelevantResult->CountMatches = 0;
-		
+		pRelevantResult->FullCountMatches = 0;
+
 		Count++;
 
 		return pRelevantResult;

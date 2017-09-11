@@ -639,7 +639,7 @@ namespace FTSearchNet
 
             this.UpdateInstanceInfo(fts);
 
-            var results = fts.SearchPhrase(tbSearchText.Text);
+            var results = fts.SearchPhrase(tbSearchText.Text, 0, 25);
 
             rtbLog.Clear();
 

@@ -50,16 +50,18 @@ RelevantResult* searchPhrase(uint32 instanceNumber,
 							 const char* phrase,
 							 uint32 phraseLen,
 							 uint32 minPage,
-							 uint32 maxPage)
+							 uint32 maxPage,
+							 uint32 skip)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
 		if (instances[i]->Configuration.InstanceNumber == instanceNumber)
 		{
 			return instances[i]->searchPhrase(phrase,
-				phraseLen,
-				minPage,
-				maxPage);
+												phraseLen,
+												minPage,
+												maxPage,
+												skip);
 		}
 	}
 }

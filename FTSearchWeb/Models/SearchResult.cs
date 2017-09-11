@@ -8,6 +8,12 @@ namespace FTSearchWeb.Model
 {
     public class SearchResult
     {
+        public const int PAGE_SIZE = 25;
+
+        public int StartPage { get; set; }
+
+        public int CurrentPage { get; set; }
+
         public string Phrase { get; set; }
         public BH.FTSearchResult[] Results { get; set; }
 

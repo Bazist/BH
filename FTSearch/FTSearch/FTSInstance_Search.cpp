@@ -709,10 +709,12 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 										  uint32 phraseLen,
 										  uint32 minPage,
-										  uint32 maxPage)
+										  uint32 maxPage,
+										  uint32 skip)
 {
 	RelevantResult* pResult = pRelevantResultPool->newObject();
 	pResult->CountMatches = 0;
+	pResult->FullCountMatches = 0;
 	
 	//1. Parse phrase
 	uint32 minCountPages = MAX_INT;
@@ -998,9 +1000,11 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 	{
 		countResultDocNumbers = MAX_FOUND_DOCUMENTS_IN_QUERY;
 	}*/
-	
+
 	if(Info.RelevantLevel)
 	{
+		//NOT IMPLEMENTED
+
 		/*if(countResultDocNumbers)
 		{
 			pResult->Matches[pResult->CountMatches++] =  (pResultDocNumbers[0] >> Info.RelevantLevel);
@@ -1018,29 +1022,56 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 	}
 	else
 	{
+		char* pPrevName = new char[Info.DocumentNameSize];
+		char* pName = 0;
+		
 		for(int i = 0; i < countResultDocNumbers; i++)
 		{
 			uint32 id = pResultDocNumbers[i];
 
-			getDocumentNameByID(id, pResult->Matches[pResult->CountMatches], Info.DocumentNameSize);
+			pName = pResult->Matches[pResult->CountMatches];
 
-			if (pResult->CountMatches > 0)
+			getDocumentNameByID(id, pName, Info.DocumentNameSize);
+
+			if (pPrevName)
 			{
-				if (strcmp(pResult->Matches[pResult->CountMatches - 1], pResult->Matches[pResult->CountMatches])) //group if items has the same name
+				if (strcmp(pPrevName, pName)) //group if items has the same name
 				{
-					pResult->CountMatches++;
+					if (!skip)
+					{
+						pResult->CountMatches++;
+					}
+					else
+					{
+						skip--;
+					}
+
+					pResult->FullCountMatches++;
 				}
 			}
 			else
 			{
-				pResult->CountMatches++;
+				if (!skip)
+				{
+					pResult->CountMatches++;
+				}
+				else
+				{
+					skip--;
+				}
+
+				pResult->FullCountMatches++;
 			}
+
+			strcpy(pPrevName, pName);
 
 			if (pResult->CountMatches >= MAX_FOUND_DOCUMENTS_IN_QUERY)
 			{
 				break;
 			}
 		}
+
+		delete[] pPrevName;
 
 		//WordRaiting docRaiting(MAX_FOUND_DOCUMENTS_IN_QUERY); //top 25 words
 
@@ -1170,6 +1201,7 @@ RelevantResult* FTSInstance::searchHtmlSeldomWords(char* text,
 
 	RelevantResult* pResult = pRelevantResultPool->newObject();
 	pResult->CountMatches = 0;
+	pResult->FullCountMatches = 0;
 	
 	for(uint32 i=0; i < wr.dictionary.Count; i++)
 	{
@@ -1187,7 +1219,8 @@ RelevantResult* FTSInstance::searchPhraseRel(const char* phrase,
 {
 	RelevantResult* pResult = pRelevantResultPool->newObject();
 	pResult->CountMatches = 0;
-	
+	pResult->FullCountMatches = 0;
+
 	Dictionary dics[MAX_WORDS_IN_QUERY]; //max words
 	uint32 countWords = 0;
 
@@ -1741,7 +1774,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 	
 	//minRange1
 	sprintf(phrase, "y%04d m%02d", startDate1Year, startDate1Month);
-	pResult = searchPhrase(phrase, strlen(phrase), 80, Info.LastNameIDRAM);
+	pResult = searchPhrase(phrase, strlen(phrase), 80, Info.LastNameIDRAM, 0);
 
 	uint32 minRange1 = 0;
 
@@ -1755,7 +1788,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 
 	//minRange2
 	sprintf(phrase, "y%04d m%02d d%02d", startDate2Year, startDate2Month, startDate2Day);
-	pResult = searchPhrase(phrase, strlen(phrase), minRange1 + 1, Info.LastNameIDRAM);
+	pResult = searchPhrase(phrase, strlen(phrase), minRange1 + 1, Info.LastNameIDRAM, 0);
 
 	uint32 minRange2 = 0;
 
@@ -1769,7 +1802,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 
 	//maxRange2
 	sprintf(phrase, "y%04d m%02d d%02d", endDate2Year, endDate2Month, endDate2Day);
-	pResult = searchPhrase(phrase, strlen(phrase), minRange2 + 1, Info.LastNameIDRAM);
+	pResult = searchPhrase(phrase, strlen(phrase), minRange2 + 1, Info.LastNameIDRAM, 0);
 
 	uint32 maxRange2 = 0;
 	
@@ -1856,7 +1889,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 				{
 					//ssql
 					sprintf(phrase, "%s %s", sites.Words[j].Word, tempWord);
-					pResult = searchPhrase(phrase, strlen(phrase), minRange2, maxRange2 - 1);
+					pResult = searchPhrase(phrase, strlen(phrase), minRange2, maxRange2 - 1, 0);
 
 					if(pResult->CountMatches >= minWordsOnSite)
 					{
@@ -1898,6 +1931,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 	wordRaiting.dictionary.sortByWeight(false);
 	
 	pResult->CountMatches = 0;
+	pResult->FullCountMatches = 0;
 
 	for(uint32 i=0; i < wordRaiting.dictionary.Count; i++)
 	{

@@ -200,13 +200,33 @@ namespace FTSearchNet
         }
 
         [OperationContract]
-        public List<FTSearch.Result> SearchPhrase(string phrase)
+        public List<FTSearch.Result> SearchPhrase(string phrase, int skip, int take)
         {
             var result = new List<FTSearch.Result>();
 
             foreach (var fts in Instances)
             {
-                result.AddRange(fts.SearchPhrase(phrase, uint.MinValue, uint.MaxValue));
+                var sr = fts.SearchPhrase(phrase, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
+
+                if(skip > sr.FullCountMatches) //skip all results
+                {
+                    skip -= Convert.ToInt32(sr.FullCountMatches);
+                }
+                else
+                {
+                    if(skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
+                    {
+                        result.AddRange(sr.Results.Take(take));
+
+                        break;
+                    }
+                    else //go to next instance
+                    {
+                        result.AddRange(sr.Results);
+
+                        skip -= sr.Results.Count;
+                    }
+                }
             }
 
             return result;

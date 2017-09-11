@@ -13,6 +13,7 @@ public:
 	RelevantResult()
 	{
 		CountMatches = 0;
+		FullCountMatches = 0;
 		MatchWords = new char[256]; //max 25 words
 	}
 
@@ -21,7 +22,7 @@ public:
 	char Matches[MAX_FOUND_DOCUMENTS_IN_QUERY][256];
 
 	uint32 CountMatches;
-	//uint32 FullCountMatches;
+	uint32 FullCountMatches;
 	
 	~RelevantResult()
 	{

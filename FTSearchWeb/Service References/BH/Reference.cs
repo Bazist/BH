@@ -768,10 +768,10 @@ namespace FTSearchWeb.BH {
         System.Threading.Tasks.Task StartAsync(int instanceNumber);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhrase", ReplyAction="http://tempuri.org/FTService/SearchPhraseResponse")]
-        FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase);
+        FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhrase", ReplyAction="http://tempuri.org/FTService/SearchPhraseResponse")]
-        System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase);
+        System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetInfo", ReplyAction="http://tempuri.org/FTService/GetInfoResponse")]
         FTSearchWeb.BH.FTServiceInfo GetInfo();
@@ -877,12 +877,12 @@ namespace FTSearchWeb.BH {
             return base.Channel.StartAsync(instanceNumber);
         }
         
-        public FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase) {
-            return base.Channel.SearchPhrase(phrase);
+        public FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase, int skip, int take) {
+            return base.Channel.SearchPhrase(phrase, skip, take);
         }
         
-        public System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase) {
-            return base.Channel.SearchPhraseAsync(phrase);
+        public System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase, int skip, int take) {
+            return base.Channel.SearchPhraseAsync(phrase, skip, take);
         }
         
         public FTSearchWeb.BH.FTServiceInfo GetInfo() {
