@@ -1,0 +1,44 @@
+﻿
+@using FTSearchWeb.Model
+
+@model SearchResult
+
+@{
+    ViewBag.Title = "BH - Search in WS logs";
+}
+
+<!--
+<div class="jumbotron">
+    <p class="lead"></p>
+</div>
+-->
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Search In Logs</h2>
+        <hr />
+        <p>
+            <table border="0">
+                <tr>
+                    <td>
+                        @using (Html.BeginForm("Search", "Home"))
+                        {
+                            <span>Searching: @Html.EditorFor(model => model.Phrase) <input type="submit" value="Search" /></span>
+                        }
+                    </td>
+                </tr>
+                @if (Model.Results != null)
+                {
+                    foreach (FTSearchWeb.BH.FTSearchResult res in Model.Results)
+                    {
+                        <tr>
+                            <td nowrap>
+                                <a href="https://go.microsoft.com/fwlink/?LinkID=517851"><span>@res.Name</span></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </p>
+    </div>
+</div>

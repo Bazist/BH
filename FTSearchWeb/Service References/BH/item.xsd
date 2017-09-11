@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/FTSearchNet" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/FTSearchNet" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8080/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="FTSearch.ConfigurationDLL">
+    <xs:annotation>
+      <xs:appinfo>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AutoSaveIndex" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AutoStemmingOn" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="CountWordInPhrase" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="DocumentNameSize" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="IndexPath" nillable="true" type="xs:base64Binary" />
+      <xs:element minOccurs="0" name="InstanceNumber" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="IsCreateNewInstanceOnUpdate" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsCustomPath" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsUseEnglishAlphabet" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsUseNumberAlphabet" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsUseRussianAlphabet" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsUseUkranianAlphabet" type="xs:boolean" />
+      <xs:element minOccurs="0" name="LimitTopResults" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="LimitUsedMemory" type="xs:unsignedLong" />
+      <xs:element minOccurs="0" name="MaxLenWord" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="MemoryMode" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="MinLenWord" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="RelevantLevel" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="WordsHeaderBase" type="xs:unsignedInt" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FTSearch.ConfigurationDLL" nillable="true" type="tns:FTSearch.ConfigurationDLL" />
+  <xs:complexType name="ArrayOfFTSearch.Result">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FTSearch.Result" type="tns:FTSearch.Result" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfFTSearch.Result" nillable="true" type="tns:ArrayOfFTSearch.Result" />
+  <xs:complexType name="FTSearch.Result">
+    <xs:annotation>
+      <xs:appinfo>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Positions" nillable="true" type="tns:ArrayOfFTSearch.ResultPosition" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FTSearch.Result" nillable="true" type="tns:FTSearch.Result" />
+  <xs:complexType name="ArrayOfFTSearch.ResultPosition">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FTSearch.ResultPosition" type="tns:FTSearch.ResultPosition" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfFTSearch.ResultPosition" nillable="true" type="tns:ArrayOfFTSearch.ResultPosition" />
+  <xs:complexType name="FTSearch.ResultPosition">
+    <xs:annotation>
+      <xs:appinfo>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Length" type="xs:int" />
+      <xs:element minOccurs="0" name="StartPosition" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FTSearch.ResultPosition" nillable="true" type="tns:FTSearch.ResultPosition" />
+  <xs:complexType name="FTService.Info">
+    <xs:annotation>
+      <xs:appinfo>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AmountInstances" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="CountWordsHDD" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="CountWordsRAM" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="DocumentNameSize" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="HasError" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IndexSize" type="xs:unsignedLong" />
+      <xs:element minOccurs="0" name="LastErrorMessage" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LastNameIDHDD" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="LastNameIDRAM" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="RelevantLevel" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="TextSize" type="xs:unsignedLong" />
+      <xs:element minOccurs="0" name="TotalMemory" type="xs:unsignedLong" />
+      <xs:element minOccurs="0" name="UsedMemory" type="xs:unsignedLong" />
+      <xs:element minOccurs="0" name="Version" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="WordsHeaderBase" type="xs:unsignedInt" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FTService.Info" nillable="true" type="tns:FTService.Info" />
+</xs:schema>

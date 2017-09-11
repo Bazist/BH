@@ -1,0 +1,44 @@
+﻿@model FTSearchWeb.Model.SearchResult
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <h2>Run & Deploy</h2>
+
+        <table border="0">
+            <tr>
+                <td>
+                    @using (Html.BeginForm("Search", "Home"))
+                    {
+                        <span>Searching: @Html.EditorFor(model => model.Phrase) <input type="submit" value="Search" /></span>
+                    }
+                </td>
+            </tr>
+            @if (Model != null)
+            {
+                @foreach (BH.FTSearchResult res in Model.Results)
+                {
+                    <tr>
+                        <td nowrap>
+                            <a href="https://go.microsoft.com/fwlink/?LinkID=517851"><span>@res.Name</span></a>
+                        </td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>

@@ -994,14 +994,14 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 	//3. Relevant result
 	//pResult->FullCountMatches = countResultDocNumbers;
 
-	if(countResultDocNumbers > MAX_FOUND_DOCUMENTS_IN_QUERY)
+	/*if(countResultDocNumbers > MAX_FOUND_DOCUMENTS_IN_QUERY)
 	{
 		countResultDocNumbers = MAX_FOUND_DOCUMENTS_IN_QUERY;
-	}
+	}*/
 	
 	if(Info.RelevantLevel)
 	{
-		if(countResultDocNumbers)
+		/*if(countResultDocNumbers)
 		{
 			pResult->Matches[pResult->CountMatches++] =  (pResultDocNumbers[0] >> Info.RelevantLevel);
 		}
@@ -1014,13 +1014,32 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 			{
 				pResult->Matches[pResult->CountMatches++] = id;
 			}
-		}
+		}*/
 	}
 	else
 	{
 		for(int i = 0; i < countResultDocNumbers; i++)
 		{
-			pResult->Matches[pResult->CountMatches++] =  pResultDocNumbers[i];
+			uint32 id = pResultDocNumbers[i];
+
+			getDocumentNameByID(id, pResult->Matches[pResult->CountMatches], Info.DocumentNameSize);
+
+			if (pResult->CountMatches > 0)
+			{
+				if (strcmp(pResult->Matches[pResult->CountMatches - 1], pResult->Matches[pResult->CountMatches])) //group if items has the same name
+				{
+					pResult->CountMatches++;
+				}
+			}
+			else
+			{
+				pResult->CountMatches++;
+			}
+
+			if (pResult->CountMatches >= MAX_FOUND_DOCUMENTS_IN_QUERY)
+			{
+				break;
+			}
 		}
 
 		//WordRaiting docRaiting(MAX_FOUND_DOCUMENTS_IN_QUERY); //top 25 words
@@ -1257,7 +1276,8 @@ RelevantResult* FTSInstance::searchPhraseRel(const char* phrase,
 	
 	for(uint32 i=0; i < docRaiting.dictionary.Count; i++)
 	{
-		pResult->Matches[i] = docRaiting.dictionary.Words[i].DocID;
+		getDocumentNameByID(docRaiting.dictionary.Words[i].DocID, pResult->Matches[i], Info.DocumentNameSize);
+
 		pResult->CountMatches++;
 	}
 
@@ -1727,7 +1747,8 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 
 	if(pResult->CountMatches)
 	{
-		minRange1 = pResult->Matches[pResult->CountMatches - 1];
+		//NOT IMPLEMENTED
+		//minRange1 = pResult->Matches[pResult->CountMatches - 1];
 	}
 
 	this->releaseRelevantResult(pResult);
@@ -1740,7 +1761,8 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 
 	if(pResult->CountMatches)
 	{
-		minRange2 = pResult->Matches[pResult->CountMatches - 1];
+		//NOT IMPLEMENTED
+		//minRange2 = pResult->Matches[pResult->CountMatches - 1];
 	}
 		
 	this->releaseRelevantResult(pResult);
@@ -1753,7 +1775,8 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 	
 	if(pResult->CountMatches)
 	{
-		maxRange2 = pResult->Matches[pResult->CountMatches - 1];
+		//NOT IMPLEMENTED
+		//maxRange2 = pResult->Matches[pResult->CountMatches - 1];
 	}
 
 	this->releaseRelevantResult(pResult);

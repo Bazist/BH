@@ -193,7 +193,7 @@ namespace FTSearchNet
 
         private void UpdateInstanceInfo(FTService fts)
         {
-            FTSearch.FTSInstanceInfo info = fts.GetInfo();
+            var info = fts.GetInfo();
 
             lbInstanceInfo.Text = "Version: " + info.Version.ToString() + "\n" +
                                   "UsedMemory: " + info.UsedMemory.ToString() + "\n" +

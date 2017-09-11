@@ -9,8 +9,42 @@ using System.Threading.Tasks;
 namespace FTSearchNet
 {
     [ServiceContract]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class FTService
     {
+        #region Classes
+
+        public struct Info
+        {
+            public uint Version;
+
+            public uint AmountInstances;
+
+            public ulong IndexSize;
+
+            public ulong TextSize;
+
+            public uint LastNameIDRAM;
+            public uint LastNameIDHDD;
+
+            public uint CountWordsRAM;
+            public uint CountWordsHDD;
+
+            public ulong UsedMemory;
+            public ulong TotalMemory;
+
+            public uint WordsHeaderBase;
+
+            public uint DocumentNameSize;
+
+            public string LastErrorMessage;
+            public bool HasError;
+
+            public uint RelevantLevel;
+        }
+
+        #endregion
+
         #region Members
 
         private List<FTSearch> Instances = new List<FTSearch>();
@@ -47,7 +81,7 @@ namespace FTSearchNet
 
         private string GetPath()
         {
-            return Encoding.ASCII.GetString(GetConfiguration().IndexPath);
+            return Encoding.ASCII.GetString(GetConfiguration().IndexPath).Replace("\0", "");
         }
 
         private Tuple<string, long>[] GetInstances(int instanceNumber = 0)
@@ -179,9 +213,9 @@ namespace FTSearchNet
         }
 
         [OperationContract]
-        public FTSearch.FTSInstanceInfo GetInfo()
+        public Info GetInfo()
         {
-            var result = new FTSearch.FTSInstanceInfo();
+            var result = new Info();
 
             foreach (var fts in Instances)
             {
@@ -199,6 +233,10 @@ namespace FTSearchNet
                 result.Version = current.Version;
                 result.WordsHeaderBase = current.WordsHeaderBase;
             }
+
+            result.IndexSize = Convert.ToUInt64(GetInstances().Sum(x => x.Item2));
+            result.AmountInstances = Convert.ToUInt32(Instances.Count);
+            result.TextSize = result.IndexSize * 55; //in average
 
             return result;
         }

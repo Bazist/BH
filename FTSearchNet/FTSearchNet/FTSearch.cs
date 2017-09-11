@@ -236,6 +236,13 @@ namespace FTSearchNet
             public System.UInt32 ReservedValue5;
         }
 
+        [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct RelevantResultNameDLL
+        {
+            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 256)]
+            public string Name;
+        }
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct RelevantResultDLL
         {
@@ -243,7 +250,7 @@ namespace FTSearchNet
             public string MatchWords;
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 25)]
-            public System.UInt32[] Matches;
+            public RelevantResultNameDLL[] Matches;
 
             public System.UInt32 CountMatches;
         }
@@ -670,7 +677,8 @@ namespace FTSearchNet
 
                 for (uint i = 0; i < relevantResultDLL.CountMatches; i++)
                 {
-                    results.Add(relevantResultDLL.Matches[i]);
+                    //NOT IMPLEMENTED
+                    //results.Add(relevantResultDLL.Matches[i]);
                 }
 
                 releaseRelevantResultDLL(InstanceNumber, pRelevantResult);
@@ -684,9 +692,8 @@ namespace FTSearchNet
         public unsafe List<Result> SearchPhrase(string phrase, uint minPage, uint maxPage)
         {
             List<Result> results = new List<Result>();
-            byte[] nameBytes = new byte[256];
-
-            fixed (Byte* pPhrase = Encoding.GetBytes(phrase), pName = nameBytes)
+            
+            fixed (Byte* pPhrase = Encoding.GetBytes(phrase))
             {
                 IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage);
 
@@ -695,12 +702,10 @@ namespace FTSearchNet
                 for (uint i = 0; i < relevantResultDLL.CountMatches; i++)
                 {
                     //get name of document
-                    getDocumentNameByIDDLL(InstanceNumber, relevantResultDLL.Matches[i], pName, DOC_NAME_LENGTH);
-
                     Result result = new Result();
                     //if (true)
                     //{
-                    result.Name = Encoding.GetString(nameBytes).Replace("\0", "");
+                    result.Name = relevantResultDLL.Matches[i].Name;
                     //*result.Positions = new ResultPosition[0]; //empty
                     //}
                     //else
@@ -760,9 +765,9 @@ namespace FTSearchNet
         {
             RelevantResult relevantResult = new RelevantResult();
 
-            byte[] nameBytes = new byte[256];
+            //byte[] nameBytes = new byte[256];
 
-            fixed (Byte* pPhrase = Encoding.GetBytes(phrase), pName = nameBytes)
+            fixed (Byte* pPhrase = Encoding.GetBytes(phrase))
             {
                 IntPtr pRelevantResult = searchPhraseRelDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage);
 
@@ -773,9 +778,9 @@ namespace FTSearchNet
                 for (uint i = 0; i < relevantResultDLL.CountMatches; i++)
                 {
                     //get name of document
-                    getDocumentNameByIDDLL(InstanceNumber, relevantResultDLL.Matches[i], pName, DOC_NAME_LENGTH);
+                    //getDocumentNameByIDDLL(InstanceNumber, relevantResultDLL.Matches[i], pName, DOC_NAME_LENGTH);
 
-                    relevantResult.Results.Add(Encoding.GetString(nameBytes).Replace("\0", ""));
+                    relevantResult.Results.Add(relevantResultDLL.Matches[i].Name);
                 }
 
                 releaseRelevantResultDLL(InstanceNumber, pRelevantResult);

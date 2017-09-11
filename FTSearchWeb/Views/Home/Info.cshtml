@@ -1,0 +1,9 @@
+﻿@using FTSearchWeb.Model
+
+@model FTSearchWeb.BH.FTServiceInfo
+
+<h2>Service Info</h2>
+<hr />
+<h4><b>BH\FTService</b> - Full Text Search engine with huge compression for large data. </h4> 
+<h4><b>@SearchResult.FormatSize(Model.TextSize)</b> bytes were indexed in <b>@SearchResult.FormatSize(Model.LastNameIDHDD)</b> documents.</h4>
+<h4>Current index has <b>@SearchResult.FormatSize(Model.IndexSize)</b> bytes size and contains <b>@SearchResult.FormatSize(Model.CountWordsHDD)</b> lexems in dictionary.</h4>
