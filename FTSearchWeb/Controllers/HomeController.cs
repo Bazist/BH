@@ -76,11 +76,16 @@ namespace FTSearchWeb.Controllers
             else //open file
             {
                 ViewBag.Title = f;
+                ViewBag.FileName = f;
 
                 var content = fts.LoadContent(f, phrase);
 
                 content = content.Replace("[BREAK]",
                                           "<br/><br/>================= BREAK =====================<br/>");
+
+                content = content.Replace("[TooManyMatches]",
+                                          "<br/><br/>================= FILE CANNOT BE LOAD FULL IN WEB ===================== <br/>");
+                
 
                 content = Regex.Replace(content, phrase, "<span style='background-color:yellow'>" + phrase + "</span>", RegexOptions.IgnoreCase);
 

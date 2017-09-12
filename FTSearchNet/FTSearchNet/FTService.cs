@@ -407,7 +407,7 @@ namespace FTSearchNet
 
             var file = name.Replace(archiveName + "\\", "");
             
-            var dest = Path.Combine(@"C:\FTS\Logs\Viewed", archiveName);
+            var dest = Path.Combine(@"C:\FTS\Logs\Cached", archiveName);
 
             if(!Directory.Exists(dest))
             {
@@ -429,7 +429,7 @@ namespace FTSearchNet
             const int amountLines = 50;
 
             //need optimize !
-            List<string> lines = new List<string>();
+            Queue<string> lines = new Queue<string>();
 
             using (StreamReader sr = new StreamReader(fullPath))
             {
@@ -466,29 +466,29 @@ namespace FTSearchNet
 
                         if (content.Length > 1024 * 1024)
                         {
-                            lines.Clear();
+                            content.AppendLine("[TooManyMatches]");
 
-                            content.AppendLine("================= FILE CANNOT BE LOAD FULL IN WEB =====================");
-                            content.AppendLine("Full loaded file you can find here: " + fullPath);
-
-                            break;
+                            return content.ToString();
                         }
 
                         startLine = -1;
                         endLine = -1;
 
                         //leave 50 rows
-                        lines.RemoveRange(0, lines.Count - amountLines);
+                        for(int i=0; i < lines.Count - amountLines; i++)
+                        {
+                            lines.Dequeue();
+                        }
                     }
 
                     if (startLine == -1 &&
                         endLine == -1 &&
                         lines.Count > amountLines)
                     {
-                        lines.RemoveAt(0);
+                        lines.Dequeue();
                     }
 
-                    lines.Add(line);
+                    lines.Enqueue(line);
                 }
             }
 
@@ -496,7 +496,11 @@ namespace FTSearchNet
             if (startLine != -1)
             {
                 content.AppendLine("[BREAK]");
-                content.AppendLine(lines.Aggregate((x, y) => x + "\r\n" + y));
+
+                if (lines.Count > 0)
+                {
+                    content.AppendLine(lines.Aggregate((x, y) => x + "\r\n" + y));
+                }
             }
             
             //File.Delete(fullPath);
