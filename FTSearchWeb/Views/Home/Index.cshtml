@@ -50,29 +50,32 @@
                             </td>
                         </tr>
 
-                        <tr>
-                            <td nowrap>
-                                <span>
-                                    @if (Model.StartPage > 1)
-                                    {
-                                        <a href="?sp=@(Model.StartPage - SearchResult.PAGE_SIZE)&cp=@(Model.StartPage - SearchResult.PAGE_SIZE)&t=@Model.Phrase">&lt;&lt;&lt;</a><span>&nbsp;</span>
-                                    }
+                        if (Model.Results.Length >= SearchResult.PAGE_SIZE)
+                        {
+                            <tr>
+                                <td nowrap>
+                                    <span>
+                                        @if (Model.StartPage > 1)
+                                        {
+                                            <a href="?sp=@(Model.StartPage - SearchResult.PAGE_SIZE)&cp=@(Model.StartPage - SearchResult.PAGE_SIZE)&t=@Model.Phrase">&lt;&lt;&lt;</a><span>&nbsp;</span>
+                                        }
 
-                                    @for (int page = Model.StartPage; page < Model.StartPage + SearchResult.PAGE_SIZE; page++)
-                                    {
-                                        if (page != Model.CurrentPage)
+                                        @for (int page = Model.StartPage; page < Model.StartPage + SearchResult.PAGE_SIZE; page++)
                                         {
-                                            <a href="?sp=@(Model.StartPage)&cp=@page&t=@Model.Phrase">@(page.ToString("00"))</a><span>&nbsp;</span>
+                                            if (page != Model.CurrentPage)
+                                            {
+                                                <a href="?sp=@(Model.StartPage)&cp=@page&t=@Model.Phrase">@(page.ToString("00"))</a><span>&nbsp;</span>
+                                            }
+                                            else
+                                            {
+                                                @(page.ToString("00"))<span>&nbsp;</span>
+                                            }
                                         }
-                                        else
-                                        {
-                                            @(page.ToString("00"))<span>&nbsp;</span>
-                                        }
-                                    }
-                                    <a href="?sp=@(Model.StartPage + SearchResult.PAGE_SIZE)&cp=@(Model.StartPage + SearchResult.PAGE_SIZE)&t=@Model.Phrase">&gt;&gt;&gt;</a><span></span>
-                                </span>
-                            </td>
-                        </tr>
+                                        <a href="?sp=@(Model.StartPage + SearchResult.PAGE_SIZE)&cp=@(Model.StartPage + SearchResult.PAGE_SIZE)&t=@Model.Phrase">&gt;&gt;&gt;</a><span></span>
+                                    </span>
+                                </td>
+                            </tr>
+                        }
                     }
                     else
                     {

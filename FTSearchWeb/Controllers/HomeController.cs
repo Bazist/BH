@@ -80,7 +80,7 @@ namespace FTSearchWeb.Controllers
                 var content = fts.LoadContent(f, phrase);
 
                 content = content.Replace("[BREAK]",
-                                          "<br/>================= BREAK =====================<br/>");
+                                          "<br/><br/>================= BREAK =====================<br/>");
 
                 content = Regex.Replace(content, phrase, "<span style='background-color:yellow'>" + phrase + "</span>", RegexOptions.IgnoreCase);
 
