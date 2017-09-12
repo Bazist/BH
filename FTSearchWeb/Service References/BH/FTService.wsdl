@@ -79,6 +79,12 @@
   <wsdl:message name="FTService_CheckIndexes_OutputMessage">
     <wsdl:part name="parameters" element="tns:CheckIndexesResponse" />
   </wsdl:message>
+  <wsdl:message name="FTService_LoadContent_InputMessage">
+    <wsdl:part name="parameters" element="tns:LoadContent" />
+  </wsdl:message>
+  <wsdl:message name="FTService_LoadContent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoadContentResponse" />
+  </wsdl:message>
   <wsdl:portType name="FTService">
     <wsdl:operation name="IsStarted">
       <wsdl:input wsaw:Action="http://tempuri.org/FTService/IsStarted" message="tns:FTService_IsStarted_InputMessage" />
@@ -127,6 +133,10 @@
     <wsdl:operation name="CheckIndexes">
       <wsdl:input wsaw:Action="http://tempuri.org/FTService/CheckIndexes" message="tns:FTService_CheckIndexes_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/FTService/CheckIndexesResponse" message="tns:FTService_CheckIndexes_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="LoadContent">
+      <wsdl:input wsaw:Action="http://tempuri.org/FTService/LoadContent" message="tns:FTService_LoadContent_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/FTService/LoadContentResponse" message="tns:FTService_LoadContent_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="BasicHttpBinding_FTService" type="tns:FTService">
@@ -232,6 +242,15 @@
     </wsdl:operation>
     <wsdl:operation name="CheckIndexes">
       <soap:operation soapAction="http://tempuri.org/FTService/CheckIndexes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoadContent">
+      <soap:operation soapAction="http://tempuri.org/FTService/LoadContent" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

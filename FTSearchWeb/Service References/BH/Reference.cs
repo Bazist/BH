@@ -808,6 +808,12 @@ namespace FTSearchWeb.BH {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/CheckIndexes", ReplyAction="http://tempuri.org/FTService/CheckIndexesResponse")]
         System.Threading.Tasks.Task CheckIndexesAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/LoadContent", ReplyAction="http://tempuri.org/FTService/LoadContentResponse")]
+        string LoadContent(string name, string aroundPhrase);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/LoadContent", ReplyAction="http://tempuri.org/FTService/LoadContentResponse")]
+        System.Threading.Tasks.Task<string> LoadContentAsync(string name, string aroundPhrase);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -931,6 +937,14 @@ namespace FTSearchWeb.BH {
         
         public System.Threading.Tasks.Task CheckIndexesAsync() {
             return base.Channel.CheckIndexesAsync();
+        }
+        
+        public string LoadContent(string name, string aroundPhrase) {
+            return base.Channel.LoadContent(name, aroundPhrase);
+        }
+        
+        public System.Threading.Tasks.Task<string> LoadContentAsync(string name, string aroundPhrase) {
+            return base.Channel.LoadContentAsync(name, aroundPhrase);
         }
     }
 }

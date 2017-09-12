@@ -34,42 +34,54 @@
                 </tr>
                 @if (Model.Results != null)
                 {
-                    foreach (FTSearchWeb.BH.FTSearchResult res in Model.Results)
+                    if (Model.Results.Length > 0)
                     {
+                        foreach (FTSearchWeb.BH.FTSearchResult res in Model.Results)
+                        {
+                            <tr>
+                                <td nowrap>
+                                    <a href="?f=@Url.Encode(res.Name)&t=@Model.Phrase"><span>@res.Name</span></a>
+                                </td>
+                            </tr>
+                        }
+                        <tr>
+                            <td>
+                                &nbsp;
+                            </td>
+                        </tr>
+
                         <tr>
                             <td nowrap>
-                                <a href="https://go.microsoft.com/fwlink/?LinkID=517851"><span>@res.Name</span></a>
+                                <span>
+                                    @if (Model.StartPage > 1)
+                                    {
+                                        <a href="?sp=@(Model.StartPage - SearchResult.PAGE_SIZE)&cp=@(Model.StartPage - SearchResult.PAGE_SIZE)&t=@Model.Phrase">&lt;&lt;&lt;</a><span>&nbsp;</span>
+                                    }
+
+                                    @for (int page = Model.StartPage; page < Model.StartPage + SearchResult.PAGE_SIZE; page++)
+                                    {
+                                        if (page != Model.CurrentPage)
+                                        {
+                                            <a href="?sp=@(Model.StartPage)&cp=@page&t=@Model.Phrase">@(page.ToString("00"))</a><span>&nbsp;</span>
+                                        }
+                                        else
+                                        {
+                                            @(page.ToString("00"))<span>&nbsp;</span>
+                                        }
+                                    }
+                                    <a href="?sp=@(Model.StartPage + SearchResult.PAGE_SIZE)&cp=@(Model.StartPage + SearchResult.PAGE_SIZE)&t=@Model.Phrase">&gt;&gt;&gt;</a><span></span>
+                                </span>
                             </td>
                         </tr>
                     }
-                    <tr>
-                        <td>
-                            &nbsp;
-                        </td>
-                    </tr>
-                    <tr>
-                        <td nowrap>
-                            <span>
-                                @if (Model.StartPage > 1)
-                                {
-                                    <a href="?sp=@(Model.StartPage - SearchResult.PAGE_SIZE)&cp=@(Model.StartPage - SearchResult.PAGE_SIZE)&t=@Model.Phrase">&lt;&lt;&lt;</a><span>&nbsp;</span>
-                                }
-
-                                @for (int page = Model.StartPage; page < Model.StartPage + SearchResult.PAGE_SIZE; page++)
-                                {
-                                    if (page != Model.CurrentPage)
-                                    {
-                                        <a href="?sp=@(Model.StartPage)&cp=@page&t=@Model.Phrase">@(page.ToString("00"))</a><span>&nbsp;</span>
-                                    }
-                                    else
-                                    {
-                                        @(page.ToString("00"))<span>&nbsp;</span>
-                                    }
-                                }
-                                <a href="?sp=@(Model.StartPage + SearchResult.PAGE_SIZE)&cp=@(Model.StartPage + SearchResult.PAGE_SIZE)&t=@Model.Phrase">&gt;&gt;&gt;</a><span></span>
-                            </span>
-                        </td>
-                    </tr>
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <span>Nothing found.</span>
+                            </td>
+                        </tr>
+                    }
                 }
 
             </table>

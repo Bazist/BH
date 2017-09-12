@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FTSearchNet
@@ -231,7 +234,7 @@ namespace FTSearchNet
 
             return result;
         }
-
+        
         [OperationContract]
         public Info GetInfo()
         {
@@ -368,7 +371,139 @@ namespace FTSearchNet
                 fts.StopInstance();
             }
         }
-        
+
+        static void Unpack(string archive, string file, string dest)
+        {
+            //7z e archive.zip - oc:\soft *.cpp - r
+            //extracts all *.cpp files from archive archive.zip to c:\soft folder.
+
+            var proc = new System.Diagnostics.Process();
+            proc.StartInfo = new System.Diagnostics.ProcessStartInfo();
+            proc.StartInfo.FileName = @"C:\Program Files\7-Zip\7z.exe";
+            proc.StartInfo.Arguments = " x \"" + archive + "\" -o\"" + dest + "\" \"" + file + "\" -r";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+            //proc.StartInfo.Verb = "runas";
+
+            proc.Start();
+            proc.WaitForExit();
+
+            //Console.WriteLine(proc.StandardError.ReadToEnd());
+            //Console.WriteLine(proc.StandardOutput.ReadToEnd());
+        }
+
+        [OperationContract]
+        public string LoadContent(string name, string aroundPhrase)
+        {
+            name = name.Replace(@"C:\FTS\Logs\Unpacked\", string.Empty);
+
+            var parts = name.Split('\\');
+
+            var archiveName = parts[0];
+
+            var archive = Path.Combine(@"\\srv3\fs\Production-Logs", archiveName) + ".7z";
+
+            var file = name.Replace(archiveName + "\\", "");
+            
+            var dest = Path.Combine(@"C:\FTS\Logs\Viewed", archiveName);
+
+            if(!Directory.Exists(dest))
+            {
+                Directory.CreateDirectory(dest);
+            }
+
+            var fullPath = Path.Combine(dest, file);
+
+            if (!File.Exists(fullPath))
+            {
+                Unpack(archive, file, dest);
+            }
+
+            var content = new StringBuilder();
+
+            int startLine = -1;
+            int endLine = -1;
+
+            const int amountLines = 50;
+
+            //need optimize !
+            List<string> lines = new List<string>();
+
+            using (StreamReader sr = new StreamReader(fullPath))
+            {
+                while (!sr.EndOfStream)
+                {
+                    string line = sr.ReadLine();
+
+                    //Regex reg1 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "[^a-zA-Z0-9]+");
+                    //Regex reg2 = new Regex("^" + aroundPhrase + "[^a-zA-Z0-9]+");
+                    //Regex reg3 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "$");
+
+                    if (Regex.Match(line, "\\b" + aroundPhrase + "\\b", RegexOptions.IgnoreCase).Success)
+                    {
+                        if (startLine == -1)
+                        {
+                            if (lines.Count > amountLines)
+                            {
+                                startLine = lines.Count - amountLines;
+                            }
+                            else
+                            {
+                                startLine = 0;
+                            }
+                        }
+
+                        endLine = lines.Count + amountLines;
+                    }
+
+                    //make break
+                    if (startLine != -1 && lines.Count > endLine)
+                    {
+                        content.AppendLine("[BREAK]");
+                        content.AppendLine(lines.Aggregate((x, y) => x + "\n" + y));
+
+                        if (content.Length > 1024 * 1024)
+                        {
+                            lines.Clear();
+
+                            content.AppendLine("================= FILE CANNOT BE LOAD FULL IN WEB =====================");
+                            content.AppendLine("Full loaded file you can find here: " + fullPath);
+
+                            break;
+                        }
+
+                        startLine = -1;
+                        endLine = -1;
+
+                        //leave 50 rows
+                        lines.RemoveRange(0, lines.Count - amountLines);
+                    }
+
+                    if (startLine == -1 &&
+                        endLine == -1 &&
+                        lines.Count > amountLines)
+                    {
+                        lines.RemoveAt(0);
+                    }
+
+                    lines.Add(line);
+                }
+            }
+
+            //end of file
+            if (startLine != -1)
+            {
+                content.AppendLine("[BREAK]");
+                content.AppendLine(lines.Aggregate((x, y) => x + "\r\n" + y));
+            }
+            
+            //File.Delete(fullPath);
+
+            return content.ToString();
+        }
+
         public static void StartWebservice()
         {
             Type serviceType = typeof(FTService);
@@ -378,6 +513,8 @@ namespace FTSearchNet
 
             var basicHttpBinding = new BasicHttpBinding();
             basicHttpBinding.MaxReceivedMessageSize = int.MaxValue;
+            basicHttpBinding.MaxBufferSize = int.MaxValue;
+
 
             _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
             _host.Open();

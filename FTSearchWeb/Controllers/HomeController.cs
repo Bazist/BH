@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 
@@ -50,20 +51,43 @@ namespace FTSearchWeb.Controllers
             {
                 phrase = Request.Params["t"];
             }
-            
+
             BH.FTServiceClient fts = new BH.FTServiceClient();
 
-            if(!fts.IsStarted())
+            if (!fts.IsStarted())
             {
                 fts.Start(0);
             }
+
+            var f = Request.Params["f"];
             
-            var res = fts.SearchPhrase(phrase, (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
-            
-            return View("Index", new SearchResult { Phrase = phrase,
-                                                    Results = res,
-                                                    StartPage = int.Parse(sp),
-                                                    CurrentPage = int.Parse(cp) });
+            if (string.IsNullOrEmpty(f)) //search phrase
+            {
+                var res = fts.SearchPhrase(phrase, (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
+
+                return View("Index", new SearchResult
+                {
+                    Phrase = phrase,
+                    Results = res,
+                    StartPage = int.Parse(sp),
+                    CurrentPage = int.Parse(cp)
+                });
+            }
+            else //open file
+            {
+                ViewBag.Title = f;
+
+                var content = fts.LoadContent(f, phrase);
+
+                content = content.Replace("[BREAK]",
+                                          "<br/>================= BREAK =====================<br/>");
+
+                content = Regex.Replace(content, phrase, "<span style='background-color:yellow'>" + phrase + "</span>", RegexOptions.IgnoreCase);
+
+                ViewBag.Content = content;
+
+                return View("File");
+            }
         }
     }
 }
