@@ -152,11 +152,13 @@ public:
 
 	RelevantResult* searchPhrase(const char* phrase)
 	{
-		return searchPhrase(phrase, strlen(phrase), 0, MAX_INT, 0);
+		return searchPhrase(phrase, strlen(phrase), 0, 0, 0, MAX_INT, 0);
 	}
 
 	RelevantResult* searchPhrase(const char* phrase,
 		uint32 phraseLen,
+		const char* templateName,
+		uint32 templateNameLen,
 		uint32 minPage,
 		uint32 maxPage,
 		uint32 skip);

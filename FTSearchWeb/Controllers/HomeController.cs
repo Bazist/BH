@@ -21,6 +21,11 @@ namespace FTSearchWeb.Controllers
         {
             BH.FTServiceClient fts = new BH.FTServiceClient();
 
+            if (!fts.IsStarted())
+            {
+                fts.Start(0);
+            }
+
             return View(fts.GetInfo());
         }
 

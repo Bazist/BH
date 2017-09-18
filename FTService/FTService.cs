@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace FTSearchNet
+namespace FTServiceWCF
 {
     [ServiceContract]
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -30,8 +30,8 @@ namespace FTSearchNet
             public uint LastNameIDRAM;
             public uint LastNameIDHDD;
 
-            public uint CountWordsRAM;
-            public uint CountWordsHDD;
+            public ulong CountWordsRAM;
+            public ulong CountWordsHDD;
 
             public ulong UsedMemory;
             public ulong TotalMemory;
@@ -59,8 +59,9 @@ namespace FTSearchNet
         private FTSearch.ConfigurationDLL _configuration;
 
         private static ServiceHost _host;
-        private static FTSearch _ftSearch;
-        
+
+        public const string DEFAULT_FTS_PATH = @"I:\FTS_Merged";
+
         #endregion
 
         #region Constructors
@@ -111,10 +112,8 @@ namespace FTSearchNet
         {
             FTSearch.ConfigurationDLL conf = new FTSearch.ConfigurationDLL();
 
-            string path = @"C:\FTS";
-
             byte[] indexPath = new byte[1024];
-            Array.Copy(Encoding.ASCII.GetBytes(path), indexPath, path.Length);
+            Array.Copy(Encoding.ASCII.GetBytes(DEFAULT_FTS_PATH), indexPath, DEFAULT_FTS_PATH.Length);
 
             conf.IndexPath = indexPath;
 
@@ -125,7 +124,7 @@ namespace FTSearchNet
             conf.DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
             conf.CountWordInPhrase = 1;
             conf.IsUseNumberAlphabet = true;
-            
+
             conf.InstanceNumber = 1;
             conf.IsUseRussianAlphabet = true;
             conf.IsUseUkranianAlphabet = true;
@@ -170,7 +169,7 @@ namespace FTSearchNet
                 var conf = GetConfiguration();
 
                 conf.InstanceNumber = currInstanceNumber;
-                
+
                 fts.StartInstance(conf);
 
                 Instances.Add(fts);
@@ -203,38 +202,47 @@ namespace FTSearchNet
         }
 
         [OperationContract]
-        public List<FTSearch.Result> SearchPhrase(string phrase, int skip, int take)
+        public List<FTSearch.Result> SearchPhrase(string phrase, string templateName, int skip, int take)
         {
             var result = new List<FTSearch.Result>();
 
             foreach (var fts in Instances)
             {
-                var sr = fts.SearchPhrase(phrase, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
+                var sr = fts.SearchPhrase(phrase, templateName, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
 
-                if(skip > sr.FullCountMatches) //skip all results
+                if (skip > sr.FullCountMatches) //skip all results
                 {
                     skip -= Convert.ToInt32(sr.FullCountMatches);
                 }
                 else
                 {
-                    if(skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
+                    if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
                     {
-                        result.AddRange(sr.Results.Take(take));
+                        result.AddRange(sr.Results.Take(take - result.Count));
 
                         break;
                     }
                     else //go to next instance
                     {
-                        result.AddRange(sr.Results);
+                        if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
+                        {
+                            result.AddRange(sr.Results);
 
-                        skip -= sr.Results.Count;
+                            skip = 0;
+                        }
+                        else //take part results from current instance, exit
+                        {
+                            result.AddRange(sr.Results.Take(take - result.Count));
+
+                            break;
+                        }
                     }
                 }
             }
 
             return result;
         }
-        
+
         [OperationContract]
         public Info GetInfo()
         {
@@ -259,7 +267,7 @@ namespace FTSearchNet
 
             result.IndexSize = Convert.ToUInt64(GetInstances().Sum(x => x.Item2));
             result.AmountInstances = Convert.ToUInt32(Instances.Count);
-            result.TextSize = result.IndexSize * 55; //in average
+            result.TextSize = result.IndexSize * 43; //in average
 
             return result;
         }
@@ -406,10 +414,10 @@ namespace FTSearchNet
             var archive = Path.Combine(@"\\srv3\fs\Production-Logs", archiveName) + ".7z";
 
             var file = name.Replace(archiveName + "\\", "");
-            
+
             var dest = Path.Combine(@"C:\FTS\Logs\Cached", archiveName);
 
-            if(!Directory.Exists(dest))
+            if (!Directory.Exists(dest))
             {
                 Directory.CreateDirectory(dest);
             }
@@ -475,7 +483,7 @@ namespace FTSearchNet
                         endLine = -1;
 
                         //leave 50 rows
-                        for(int i=0; i < lines.Count - amountLines; i++)
+                        for (int i = 0; i < lines.Count - amountLines; i++)
                         {
                             lines.Dequeue();
                         }
@@ -502,7 +510,7 @@ namespace FTSearchNet
                     content.AppendLine(lines.Aggregate((x, y) => x + "\r\n" + y));
                 }
             }
-            
+
             //File.Delete(fullPath);
 
             return content.ToString();
@@ -522,6 +530,11 @@ namespace FTSearchNet
 
             _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
             _host.Open();
+        }
+
+        public static void StopWebService()
+        {
+            _host.Abort();
         }
 
         #endregion

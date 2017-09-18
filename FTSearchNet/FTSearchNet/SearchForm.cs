@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 
-namespace FTSearchNet
+namespace FTSearchTest
 {
     public partial class SearchForm : Form
     {

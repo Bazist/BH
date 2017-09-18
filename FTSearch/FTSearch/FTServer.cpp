@@ -49,6 +49,8 @@ void startInstance(FTSConfiguration configuration, bool onlyCheckIndex)
 RelevantResult* searchPhrase(uint32 instanceNumber,
 							 const char* phrase,
 							 uint32 phraseLen,
+							 const char* templateName,
+							 uint32 templateNameLen,
 							 uint32 minPage,
 							 uint32 maxPage,
 							 uint32 skip)
@@ -59,6 +61,8 @@ RelevantResult* searchPhrase(uint32 instanceNumber,
 		{
 			return instances[i]->searchPhrase(phrase,
 												phraseLen,
+												templateName,
+												templateNameLen,
 												minPage,
 												maxPage,
 												skip);

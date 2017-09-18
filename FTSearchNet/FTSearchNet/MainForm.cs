@@ -10,8 +10,9 @@ using System.IO;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Threading;
+using FTServiceWCF;
 
-namespace FTSearchNet
+namespace FTSearchTest
 {
     public partial class MainForm : Form
     {
@@ -27,8 +28,6 @@ namespace FTSearchNet
         private Stopwatch indexedTime = new Stopwatch();
         private Stopwatch totalTime = new Stopwatch();
 
-        private const string FTS_PATH = @"C:\FTS";
-        
         private FTService fts = new FTService();
 
         private void UpdateScanSpeed()
@@ -639,7 +638,7 @@ namespace FTSearchNet
 
             this.UpdateInstanceInfo(fts);
 
-            var results = fts.SearchPhrase(tbSearchText.Text, 0, 25);
+            var results = fts.SearchPhrase(tbSearchText.Text, string.Empty, 0, 25);
 
             rtbLog.Clear();
 

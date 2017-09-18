@@ -74,8 +74,8 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="AmountInstances" type="xs:unsignedInt" />
-      <xs:element minOccurs="0" name="CountWordsHDD" type="xs:unsignedInt" />
-      <xs:element minOccurs="0" name="CountWordsRAM" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="CountWordsHDD" type="xs:unsignedLong" />
+      <xs:element minOccurs="0" name="CountWordsRAM" type="xs:unsignedLong" />
       <xs:element minOccurs="0" name="DocumentNameSize" type="xs:unsignedInt" />
       <xs:element minOccurs="0" name="HasError" type="xs:boolean" />
       <xs:element minOccurs="0" name="IndexSize" type="xs:unsignedLong" />

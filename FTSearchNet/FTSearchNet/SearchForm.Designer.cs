@@ -1,4 +1,4 @@
-﻿namespace FTSearchNet
+﻿namespace FTSearchTest
 {
     partial class SearchForm
     {

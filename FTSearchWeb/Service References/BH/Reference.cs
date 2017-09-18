@@ -478,10 +478,10 @@ namespace FTSearchWeb.BH {
         private uint AmountInstancesField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private uint CountWordsHDDField;
+        private ulong CountWordsHDDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private uint CountWordsRAMField;
+        private ulong CountWordsRAMField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private uint DocumentNameSizeField;
@@ -542,7 +542,7 @@ namespace FTSearchWeb.BH {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public uint CountWordsHDD {
+        public ulong CountWordsHDD {
             get {
                 return this.CountWordsHDDField;
             }
@@ -555,7 +555,7 @@ namespace FTSearchWeb.BH {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public uint CountWordsRAM {
+        public ulong CountWordsRAM {
             get {
                 return this.CountWordsRAMField;
             }

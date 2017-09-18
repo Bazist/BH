@@ -7,7 +7,7 @@ using System.IO;
 using System.Net;
 using System.ServiceModel;
 
-namespace FTSearchNet
+namespace FTServiceWCF
 {
     public class FTSearch
     {
@@ -365,7 +365,14 @@ namespace FTSearchNet
         private static extern IntPtr getInfoDLL(System.UInt32 instanceNumber);
 
         [DllImport(DLL_PATH, EntryPoint = "searchPhrase", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static unsafe extern IntPtr searchPhraseDLL(System.UInt32 instanceNumber, byte* phrase, System.UInt32 phraseLen, System.UInt32 minPage, System.UInt32 maxPage, uint skip);
+        private static unsafe extern IntPtr searchPhraseDLL(System.UInt32 instanceNumber,
+                                                            byte* phrase,
+                                                            System.UInt32 phraseLen,
+                                                            byte* templateName,
+                                                            System.UInt32 templateNameLen,
+                                                            System.UInt32 minPage,
+                                                            System.UInt32 maxPage,
+                                                            uint skip);
 
         [DllImport(DLL_PATH, EntryPoint = "searchPhraseRel", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static unsafe extern IntPtr searchPhraseRelDLL(System.UInt32 instanceNumber, byte* phrase, System.UInt32 phraseLen, System.UInt32 minPage, System.UInt32 maxPage);
@@ -638,7 +645,7 @@ namespace FTSearchNet
 
             foreach (string currPhrase in phrases)
             {
-                ids.AddRange(SearchIDByPhrase(currPhrase, minPage, maxPage));
+                ids.AddRange(SearchIDByPhrase(currPhrase, string.Empty, minPage, maxPage));
             }
 
             ids.Sort();
@@ -665,14 +672,23 @@ namespace FTSearchNet
             return results;
         }
 
-        public unsafe List<uint> SearchIDByPhrase(string phrase, uint minPage, uint maxPage)
+        public unsafe List<uint> SearchIDByPhrase(string phrase, string templateName, uint minPage, uint maxPage)
         {
             List<uint> results = new List<uint>();
             byte[] nameBytes = new byte[256];
 
-            fixed (Byte* pPhrase = Encoding.GetBytes(phrase), pName = nameBytes)
+            fixed (Byte* pPhrase = Encoding.GetBytes(phrase),
+                         pTemplateName = Encoding.GetBytes(templateName),
+                         pName = nameBytes)
             {
-                IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage, 0);
+                IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber,
+                                                         pPhrase,
+                                                         (System.UInt32)phrase.Length,
+                                                         pTemplateName,
+                                                         (System.UInt32)templateName.Length,
+                                                         minPage,
+                                                         maxPage,
+                                                         0);
 
                 RelevantResultDLL relevantResultDLL = (RelevantResultDLL)Marshal.PtrToStructure(pRelevantResult, typeof(RelevantResultDLL));
 
@@ -696,13 +712,25 @@ namespace FTSearchNet
             public uint FullCountMatches = 0;
         }
 
-        public unsafe SearchResult SearchPhrase(string phrase, uint minPage, uint maxPage, uint skip)
+        public unsafe SearchResult SearchPhrase(string phrase,
+                                                string templateName,
+                                                uint minPage,
+                                                uint maxPage,
+                                                uint skip)
         {
             SearchResult sr = new SearchResult();
             
-            fixed (Byte* pPhrase = Encoding.GetBytes(phrase))
+            fixed (Byte* pPhrase = Encoding.GetBytes(phrase),
+                         pTemplateName = Encoding.GetBytes(templateName))
             {
-                IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage, skip);
+                IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber,
+                                                         pPhrase,
+                                                         (System.UInt32)phrase.Length,
+                                                         pTemplateName,
+                                                         (System.UInt32)templateName.Length,
+                                                         minPage,
+                                                         maxPage,
+                                                         skip);
 
                 RelevantResultDLL relevantResultDLL = (RelevantResultDLL)Marshal.PtrToStructure(pRelevantResult, typeof(RelevantResultDLL));
 

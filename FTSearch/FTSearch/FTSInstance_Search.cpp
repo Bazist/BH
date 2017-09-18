@@ -708,6 +708,8 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 	
 RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 										  uint32 phraseLen,
+										  const char* templateName,
+										  uint32 templateNameLen,
 										  uint32 minPage,
 										  uint32 maxPage,
 										  uint32 skip)
@@ -1774,7 +1776,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 	
 	//minRange1
 	sprintf(phrase, "y%04d m%02d", startDate1Year, startDate1Month);
-	pResult = searchPhrase(phrase, strlen(phrase), 80, Info.LastNameIDRAM, 0);
+	pResult = searchPhrase(phrase, strlen(phrase), "", 0, 80, Info.LastNameIDRAM, 0);
 
 	uint32 minRange1 = 0;
 
@@ -1788,7 +1790,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 
 	//minRange2
 	sprintf(phrase, "y%04d m%02d d%02d", startDate2Year, startDate2Month, startDate2Day);
-	pResult = searchPhrase(phrase, strlen(phrase), minRange1 + 1, Info.LastNameIDRAM, 0);
+	pResult = searchPhrase(phrase, strlen(phrase), "", 0, minRange1 + 1, Info.LastNameIDRAM, 0);
 
 	uint32 minRange2 = 0;
 
@@ -1802,7 +1804,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 
 	//maxRange2
 	sprintf(phrase, "y%04d m%02d d%02d", endDate2Year, endDate2Month, endDate2Day);
-	pResult = searchPhrase(phrase, strlen(phrase), minRange2 + 1, Info.LastNameIDRAM, 0);
+	pResult = searchPhrase(phrase, strlen(phrase), "", 0, minRange2 + 1, Info.LastNameIDRAM, 0);
 
 	uint32 maxRange2 = 0;
 	
@@ -1889,7 +1891,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 				{
 					//ssql
 					sprintf(phrase, "%s %s", sites.Words[j].Word, tempWord);
-					pResult = searchPhrase(phrase, strlen(phrase), minRange2, maxRange2 - 1, 0);
+					pResult = searchPhrase(phrase, strlen(phrase), "", 0, minRange2, maxRange2 - 1, 0);
 
 					if(pResult->CountMatches >= minWordsOnSite)
 					{
