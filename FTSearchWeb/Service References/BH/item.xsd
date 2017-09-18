@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/FTSearchNet" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/FTSearchNet" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/FTServiceWCF" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/FTServiceWCF" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:8080/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:complexType name="FTSearch.ConfigurationDLL">
-    <xs:annotation>
-      <xs:appinfo>
-        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
-      </xs:appinfo>
-    </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="AutoSaveIndex" type="xs:boolean" />
       <xs:element minOccurs="0" name="AutoStemmingOn" type="xs:unsignedInt" />

@@ -15,9 +15,9 @@ namespace FTSearchWeb.BH {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.ConfigurationDLL", Namespace="http://schemas.datacontract.org/2004/07/FTSearchNet")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.ConfigurationDLL", Namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF")]
     [System.SerializableAttribute()]
-    public partial struct FTSearchConfigurationDLL : System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class FTSearchConfigurationDLL : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
@@ -79,6 +79,7 @@ namespace FTSearchWeb.BH {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private uint WordsHeaderBaseField;
         
+        [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
                 return this.extensionDataField;
@@ -337,7 +338,7 @@ namespace FTSearchWeb.BH {
         
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
-        void RaisePropertyChanged(string propertyName) {
+        protected void RaisePropertyChanged(string propertyName) {
             System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
             if ((propertyChanged != null)) {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
@@ -347,7 +348,7 @@ namespace FTSearchWeb.BH {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.Result", Namespace="http://schemas.datacontract.org/2004/07/FTSearchNet")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.Result", Namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF")]
     [System.SerializableAttribute()]
     public partial struct FTSearchResult : System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -407,7 +408,7 @@ namespace FTSearchWeb.BH {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.ResultPosition", Namespace="http://schemas.datacontract.org/2004/07/FTSearchNet")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.ResultPosition", Namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF")]
     [System.SerializableAttribute()]
     public partial struct FTSearchResultPosition : System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -467,7 +468,7 @@ namespace FTSearchWeb.BH {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FTService.Info", Namespace="http://schemas.datacontract.org/2004/07/FTSearchNet")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTService.Info", Namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF")]
     [System.SerializableAttribute()]
     public partial struct FTServiceInfo : System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -768,10 +769,10 @@ namespace FTSearchWeb.BH {
         System.Threading.Tasks.Task StartAsync(int instanceNumber);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhrase", ReplyAction="http://tempuri.org/FTService/SearchPhraseResponse")]
-        FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase, int skip, int take);
+        FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase, string templateName, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhrase", ReplyAction="http://tempuri.org/FTService/SearchPhraseResponse")]
-        System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase, int skip, int take);
+        System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase, string templateName, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetInfo", ReplyAction="http://tempuri.org/FTService/GetInfoResponse")]
         FTSearchWeb.BH.FTServiceInfo GetInfo();
@@ -883,12 +884,12 @@ namespace FTSearchWeb.BH {
             return base.Channel.StartAsync(instanceNumber);
         }
         
-        public FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase, int skip, int take) {
-            return base.Channel.SearchPhrase(phrase, skip, take);
+        public FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase, string templateName, int skip, int take) {
+            return base.Channel.SearchPhrase(phrase, templateName, skip, take);
         }
         
-        public System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase, int skip, int take) {
-            return base.Channel.SearchPhraseAsync(phrase, skip, take);
+        public System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase, string templateName, int skip, int take) {
+            return base.Channel.SearchPhraseAsync(phrase, templateName, skip, take);
         }
         
         public FTSearchWeb.BH.FTServiceInfo GetInfo() {

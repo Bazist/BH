@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8080/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/FTSearchNet" />
+  <xs:import schemaLocation="http://localhost:8080/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF" />
   <xs:element name="IsStarted">
     <xs:complexType>
       <xs:sequence />
@@ -21,7 +21,7 @@
   <xs:element name="GetConfigurationResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/FTSearchNet" minOccurs="0" name="GetConfigurationResult" type="q1:FTSearch.ConfigurationDLL" />
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/FTServiceWCF" minOccurs="0" name="GetConfigurationResult" nillable="true" type="q1:FTSearch.ConfigurationDLL" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -33,14 +33,14 @@
   <xs:element name="GetDefaultConfigurationResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/FTSearchNet" minOccurs="0" name="GetDefaultConfigurationResult" type="q2:FTSearch.ConfigurationDLL" />
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/FTServiceWCF" minOccurs="0" name="GetDefaultConfigurationResult" nillable="true" type="q2:FTSearch.ConfigurationDLL" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SetConfiguration">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/FTSearchNet" minOccurs="0" name="configuration" type="q3:FTSearch.ConfigurationDLL" />
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/FTServiceWCF" minOccurs="0" name="configuration" nillable="true" type="q3:FTSearch.ConfigurationDLL" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -65,6 +65,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="phrase" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="templateName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="skip" type="xs:int" />
         <xs:element minOccurs="0" name="take" type="xs:int" />
       </xs:sequence>
@@ -73,7 +74,7 @@
   <xs:element name="SearchPhraseResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/FTSearchNet" minOccurs="0" name="SearchPhraseResult" nillable="true" type="q4:ArrayOfFTSearch.Result" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/FTServiceWCF" minOccurs="0" name="SearchPhraseResult" nillable="true" type="q4:ArrayOfFTSearch.Result" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -85,7 +86,7 @@
   <xs:element name="GetInfoResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/FTSearchNet" minOccurs="0" name="GetInfoResult" type="q5:FTService.Info" />
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/FTServiceWCF" minOccurs="0" name="GetInfoResult" type="q5:FTService.Info" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -449,7 +449,9 @@ namespace FTServiceWCF
                     //Regex reg2 = new Regex("^" + aroundPhrase + "[^a-zA-Z0-9]+");
                     //Regex reg3 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "$");
 
-                    if (Regex.Match(line, "\\b" + aroundPhrase + "\\b", RegexOptions.IgnoreCase).Success)
+                    var words = aroundPhrase.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (words.Any(m => Regex.Match(line, "\\b" + m + "\\b", RegexOptions.IgnoreCase).Success))
                     {
                         if (startLine == -1)
                         {

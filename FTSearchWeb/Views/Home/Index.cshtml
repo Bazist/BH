@@ -23,7 +23,33 @@
                     <td>
                         @using (Html.BeginForm("Search", "Home"))
                         {
-                            <span>Searching: @Html.EditorFor(model => model.Phrase) <input type="submit" value="Search" /></span>
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        Search text:&nbsp;
+                                    </td>
+                                    <td>
+                                        @Html.EditorFor(model => model.Phrase)
+                                        @Html.ValidationMessageFor(model => model.Phrase)
+                                    </td>
+                                    <td>
+                                        &nbsp;<input type="submit" value="Search" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="height:5px;"></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Name contains:&nbsp;
+                                    </td>
+                                    <td>
+                                        @Html.EditorFor(model => model.TemplateName)
+                                        @Html.ValidationMessageFor(model => model.TemplateName)
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </table>
                         }
                     </td>
                 </tr>
@@ -40,7 +66,7 @@
                         {
                             <tr>
                                 <td nowrap>
-                                    <a href="?f=@Url.Encode(res.Name)&t=@Model.Phrase"><span>@res.Name</span></a>
+                                    <a href="?f=@Url.Encode(res.Name)&t=@Model.Phrase&tn=@Model.TemplateName"><span>@res.Name</span></a>
                                 </td>
                             </tr>
                         }
@@ -57,21 +83,21 @@
                                     <span>
                                         @if (Model.StartPage > 1)
                                         {
-                                            <a href="?sp=@(Model.StartPage - SearchResult.PAGE_SIZE)&cp=@(Model.StartPage - SearchResult.PAGE_SIZE)&t=@Model.Phrase">&lt;&lt;&lt;</a><span>&nbsp;</span>
+                                            <a href="?sp=@(Model.StartPage - SearchResult.PAGE_SIZE)&cp=@(Model.StartPage - SearchResult.PAGE_SIZE)&t=@Model.Phrase&tn=@Model.TemplateName">&lt;&lt;&lt;</a><span>&nbsp;</span>
                                         }
 
                                         @for (int page = Model.StartPage; page < Model.StartPage + SearchResult.PAGE_SIZE; page++)
                                         {
                                             if (page != Model.CurrentPage)
                                             {
-                                                <a href="?sp=@(Model.StartPage)&cp=@page&t=@Model.Phrase">@(page.ToString("00"))</a><span>&nbsp;</span>
+                                                <a href="?sp=@(Model.StartPage)&cp=@page&t=@Model.Phrase&tn=@Model.TemplateName">@(page.ToString("00"))</a><span>&nbsp;</span>
                                             }
                                             else
                                             {
                                                 @(page.ToString("00"))<span>&nbsp;</span>
                                             }
                                         }
-                                        <a href="?sp=@(Model.StartPage + SearchResult.PAGE_SIZE)&cp=@(Model.StartPage + SearchResult.PAGE_SIZE)&t=@Model.Phrase">&gt;&gt;&gt;</a><span></span>
+                                        <a href="?sp=@(Model.StartPage + SearchResult.PAGE_SIZE)&cp=@(Model.StartPage + SearchResult.PAGE_SIZE)&t=@Model.Phrase&tn=@Model.TemplateName">&gt;&gt;&gt;</a><span></span>
                                     </span>
                                 </td>
                             </tr>

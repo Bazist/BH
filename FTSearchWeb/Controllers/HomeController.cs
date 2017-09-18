@@ -36,67 +36,79 @@ namespace FTSearchWeb.Controllers
             return View();
         }
 
-        public ActionResult Search(string phrase)
+        public ActionResult Search(string phrase, string templateName)
         {
-            string sp = Request.Params["sp"];
-
-            if (string.IsNullOrEmpty(sp))
+            if (ModelState.IsValid)
             {
-                sp = "1";
-            }
+                string sp = Request.Params["sp"];
 
-            string cp = Request.Params["cp"];
-
-            if (string.IsNullOrEmpty(cp))
-            {
-                cp = "1";
-            }
-
-            if(string.IsNullOrEmpty(phrase))
-            {
-                phrase = Request.Params["t"];
-            }
-
-            BH.FTServiceClient fts = new BH.FTServiceClient();
-
-            if (!fts.IsStarted())
-            {
-                fts.Start(0);
-            }
-
-            var f = Request.Params["f"];
-            
-            if (string.IsNullOrEmpty(f)) //search phrase
-            {
-                var res = fts.SearchPhrase(phrase, (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
-
-                return View("Index", new SearchResult
+                if (string.IsNullOrEmpty(sp))
                 {
-                    Phrase = phrase,
-                    Results = res,
-                    StartPage = int.Parse(sp),
-                    CurrentPage = int.Parse(cp)
-                });
+                    sp = "1";
+                }
+
+                string cp = Request.Params["cp"];
+
+                if (string.IsNullOrEmpty(cp))
+                {
+                    cp = "1";
+                }
+
+                if (string.IsNullOrEmpty(phrase))
+                {
+                    phrase = Request.Params["t"];
+                }
+
+                if (string.IsNullOrEmpty(templateName))
+                {
+                    templateName = Request.Params["tn"];
+                }
+
+                BH.FTServiceClient fts = new BH.FTServiceClient();
+
+                if (!fts.IsStarted())
+                {
+                    fts.Start(0);
+                }
+
+                var f = Request.Params["f"];
+
+                if (string.IsNullOrEmpty(f)) //search phrase
+                {
+                    var res = fts.SearchPhrase(phrase, (templateName ?? string.Empty).Trim(), (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
+
+                    return View("Index", new SearchResult
+                    {
+                        Phrase = phrase,
+                        Results = res,
+                        StartPage = int.Parse(sp),
+                        CurrentPage = int.Parse(cp)
+                    });
+                }
+                else //open file
+                {
+                    ViewBag.Title = f;
+                    ViewBag.FileName = f;
+
+                    var content = fts.LoadContent(f, phrase);
+
+                    content = content.Replace("[BREAK]",
+                                              "<br/><br/>================= BREAK =====================<br/>");
+
+                    content = content.Replace("[TooManyMatches]",
+                                              "<br/><br/>================= FILE CANNOT BE LOAD FULL IN WEB ===================== <br/>");
+
+
+                    content = Regex.Replace(content, phrase, "<span style='background-color:yellow'>" + phrase + "</span>", RegexOptions.IgnoreCase);
+
+                    ViewBag.Content = content;
+
+                    return View("File");
+                }
             }
-            else //open file
+            else
             {
-                ViewBag.Title = f;
-                ViewBag.FileName = f;
-
-                var content = fts.LoadContent(f, phrase);
-
-                content = content.Replace("[BREAK]",
-                                          "<br/><br/>================= BREAK =====================<br/>");
-
-                content = content.Replace("[TooManyMatches]",
-                                          "<br/><br/>================= FILE CANNOT BE LOAD FULL IN WEB ===================== <br/>");
-                
-
-                content = Regex.Replace(content, phrase, "<span style='background-color:yellow'>" + phrase + "</span>", RegexOptions.IgnoreCase);
-
-                ViewBag.Content = content;
-
-                return View("File");
+                return View("Index", new SearchResult { StartPage = 1, CurrentPage = 1 });
             }
         }
     }

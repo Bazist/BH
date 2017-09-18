@@ -612,7 +612,7 @@ namespace FTSearchTest
 
             fts.SetConfiguration(fts.GetDefaultConfiguration());
 
-            FTService.StartWebservice();
+            FTService.StartWebservice("http://localhost:8080");
         }
 
         private void button7_Click(object sender, EventArgs e)
