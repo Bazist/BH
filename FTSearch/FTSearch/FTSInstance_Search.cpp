@@ -1035,9 +1035,25 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 			getDocumentNameByID(id, pName, Info.DocumentNameSize);
 
-			if (pPrevName)
+			if (templateNameLen == 0 || strstr(pName, templateName))
 			{
-				if (strcmp(pPrevName, pName)) //group if items has the same name
+				if (pPrevName)
+				{
+					if (strcmp(pPrevName, pName)) //group if items has the same name
+					{
+						if (!skip)
+						{
+							pResult->CountMatches++;
+						}
+						else
+						{
+							skip--;
+						}
+
+						pResult->FullCountMatches++;
+					}
+				}
+				else
 				{
 					if (!skip)
 					{
@@ -1050,26 +1066,13 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 					pResult->FullCountMatches++;
 				}
-			}
-			else
-			{
-				if (!skip)
+
+				strcpy(pPrevName, pName);
+
+				if (pResult->CountMatches >= MAX_FOUND_DOCUMENTS_IN_QUERY)
 				{
-					pResult->CountMatches++;
+					break;
 				}
-				else
-				{
-					skip--;
-				}
-
-				pResult->FullCountMatches++;
-			}
-
-			strcpy(pPrevName, pName);
-
-			if (pResult->CountMatches >= MAX_FOUND_DOCUMENTS_IN_QUERY)
-			{
-				break;
 			}
 		}
 

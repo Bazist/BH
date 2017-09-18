@@ -152,8 +152,16 @@ namespace FTServiceWCF
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        unsafe public struct ConfigurationDLL
+        unsafe public class ConfigurationDLL
         {
+            public void SetIndexPath(string indexPath)
+            {
+                byte[] arrPath = new byte[1024];
+                Array.Copy(Encoding.GetBytes(indexPath), arrPath, indexPath.Length);
+
+                IndexPath = arrPath;
+            }
+
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1024)]
             public byte[] IndexPath;
 
@@ -339,9 +347,9 @@ namespace FTServiceWCF
         #region DLL Import
 
 #if DEBUG
-        const string DLL_PATH = @"C:\FTS\BH\FTSearch\x64\Debug\FTSearch.dll";
+        const string DLL_PATH = @"FTSearch.dll";
 #else
-        const string DLL_PATH = @"C:\FTS\BH\FTSearch\x64\Release\FTSearch.dll";
+        const string DLL_PATH = @"FTSearch.dll";
 #endif
 
         //[DllImport(DLL_PATH, EntryPoint = "startDefaultInstance", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]

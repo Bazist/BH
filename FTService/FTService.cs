@@ -516,10 +516,10 @@ namespace FTServiceWCF
             return content.ToString();
         }
 
-        public static void StartWebservice()
+        public static void StartWebservice(string url)
         {
             Type serviceType = typeof(FTService);
-            Uri serviceUri = new Uri(string.Format("http://localhost:8080/"));
+            Uri serviceUri = new Uri(url);
 
             _host = new ServiceHost(serviceType, serviceUri);
 

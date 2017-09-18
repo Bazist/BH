@@ -18,17 +18,29 @@ namespace FTWinService
     {
         public WinService()
         {
-            InitializeComponent();
+#if !DEBUG
+                InitializeComponent();
 
-            this.ServiceName = @"BH.FTSearch";
-            this.EventLog.Source = this.ServiceName;
-            this.EventLog.Log = "Application";
+                this.ServiceName = @"BH.FTSearch";
+                this.EventLog.Source = this.ServiceName;
+                this.EventLog.Log = "Application";
+#endif
         }
 
         private FTService _fts = new FTService();
         private string _indexedArchives = string.Empty;
         private long _readBytes = 0;
         private int _amountDocuments = 0;
+
+        public void TestStart()
+        {
+            OnStart(null);
+        }
+
+        public void TestStop()
+        {
+            OnStop();
+        }
 
         protected override void OnStart(string[] args)
         {
@@ -40,17 +52,26 @@ namespace FTWinService
                     {
                         WriteLog("Start web service ...", EventLogEntryType.Information);
 
-                        _fts.SetConfiguration(_fts.GetDefaultConfiguration());
+                        var conf = _fts.GetDefaultConfiguration();
+
+                        conf.SetIndexPath(ConfigurationManager.AppSettings["IndexPath"]);
+                        conf.LimitUsedMemory = ulong.Parse(ConfigurationManager.AppSettings["LimitUsedMemory"]);
+
+                        _fts.SetConfiguration(conf);
 
                         _fts.Start();
 
-                        FTService.StartWebservice();
+                        FTService.StartWebservice(ConfigurationManager.AppSettings["URL"]);
 
                         WriteLog("Service started.", EventLogEntryType.Information);
                     }
                     catch (Exception ex)
                     {
                         WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+
+                        Stop();
+
+                        throw ex;
                     }
                 });
 
@@ -92,6 +113,10 @@ namespace FTWinService
                         catch (Exception ex)
                         {
                             WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+
+                            Stop();
+
+                            throw ex;
                         }
                     }
                 );
@@ -117,12 +142,20 @@ namespace FTWinService
                     catch (Exception ex)
                     {
                         WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+
+                        Stop();
+
+                        throw ex;
                     }
                 });
         }
 
         private void WriteLog(string message, EventLogEntryType eventType)
         {
+            message = $"[{DateTime.Now.ToString()}] {message}";
+#if DEBUG
+            Trace.WriteLine(message);
+#else
             ((ISupportInitialize)(this.EventLog)).BeginInit();
             if (!EventLog.SourceExists(this.EventLog.Source))
             {
@@ -130,10 +163,11 @@ namespace FTWinService
             }
             ((ISupportInitialize)(this.EventLog)).EndInit();
 
-            this.EventLog.WriteEntry($"[{DateTime.Now.ToString()}] {message}", eventType);
+            this.EventLog.WriteEntry(message, eventType);
+#endif
         }
 
-        #region Index Files
+#region Index Files
 
         private bool IndexFile(string name, string text)
         {
@@ -338,6 +372,6 @@ namespace FTWinService
             }
         }
 
-        #endregion
+#endregion
     }
 }

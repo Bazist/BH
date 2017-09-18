@@ -395,7 +395,7 @@ namespace FTSearchTest
 
                         readTime.Stop();
 
-                        res |= this.IndexFile(fi.FullName, text);
+                        res |= this.IndexFile(fullName, text);
                     }
                     else
                     {
@@ -496,7 +496,7 @@ namespace FTSearchTest
 
             //return;
 
-            string srcPath = @"N:\Production-Logs\";
+            string srcPath = @"\\srv3\fs\Production-Logs\";
             string destPath = @"C:\FTS\Logs\";
             string logPath = @"C:\FTS\archives.txt";
 
