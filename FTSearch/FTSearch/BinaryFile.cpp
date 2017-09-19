@@ -116,11 +116,9 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 
 	if (position + length > m_fileSize)
 	{
-		ulong64 allocateSize = m_fileSize - position - length;
+		ulong64 allocateSize = (position + length) - m_fileSize;
 
-		allocate(allocateSize, m_fileSize);
-
-		m_fileSize += allocateSize;
+		m_fileSize += allocate(allocateSize, m_fileSize);
 	}
 
 	//return read(pData, position, length);
@@ -278,11 +276,9 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 
 	if (position + length > m_fileSize)
 	{
-		ulong64 allocateSize = m_fileSize - position - length;
+		ulong64 allocateSize = (position + length) - m_fileSize;
 
-		allocate(allocateSize, m_fileSize);
-
-		m_fileSize += allocateSize;
+		m_fileSize += allocate(allocateSize, m_fileSize);
 	}
 
 	//write(pData, position, length);

@@ -90,8 +90,11 @@ public:
 
 	void startInstance(FTSConfiguration& configuration, bool onlyCheckIndex)
 	{
-		//destroy previous instance
-		destroy();
+		if (strlen(Configuration.IndexPath) > 0)
+		{
+			//destroy previous instance
+			destroy();
+		}
 
 		Configuration = configuration;
 

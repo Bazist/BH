@@ -36,7 +36,7 @@ namespace FTSearchWeb.Controllers
             return View();
         }
 
-        public ActionResult Search(string phrase, string templateName)
+        public ActionResult Search(SearchResult result)
         {
             if (ModelState.IsValid)
             {
@@ -54,14 +54,14 @@ namespace FTSearchWeb.Controllers
                     cp = "1";
                 }
 
-                if (string.IsNullOrEmpty(phrase))
+                if (string.IsNullOrEmpty(result.Phrase))
                 {
-                    phrase = Request.Params["t"];
+                    result.Phrase = Request.Params["t"];
                 }
 
-                if (string.IsNullOrEmpty(templateName))
+                if (string.IsNullOrEmpty(result.TemplateName))
                 {
-                    templateName = Request.Params["tn"];
+                    result.TemplateName = Request.Params["tn"];
                 }
 
                 BH.FTServiceClient fts = new BH.FTServiceClient();
@@ -75,11 +75,11 @@ namespace FTSearchWeb.Controllers
 
                 if (string.IsNullOrEmpty(f)) //search phrase
                 {
-                    var res = fts.SearchPhrase(phrase, (templateName ?? string.Empty).Trim(), (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
+                    var res = fts.SearchPhrase(result.Phrase, (result.TemplateName ?? string.Empty).Trim(), (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
 
                     return View("Index", new SearchResult
                     {
-                        Phrase = phrase,
+                        Phrase = result.Phrase,
                         Results = res,
                         StartPage = int.Parse(sp),
                         CurrentPage = int.Parse(cp)
@@ -90,7 +90,7 @@ namespace FTSearchWeb.Controllers
                     ViewBag.Title = f;
                     ViewBag.FileName = f;
 
-                    var content = fts.LoadContent(f, phrase);
+                    var content = fts.LoadContent(f, result.Phrase);
 
                     content = content.Replace("[BREAK]",
                                               "<br/><br/>================= BREAK =====================<br/>");
@@ -98,8 +98,12 @@ namespace FTSearchWeb.Controllers
                     content = content.Replace("[TooManyMatches]",
                                               "<br/><br/>================= FILE CANNOT BE LOAD FULL IN WEB ===================== <br/>");
 
+                    var words = result.Phrase.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    content = Regex.Replace(content, phrase, "<span style='background-color:yellow'>" + phrase + "</span>", RegexOptions.IgnoreCase);
+                    foreach (var word in words)
+                    {
+                        content = Regex.Replace(content, word, "<span style='background-color:yellow'>" + word + "</span>", RegexOptions.IgnoreCase);
+                    }
 
                     ViewBag.Content = content;
 

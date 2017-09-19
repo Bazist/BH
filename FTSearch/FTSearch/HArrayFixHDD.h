@@ -377,9 +377,9 @@ public:
 
 			for (uint32 i = 0; i < info.CountPartitions; i++)
 			{
-				partitions[i].ContentPagesSize = info.Partitions[i].ContentPagesCount * MAX_SHORT;
-				partitions[i].BranchPagesSize = info.Partitions[i].BranchPagesCount * MAX_SHORT;
-				partitions[i].BlockPagesSize = info.Partitions[i].BlockPagesCount * MAX_SHORT;
+				partitions[i].ContentPagesSize = info.Partitions[i].ContentPagesCount;
+				partitions[i].BranchPagesSize = info.Partitions[i].BranchPagesCount;
+				partitions[i].BlockPagesSize = info.Partitions[i].BlockPagesCount;
 
 				partitions[i].lastContentOffset = info.Partitions[i].LastContentOffset;
 				partitions[i].lastBranchOffset = info.Partitions[i].LastBranchOffset;
@@ -427,19 +427,16 @@ public:
 			if (partitions[i].pContentPagesFile)
 			{
 				partitions[i].pContentPagesFile->flush();
-				partitions[i].ContentPagesSize = partitions[i].pContentPagesFile->getFileSize() / sizeof(ContentCell);
 			}
 
 			if (partitions[i].pBranchPagesFile)
 			{
 				partitions[i].pBranchPagesFile->flush();
-				partitions[i].BranchPagesSize = partitions[i].pBranchPagesFile->getFileSize() / sizeof(BranchCell);
 			}
 
 			if (partitions[i].pBlockPagesFile)
 			{
 				partitions[i].pBlockPagesFile->flush();
-				partitions[i].BlockPagesSize = partitions[i].pBlockPagesFile->getFileSize() / sizeof(BlockCell);
 			}
 		}
 
@@ -467,9 +464,9 @@ public:
 
 				for (uint32 i = 0; i < countPartitions; i++)
 				{
-					info.Partitions[i].ContentPagesCount = partitions[i].ContentPagesSize / MAX_SHORT;
-					info.Partitions[i].BranchPagesCount = partitions[i].BranchPagesSize / MAX_SHORT;
-					info.Partitions[i].BlockPagesCount = partitions[i].BlockPagesSize / MAX_SHORT;
+					info.Partitions[i].ContentPagesCount = (partitions[i].lastContentOffset | MAX_SHORT) / MAX_SHORT; //alingment on MAX_SHORT
+					info.Partitions[i].BranchPagesCount = (partitions[i].lastBranchOffset | MAX_SHORT) / MAX_SHORT;
+					info.Partitions[i].BlockPagesCount = (partitions[i].lastBlockOffset | MAX_SHORT) / MAX_SHORT;
 					info.Partitions[i].LastContentOffset = partitions[i].lastContentOffset;
 					info.Partitions[i].LastBranchOffset = partitions[i].lastBranchOffset;
 					info.Partitions[i].LastBlockOffset = partitions[i].lastBlockOffset;

@@ -259,7 +259,7 @@ namespace FTWinService
                           extension == ".log" || extension == ".csv" ||
                           extension == ".xml"))
                 {
-                    int maxSize = 1024 * 1024 * 10;
+                    long maxSize = 1024 * 1024 * 10;
 
                     string fullName = fi.FullName.Replace(rootPath, "");
 
@@ -273,7 +273,7 @@ namespace FTWinService
                     {
                         using (StreamReader sr = new StreamReader(fi.FullName))
                         {
-                            for (int i = 0; i < fi.Length; i += maxSize)
+                            for (long i = 0; i < fi.Length; i += maxSize)
                             {
                                 long size;
 
@@ -370,6 +370,11 @@ namespace FTWinService
 
                 //break;
             }
+
+            //save index
+            _fts.SaveIndex();
+
+            File.AppendAllText(logPath, _indexedArchives + "\r\n");
         }
 
 #endregion

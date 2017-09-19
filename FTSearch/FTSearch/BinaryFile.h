@@ -83,16 +83,16 @@ public:
 		fflush(m_file);
 	}
 
-	void allocate(uint32 size, ulong64 fromPosition)
+	ulong64 allocate(ulong64 size, ulong64 fromPosition)
 	{
-		size /= MAX_SHORT;
+		uint32 blocks = size / MAX_SHORT + 1;
 
 		uchar8* buff = new uchar8[MAX_SHORT];
 		memset(buff, 0, MAX_SHORT);
 		
 		setPosition(fromPosition);
 
-		for(uint32 i=0; i<size; i++)
+		for(uint32 i=0; i < blocks; i++)
 		{
 			write(buff, MAX_SHORT);
 		}
@@ -100,6 +100,8 @@ public:
 		//setPosition(0);
 
 		delete[] buff;
+
+		return blocks * MAX_SHORT;
 	}
 
 	ulong64 getFileSize()

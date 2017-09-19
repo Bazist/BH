@@ -60,7 +60,7 @@ namespace FTServiceWCF
 
         private static ServiceHost _host;
 
-        public const string DEFAULT_FTS_PATH = @"I:\FTS_Merged";
+        public const string DEFAULT_FTS_PATH = @"C:\FTS";
 
         #endregion
 
@@ -80,7 +80,10 @@ namespace FTServiceWCF
         [OperationContract]
         public bool IsStarted()
         {
-            return Instances.Count > 0;
+            lock (this)
+            {
+                return Instances.Count > 0;
+            }
         }
 
         private string GetPath()
@@ -104,240 +107,267 @@ namespace FTServiceWCF
         [OperationContract]
         public FTSearch.ConfigurationDLL GetConfiguration()
         {
-            return _configuration;
+            lock (this)
+            {
+                return _configuration;
+            }
         }
 
         [OperationContract]
         public FTSearch.ConfigurationDLL GetDefaultConfiguration()
         {
-            FTSearch.ConfigurationDLL conf = new FTSearch.ConfigurationDLL();
+            lock (this)
+            {
+                FTSearch.ConfigurationDLL conf = new FTSearch.ConfigurationDLL();
 
-            byte[] indexPath = new byte[1024];
-            Array.Copy(Encoding.ASCII.GetBytes(DEFAULT_FTS_PATH), indexPath, DEFAULT_FTS_PATH.Length);
+                byte[] indexPath = new byte[1024];
+                Array.Copy(Encoding.ASCII.GetBytes(DEFAULT_FTS_PATH), indexPath, DEFAULT_FTS_PATH.Length);
 
-            conf.IndexPath = indexPath;
+                conf.IndexPath = indexPath;
 
-            conf.MemoryMode = (uint)FTSearch.MemoryMode.HDD;
-            conf.AutoStemmingOn = 12;
-            conf.MinLenWord = 3;
-            conf.MaxLenWord = 64;
-            conf.DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
-            conf.CountWordInPhrase = 1;
-            conf.IsUseNumberAlphabet = true;
+                conf.MemoryMode = (uint)FTSearch.MemoryMode.HDD;
+                conf.AutoStemmingOn = 12;
+                conf.MinLenWord = 3;
+                conf.MaxLenWord = 64;
+                conf.DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
+                conf.CountWordInPhrase = 1;
+                conf.IsUseNumberAlphabet = true;
 
-            conf.InstanceNumber = 1;
-            conf.IsUseRussianAlphabet = true;
-            conf.IsUseUkranianAlphabet = true;
-            conf.IsUseEnglishAlphabet = true;
-            conf.WordsHeaderBase = 24;
-            conf.LimitTopResults = 100;
-            conf.LimitUsedMemory = 8000000000; //8000 má by default
-            conf.RelevantLevel = 0;
-            conf.IsCreateNewInstanceOnUpdate = false;
-            conf.IsCustomPath = false;
-            conf.AutoSaveIndex = false;
+                conf.InstanceNumber = 1;
+                conf.IsUseRussianAlphabet = true;
+                conf.IsUseUkranianAlphabet = true;
+                conf.IsUseEnglishAlphabet = true;
+                conf.WordsHeaderBase = 24;
+                conf.LimitTopResults = 100;
+                conf.LimitUsedMemory = 8000000000; //8000 má by default
+                conf.RelevantLevel = 0;
+                conf.IsCreateNewInstanceOnUpdate = false;
+                conf.IsCustomPath = false;
+                conf.AutoSaveIndex = false;
 
-            return conf;
+                return conf;
+            }
         }
 
         [OperationContract]
         public void SetConfiguration(FTSearch.ConfigurationDLL configuration)
         {
-            _configuration = configuration;
+            lock (this)
+            {
+                _configuration = configuration;
+            }
         }
 
         [OperationContract]
         public void Start(int instanceNumber = 0)
         {
-            if (IsStarted())
-                Stop();
-
-            var dirsLenSort = GetInstances(instanceNumber);
-
-            uint maxInstanceNumber = 0;
-
-            for (int i = 0; i < dirsLenSort.Length; i++)
+            lock (this)
             {
-                string[] parts = dirsLenSort[i].Item1.Split(new string[] { "Instance" }, StringSplitOptions.None);
+                if (IsStarted())
+                    Stop();
 
-                string instance = parts[parts.Length - 1];
+                var dirsLenSort = GetInstances(instanceNumber);
 
-                UInt32 currInstanceNumber = uint.Parse(instance);
+                uint maxInstanceNumber = 0;
 
-                FTSearch fts = new FTSearch();
-
-                var conf = GetConfiguration();
-
-                conf.InstanceNumber = currInstanceNumber;
-
-                fts.StartInstance(conf);
-
-                Instances.Add(fts);
-
-                if (ActiveInstance == null && dirsLenSort[i].Item2 < MaxSizeActiveInstance)
+                for (int i = 0; i < dirsLenSort.Length; i++)
                 {
+                    string[] parts = dirsLenSort[i].Item1.Split(new string[] { "Instance" }, StringSplitOptions.None);
+
+                    string instance = parts[parts.Length - 1];
+
+                    UInt32 currInstanceNumber = uint.Parse(instance);
+
+                    FTSearch fts = new FTSearch();
+
+                    var conf = GetConfiguration();
+
+                    conf.InstanceNumber = currInstanceNumber;
+
+                    fts.StartInstance(conf);
+
+                    Instances.Add(fts);
+
+                    if (ActiveInstance == null && dirsLenSort[i].Item2 < MaxSizeActiveInstance)
+                    {
+                        ActiveInstance = fts;
+                    }
+
+                    if (currInstanceNumber > maxInstanceNumber)
+                    {
+                        maxInstanceNumber = currInstanceNumber;
+                    }
+                }
+
+                if (ActiveInstance == null)
+                {
+                    FTSearch fts = new FTSearch();
+
+                    var conf = GetConfiguration();
+
+                    conf.InstanceNumber = maxInstanceNumber + 1;
+
+                    fts.StartInstance(conf);
+
+                    Instances.Add(fts);
+
                     ActiveInstance = fts;
                 }
-
-                if (currInstanceNumber > maxInstanceNumber)
-                {
-                    maxInstanceNumber = currInstanceNumber;
-                }
-            }
-
-            if (ActiveInstance == null)
-            {
-                FTSearch fts = new FTSearch();
-
-                var conf = GetConfiguration();
-
-                conf.InstanceNumber = maxInstanceNumber + 1;
-
-                fts.StartInstance(conf);
-
-                Instances.Add(fts);
-
-                ActiveInstance = fts;
             }
         }
 
         [OperationContract]
         public List<FTSearch.Result> SearchPhrase(string phrase, string templateName, int skip, int take)
         {
-            var result = new List<FTSearch.Result>();
-
-            foreach (var fts in Instances)
+            lock (this)
             {
-                var sr = fts.SearchPhrase(phrase, templateName, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
+                var result = new List<FTSearch.Result>();
 
-                if (skip > sr.FullCountMatches) //skip all results
+                foreach (var fts in Instances)
                 {
-                    skip -= Convert.ToInt32(sr.FullCountMatches);
-                }
-                else
-                {
-                    if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
+                    var sr = fts.SearchPhrase(phrase, templateName, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
+
+                    if (skip > sr.FullCountMatches) //skip all results
                     {
-                        result.AddRange(sr.Results.Take(take - result.Count));
-
-                        break;
+                        skip -= Convert.ToInt32(sr.FullCountMatches);
                     }
-                    else //go to next instance
+                    else
                     {
-                        if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
-                        {
-                            result.AddRange(sr.Results);
-
-                            skip = 0;
-                        }
-                        else //take part results from current instance, exit
+                        if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
                         {
                             result.AddRange(sr.Results.Take(take - result.Count));
 
                             break;
                         }
+                        else //go to next instance
+                        {
+                            if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
+                            {
+                                result.AddRange(sr.Results);
+
+                                skip = 0;
+                            }
+                            else //take part results from current instance, exit
+                            {
+                                result.AddRange(sr.Results.Take(take - result.Count));
+
+                                break;
+                            }
+                        }
                     }
                 }
-            }
 
-            return result;
+                return result;
+            }
         }
 
         [OperationContract]
         public Info GetInfo()
         {
-            var result = new Info();
-
-            foreach (var fts in Instances)
+            lock (this)
             {
-                var current = fts.GetInfo();
+                var result = new Info();
 
-                result.CountWordsHDD += current.CountWordsHDD;
-                result.CountWordsRAM += current.CountWordsRAM;
-                result.DocumentNameSize = current.DocumentNameSize;
-                result.HasError = result.HasError || current.HasError;
-                result.LastErrorMessage += current.LastErrorMessage;
-                result.LastNameIDHDD += current.LastNameIDHDD;
-                result.LastNameIDRAM += current.LastNameIDRAM;
-                result.TotalMemory += current.TotalMemory;
-                result.UsedMemory += current.UsedMemory;
-                result.Version = current.Version;
-                result.WordsHeaderBase = current.WordsHeaderBase;
+                foreach (var fts in Instances)
+                {
+                    var current = fts.GetInfo();
+
+                    result.CountWordsHDD += current.CountWordsHDD;
+                    result.CountWordsRAM += current.CountWordsRAM;
+                    result.DocumentNameSize = current.DocumentNameSize;
+                    result.HasError = result.HasError || current.HasError;
+                    result.LastErrorMessage += current.LastErrorMessage;
+                    result.LastNameIDHDD += current.LastNameIDHDD;
+                    result.LastNameIDRAM += current.LastNameIDRAM;
+                    result.TotalMemory += current.TotalMemory;
+                    result.UsedMemory += current.UsedMemory;
+                    result.Version = current.Version;
+                    result.WordsHeaderBase = current.WordsHeaderBase;
+                }
+
+                result.IndexSize = Convert.ToUInt64(GetInstances().Sum(x => x.Item2));
+                result.AmountInstances = Convert.ToUInt32(Instances.Count);
+                result.TextSize = result.IndexSize * 43; //in average
+
+                return result;
             }
-
-            result.IndexSize = Convert.ToUInt64(GetInstances().Sum(x => x.Item2));
-            result.AmountInstances = Convert.ToUInt32(Instances.Count);
-            result.TextSize = result.IndexSize * 43; //in average
-
-            return result;
         }
 
         [OperationContract]
         public bool IndexText(string aliasName, string contentText)
         {
-            return ActiveInstance.IndexContent(aliasName, contentText, FTSearch.ContentType.Text);
+            lock (this)
+            {
+                return ActiveInstance.IndexContent(aliasName, contentText, FTSearch.ContentType.Text);
 
-            //{
-            //    foreach (var file in IndexedFilesInMemory)
-            //    {
-            //        File.AppendAllText(string.Format(@"{0}\log.txt", Path),
-            //                           string.Format(@"[{0}] {1}", DateTime.Now.ToString(), file));
-            //    }
-            //}
+                //{
+                //    foreach (var file in IndexedFilesInMemory)
+                //    {
+                //        File.AppendAllText(string.Format(@"{0}\log.txt", Path),
+                //                           string.Format(@"[{0}] {1}", DateTime.Now.ToString(), file));
+                //    }
+                //}
+            }
         }
 
         [OperationContract]
         public void SaveIndex()
         {
-            ActiveInstance.SaveIndex();
+            lock (this)
+            {
+                ActiveInstance.SaveIndex();
+            }
         }
 
         [OperationContract]
         public void MergeIndexes()
         {
-            int skipedBySize = 0;
-
-            while (true)
+            lock (this)
             {
-                var dirsLenSort = GetInstances();
+                int skipedBySize = 0;
 
-                if (dirsLenSort.Length <= skipedBySize + 1)
+                while (true)
                 {
-                    break;
-                }
+                    var dirsLenSort = GetInstances();
 
-                skipedBySize = 0;
-
-                for (int i = 0; i < dirsLenSort.Length - 1; i += 2)
-                {
-                    if (dirsLenSort[i].Item2 + dirsLenSort[i + 1].Item2 < MaxSizeActiveInstance)
+                    if (dirsLenSort.Length <= skipedBySize + 1)
                     {
-                        string path1 = dirsLenSort[i].Item1;
-                        string path2 = dirsLenSort[i + 1].Item1;
-
-                        string[] parts = path1.Split(new string[] { "Instance" }, StringSplitOptions.None);
-
-                        string instance = parts[parts.Length - 1];
-
-                        UInt32 instanceNumber = uint.Parse(instance);
-
-                        FTSearch fts = new FTSearch();
-
-                        var conf = GetConfiguration();
-
-                        conf.InstanceNumber = instanceNumber;
-
-                        fts.StartInstance(conf);
-
-                        fts.ImportIndex(path2);
-
-                        fts.StopInstance();
-
-                        //Directory.Delete(path2, true);
+                        break;
                     }
-                    else
+
+                    skipedBySize = 0;
+
+                    for (int i = 0; i < dirsLenSort.Length - 1; i += 2)
                     {
-                        skipedBySize += 2;
+                        if (dirsLenSort[i].Item2 + dirsLenSort[i + 1].Item2 < MaxSizeActiveInstance)
+                        {
+                            string path1 = dirsLenSort[i].Item1;
+                            string path2 = dirsLenSort[i + 1].Item1;
+
+                            string[] parts = path1.Split(new string[] { "Instance" }, StringSplitOptions.None);
+
+                            string instance = parts[parts.Length - 1];
+
+                            UInt32 instanceNumber = uint.Parse(instance);
+
+                            FTSearch fts = new FTSearch();
+
+                            var conf = GetConfiguration();
+
+                            conf.InstanceNumber = instanceNumber;
+
+                            fts.StartInstance(conf);
+
+                            fts.ImportIndex(path2);
+
+                            fts.StopInstance();
+
+                            //Directory.Delete(path2, true);
+                        }
+                        else
+                        {
+                            skipedBySize += 2;
+                        }
                     }
                 }
             }
@@ -346,37 +376,43 @@ namespace FTServiceWCF
         [OperationContract]
         public void Stop()
         {
-            foreach (var fts in Instances)
+            lock (this)
             {
-                fts.StopInstance();
-            }
+                foreach (var fts in Instances)
+                {
+                    fts.StopInstance();
+                }
 
-            Instances.Clear();
+                Instances.Clear();
+            }
         }
 
         [OperationContract]
         public void CheckIndexes()
         {
-            var dirsLenSort = GetInstances();
-
-            for (int i = 0; i < dirsLenSort.Length; i++)
+            lock (this)
             {
-                string[] parts = dirsLenSort[i].Item1.Split(new string[] { "Instance" }, StringSplitOptions.None);
+                var dirsLenSort = GetInstances();
 
-                string instance = parts[parts.Length - 1];
+                for (int i = 0; i < dirsLenSort.Length; i++)
+                {
+                    string[] parts = dirsLenSort[i].Item1.Split(new string[] { "Instance" }, StringSplitOptions.None);
 
-                UInt32 instanceNumber = uint.Parse(instance);
+                    string instance = parts[parts.Length - 1];
 
-                FTSearch fts = new FTSearch();
+                    UInt32 instanceNumber = uint.Parse(instance);
 
-                var conf = GetConfiguration();
+                    FTSearch fts = new FTSearch();
 
-                conf.InstanceNumber = instanceNumber;
-                //conf.OnlyCheckIndex = false;
+                    var conf = GetConfiguration();
 
-                fts.StartInstance(conf);
+                    conf.InstanceNumber = instanceNumber;
+                    //conf.OnlyCheckIndex = false;
 
-                fts.StopInstance();
+                    fts.StartInstance(conf);
+
+                    fts.StopInstance();
+                }
             }
         }
 
@@ -405,117 +441,120 @@ namespace FTServiceWCF
         [OperationContract]
         public string LoadContent(string name, string aroundPhrase)
         {
-            name = name.Replace(@"C:\FTS\Logs\Unpacked\", string.Empty);
-
-            var parts = name.Split('\\');
-
-            var archiveName = parts[0];
-
-            var archive = Path.Combine(@"\\srv3\fs\Production-Logs", archiveName) + ".7z";
-
-            var file = name.Replace(archiveName + "\\", "");
-
-            var dest = Path.Combine(@"C:\FTS\Logs\Cached", archiveName);
-
-            if (!Directory.Exists(dest))
+            lock (this)
             {
-                Directory.CreateDirectory(dest);
-            }
+                name = name.Replace(@"C:\FTS\Logs\Unpacked\", string.Empty);
 
-            var fullPath = Path.Combine(dest, file);
+                var parts = name.Split('\\');
 
-            if (!File.Exists(fullPath))
-            {
-                Unpack(archive, file, dest);
-            }
+                var archiveName = parts[0];
 
-            var content = new StringBuilder();
+                var archive = Path.Combine(@"\\srv3\fs\Production-Logs", archiveName) + ".7z";
 
-            int startLine = -1;
-            int endLine = -1;
+                var file = name.Replace(archiveName + "\\", "");
 
-            const int amountLines = 50;
+                var dest = Path.Combine(@"C:\FTS\Logs\Cached", archiveName);
 
-            //need optimize !
-            Queue<string> lines = new Queue<string>();
-
-            using (StreamReader sr = new StreamReader(fullPath))
-            {
-                while (!sr.EndOfStream)
+                if (!Directory.Exists(dest))
                 {
-                    string line = sr.ReadLine();
+                    Directory.CreateDirectory(dest);
+                }
 
-                    //Regex reg1 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "[^a-zA-Z0-9]+");
-                    //Regex reg2 = new Regex("^" + aroundPhrase + "[^a-zA-Z0-9]+");
-                    //Regex reg3 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "$");
+                var fullPath = Path.Combine(dest, file);
 
-                    var words = aroundPhrase.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (!File.Exists(fullPath))
+                {
+                    Unpack(archive, file, dest);
+                }
 
-                    if (words.Any(m => Regex.Match(line, "\\b" + m + "\\b", RegexOptions.IgnoreCase).Success))
+                var content = new StringBuilder();
+
+                int startLine = -1;
+                int endLine = -1;
+
+                const int amountLines = 50;
+
+                //need optimize !
+                Queue<string> lines = new Queue<string>();
+
+                using (StreamReader sr = new StreamReader(fullPath))
+                {
+                    while (!sr.EndOfStream)
                     {
-                        if (startLine == -1)
+                        string line = sr.ReadLine();
+
+                        //Regex reg1 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "[^a-zA-Z0-9]+");
+                        //Regex reg2 = new Regex("^" + aroundPhrase + "[^a-zA-Z0-9]+");
+                        //Regex reg3 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "$");
+
+                        var words = aroundPhrase.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        if (words.Any(m => Regex.Match(line, "\\b" + m + "\\b", RegexOptions.IgnoreCase).Success))
                         {
-                            if (lines.Count > amountLines)
+                            if (startLine == -1)
                             {
-                                startLine = lines.Count - amountLines;
+                                if (lines.Count > amountLines)
+                                {
+                                    startLine = lines.Count - amountLines;
+                                }
+                                else
+                                {
+                                    startLine = 0;
+                                }
                             }
-                            else
+
+                            endLine = lines.Count + amountLines;
+                        }
+
+                        //make break
+                        if (startLine != -1 && lines.Count > endLine)
+                        {
+                            content.AppendLine("[BREAK]");
+                            content.AppendLine(lines.Aggregate((x, y) => x + "\n" + y));
+
+                            if (content.Length > 1024 * 1024)
                             {
-                                startLine = 0;
+                                content.AppendLine("[TooManyMatches]");
+
+                                return content.ToString();
+                            }
+
+                            startLine = -1;
+                            endLine = -1;
+
+                            //leave 50 rows
+                            for (int i = 0; i < lines.Count - amountLines; i++)
+                            {
+                                lines.Dequeue();
                             }
                         }
 
-                        endLine = lines.Count + amountLines;
-                    }
-
-                    //make break
-                    if (startLine != -1 && lines.Count > endLine)
-                    {
-                        content.AppendLine("[BREAK]");
-                        content.AppendLine(lines.Aggregate((x, y) => x + "\n" + y));
-
-                        if (content.Length > 1024 * 1024)
-                        {
-                            content.AppendLine("[TooManyMatches]");
-
-                            return content.ToString();
-                        }
-
-                        startLine = -1;
-                        endLine = -1;
-
-                        //leave 50 rows
-                        for (int i = 0; i < lines.Count - amountLines; i++)
+                        if (startLine == -1 &&
+                            endLine == -1 &&
+                            lines.Count > amountLines)
                         {
                             lines.Dequeue();
                         }
-                    }
 
-                    if (startLine == -1 &&
-                        endLine == -1 &&
-                        lines.Count > amountLines)
-                    {
-                        lines.Dequeue();
+                        lines.Enqueue(line);
                     }
-
-                    lines.Enqueue(line);
                 }
-            }
 
-            //end of file
-            if (startLine != -1)
-            {
-                content.AppendLine("[BREAK]");
-
-                if (lines.Count > 0)
+                //end of file
+                if (startLine != -1)
                 {
-                    content.AppendLine(lines.Aggregate((x, y) => x + "\r\n" + y));
+                    content.AppendLine("[BREAK]");
+
+                    if (lines.Count > 0)
+                    {
+                        content.AppendLine(lines.Aggregate((x, y) => x + "\r\n" + y));
+                    }
                 }
+
+                //File.Delete(fullPath);
+
+                return content.ToString();
             }
-
-            //File.Delete(fullPath);
-
-            return content.ToString();
         }
 
         public static void StartWebservice(string url)

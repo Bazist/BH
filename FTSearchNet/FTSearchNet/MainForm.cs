@@ -383,7 +383,7 @@ namespace FTSearchTest
                           extension == ".log" || extension == ".csv" ||
                           extension == ".xml"))
                 {
-                    int maxSize = 1024 * 1024 * 10;
+                    long maxSize = 1024 * 1024 * 10;
 
                     string fullName = fi.FullName.Replace(rootPath, "");
 
@@ -401,7 +401,7 @@ namespace FTSearchTest
                     {
                         using (StreamReader sr = new StreamReader(fi.FullName))
                         {
-                            for (int i = 0; i < fi.Length; i += maxSize)
+                            for (long i = 0; i < fi.Length; i += maxSize)
                             {
                                 long size;
 
@@ -568,6 +568,10 @@ namespace FTSearchTest
                 //break;
             }
 
+            fts.SaveIndex();
+
+            File.AppendAllText(logPath, indexedArchives + "\r\n");
+
             ////StringBuilder name = new StringBuilder("doc1");
             ////StringBuilder str = new StringBuilder("киевский политихнический институт");
 
@@ -698,25 +702,36 @@ namespace FTSearchTest
 
         private void btnStartJob_Click(object sender, EventArgs e)
         {
-            ThreadPool.QueueUserWorkItem(x =>
-            {
-                DateTime dt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 3, 0, 0);
+            fts.Start();
+            
+            IndexFiles(fts, @"C:\FTS\Logs", @"C:\FTS\Logs");
 
-                while (true)
-                {
-                    if(DateTime.Now >= dt)
-                    {
-                        btnIndex_Click(null, null);
+            fts.SaveIndex();
 
-                        dt = dt.AddDays(1);
-                    }
-                    else
-                    {
-                        Thread.Sleep(1000);
-                    }
-                }
-            }
-            );
+            IndexFiles(fts, @"C:\FTS\Logs", @"C:\FTS\Logs");
+
+            fts.SaveIndex();
+
+            fts.Stop();
+            //ThreadPool.QueueUserWorkItem(x =>
+            //{
+            //    DateTime dt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 3, 0, 0);
+
+            //    while (true)
+            //    {
+            //        if(DateTime.Now >= dt)
+            //        {
+            //            btnIndex_Click(null, null);
+
+            //            dt = dt.AddDays(1);
+            //        }
+            //        else
+            //        {
+            //            Thread.Sleep(1000);
+            //        }
+            //    }
+            //}
+            //);
         }
     }
 }
