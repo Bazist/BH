@@ -594,6 +594,8 @@ namespace FTSearchTest
 
         private void btnIndex_Click(object sender, EventArgs e)
         {
+            fts.GetConfiguration().LimitUsedMemory = 500000000;
+
             fts.Start();
 
             Index();
@@ -705,6 +707,8 @@ namespace FTSearchTest
             fts.Start();
             
             IndexFiles(fts, @"C:\FTS\Logs", @"C:\FTS\Logs");
+
+            
 
             fts.SaveIndex();
 

@@ -56,6 +56,7 @@ public:
 	uint32 writeBuffered(const void* pData, ulong64 position, const uint32 length);
 
 	uint32 write(const void* pData, const uint32 length);
+	uint32 writeZero(const uint32 length);
 
 	bool readInt(uint32* pValue, ulong64 position);
 	bool readInt(uint32* pValue);
@@ -67,6 +68,8 @@ public:
 
 	void writeInt(const uint32* pValue);
 	void writeInt(const uint32* pValue, const ulong64 position);
+
+	void writeByte(const uchar8* pValue);
 
 	void writeLong(const ulong64* pValue);
 	void writeLong(const ulong64* pValue, const ulong64 position);

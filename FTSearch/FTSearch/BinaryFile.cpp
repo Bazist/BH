@@ -424,6 +424,22 @@ uint32 BinaryFile::write(const void* pData, uint32 length)
 	return fwrite(pData, 1, length, m_file);
 }
 
+uint32 BinaryFile::writeZero(uint32 length)
+{
+	if (length < 256)
+	{
+		char buff[256];
+		memset(buff, 0, length);
+
+		return write(buff, length);
+	}
+	else
+	{
+		//not implemented
+		return 0;
+	}
+}
+
 bool BinaryFile::readInt(uint32* pValue, 
 						 ulong64 position)
 {
@@ -467,6 +483,11 @@ bool BinaryFile::readInts(uint32* pValues,
 void BinaryFile::writeInt(const uint32* pValue)
 {
 	fwrite (pValue, 4, 1, m_file);
+}
+
+void BinaryFile::writeByte(const uchar8* pValue)
+{
+	fwrite(pValue, 1, 1, m_file);
 }
 
 void BinaryFile::writeLong(const ulong64* pValue)

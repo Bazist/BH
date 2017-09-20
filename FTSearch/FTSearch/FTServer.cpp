@@ -254,6 +254,10 @@ void getDocumentNameByID(uint32 instanceNumber, uint32 id, char* name, uint32 si
 void clearInstance()
 {
 	//instance.clearInstance("c:\\fts");
+
+
+
+
 }
 
 void saveIndex(uint32 instanceNumber)

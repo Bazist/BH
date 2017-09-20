@@ -166,6 +166,7 @@
     <ClInclude Include="FTSInstance.h" />
     <ClInclude Include="FTSInstanceInfo.h" />
     <ClInclude Include="FTSServer.h" />
+    <ClInclude Include="HArrayTextFile.h" />
     <ClInclude Include="HArrayFixBase.h" />
     <ClInclude Include="HArrayFixHDD.h" />
     <ClInclude Include="HArrayFixRAM.h" />
