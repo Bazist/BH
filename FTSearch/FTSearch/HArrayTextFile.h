@@ -1,6 +1,8 @@
 #pragma once
 
 #include <direct.h>
+#include "HArrayFixBase.h"
+#include "HArrayVisitor.h"
 #include "BinaryFile.h"
 #include "stdafx.h"
 
@@ -12,6 +14,8 @@ private:
 	BinaryFile* pFile;
 	char templateWord[256];
 	ulong64 fileSize;
+	uint32 maxKeyLen;
+	uint32 autoStemmingOn;
 
 public:
 
@@ -20,11 +24,17 @@ public:
 		memset(this, 0, sizeof(HArrayTextFile));
 	}
 	
-	void init(char* fileName, bool isWritable, bool isOverwrite)
+	void init(char* fileName,
+			  uint32 maxKeyLen,
+			  uint32 autoStemmingOn,
+			  bool isWritable,
+			  bool isOverwrite)
 	{
-		pFile = new BinaryFile(fileName, isWritable, isOverwrite);
+		this->pFile = new BinaryFile(fileName, isWritable, isOverwrite);
 
-		fileSize = pFile->getFileSize();
+		this->fileSize = pFile->getFileSize();
+		this->maxKeyLen = maxKeyLen;
+		this->autoStemmingOn = autoStemmingOn;
 	}
 
 	void insert(const char* word, ulong64 value, uint32 wordLen)
@@ -86,9 +96,11 @@ public:
 		fileSize += (currLen + 1);
 	}
 
-	ulong64 getValueByKey(const char* word, uint32 wordLen)
+	ulong64 getValueByKey(const uint32* key, uint32 keyLen)
 	{
-		return getValueByKey(word, wordLen, 0, fileSize);
+		HArrayVisitor::getWord(templateWord, key, autoStemmingOn);
+
+		return getValueByKey(templateWord, 0, fileSize);
 	}
 
 	ulong64 getValue(char* data)
@@ -96,7 +108,9 @@ public:
 		return ((ulong64)(uchar8)data[0] << 32) | *(uint32*)&data[1];
 	}
 
-	int readBlock(ulong64 pos, const char* findWord, uint32 findWordLen, ulong64& value)
+	int readBlock(ulong64 pos,
+				  const char* findWord,
+				  ulong64& value)
 	{
 		char currWord[256];
 
@@ -112,7 +126,7 @@ public:
 			uchar8 header = data[i];
 
 			uchar8 startPos = header >> 4;
-			uchar8 wordLen = header & 0xF;
+			uchar8 wordLen = startPos + (header & 0xF);
 
 			if (wordLen)
 			{
@@ -166,7 +180,6 @@ public:
 	}
 
 	ulong64 getValueByKey(const char* word,
-						  uint32 wordLen,
 						  ulong64 startPos,
 						  ulong64 endPos)
 	{
@@ -175,20 +188,20 @@ public:
 			ulong64 midPos = (endPos - startPos) / 2 / HARRAY_TEXT_FILE_BLOCK_SIZE * HARRAY_TEXT_FILE_BLOCK_SIZE;
 			ulong64 value;
 
-			int res = readBlock(midPos, word, wordLen, value);
+			int res = readBlock(midPos, word, value);
 
 			if (res)
 			{
 				//left part
 				if (res < 0)
 				{
-					return getValueByKey(word, wordLen, startPos, midPos);
+					return getValueByKey(word, startPos, midPos);
 				}
 
 				//right part
 				if (res > 0)
 				{
-					return getValueByKey(word, wordLen, midPos, endPos);
+					return getValueByKey(word, midPos, endPos);
 				}
 			}
 			else //stop searching
@@ -200,7 +213,7 @@ public:
 		{
 			ulong64 value;
 
-			int res = readBlock(startPos, word, wordLen, value);
+			int res = readBlock(startPos, word, value);
 
 			if (!res) //stop searching
 			{
@@ -213,9 +226,83 @@ public:
 		}
 	}
 
-	void getPortion()
+	uint32 getKeysAndValuesByPortions(HArrayFixPair* pairs,
+									  uint32 size,
+									  uint32& blockNumber,
+									  uint32& wordInBlock)
 	{
+		uint32 count = 0;
 
+		uint32 blocks = fileSize / HARRAY_TEXT_FILE_BLOCK_SIZE;
+
+		for (; blockNumber <= blocks; blockNumber++)
+		{
+			char currWord[256];
+
+			char data[HARRAY_TEXT_FILE_BLOCK_SIZE];
+
+			uint32 len = pFile->read(data,
+									 blockNumber * HARRAY_TEXT_FILE_BLOCK_SIZE,
+									 HARRAY_TEXT_FILE_BLOCK_SIZE);
+			
+			bool bFirst = true;
+
+			uint32 currWordInBlock = 0;
+
+			for (uint32 i = 0; i < len; currWordInBlock++)
+			{
+				//heaer
+				uchar8 header = data[i];
+
+				uchar8 startPos = header >> 4;
+				uchar8 wordLen = startPos + (header & 0xF);
+
+				if (wordLen)
+				{
+					i++;
+
+					//word
+					for (; startPos < wordLen; startPos++, i++)
+					{
+						currWord[startPos] = data[i];
+					}
+
+					currWord[startPos] = 0;
+
+					if (currWordInBlock > wordInBlock)
+					{
+						//get word
+						HArrayVisitor::getPartWords(currWord,
+													startPos + wordLen,
+													maxKeyLen,
+													pairs[count++].Key,
+													autoStemmingOn);
+						
+
+						//get value
+						pairs[i].Value = getValue(data + i);
+
+						i += 5;
+
+						wordInBlock = currWordInBlock;
+
+						//check overflow
+						if (count >= size)
+						{
+							return count;
+						}
+					}
+
+					bFirst = false;
+				}
+				else //value in next block
+				{
+					break;
+				}
+			}
+		}
+
+		return count;
 	}
 
 	void close()

@@ -22,7 +22,7 @@ public:
 	}
 
 	static void getWord(char* word,
-					   uint32* key,
+					   const uint32* key,
 					   uint32 autoStemmingOn)
 	{
 		uint32 len = 0;
@@ -66,6 +66,43 @@ public:
 		}
 
 		word[j++] = 0;
+	}
+
+	static void getPartWords(const char* word,
+		uint32 len,
+		uint32 maxLen,
+		uint32* key,
+		uint32 autoStemmingOn)
+	{
+
+		//Fill key
+		uint32* words = (uint32*)word;
+
+		if (len > autoStemmingOn)
+		{
+			len = autoStemmingOn;
+		}
+
+		//main len
+		uint32 count = len >> 2; // the same count = len / 4
+
+		uint32 i;
+		for (i = 0; i < count; i++)
+		{
+			key[i] = words[i];
+		}
+
+		//rest len, clear
+		for (uint32 i = count; i < maxLen; i++)
+		{
+			key[i] = 0;
+		}
+
+		//fill last digits
+		for (i = count << 2; i < len; i++)
+		{
+			key[count] = (key[count] << 8) | (uchar8)word[i];
+		}
 	}
 };
 

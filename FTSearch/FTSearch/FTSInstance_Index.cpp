@@ -268,7 +268,7 @@ inline void FTSInstance::indexWord(char* word,
 								   uint32& len,
 								   uint32 docID)
 {
-	getPartWords(word, len, tempKey);
+	HArrayVisitor::getPartWords(word, len, haWordsHDD.KeyLen, tempKey, Configuration.AutoStemmingOn);
 
 	DocumentsBlock* pDocumentsBlock;
 

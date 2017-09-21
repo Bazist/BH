@@ -109,41 +109,6 @@ public:
 	uint32 getSearchPoolsMemory();
 	void logFile(const char* text);
 
-	inline void getPartWords(const char* word,
-		uint32 len,
-		uint32* key)
-	{
-
-		//Fill key
-		uint32* words = (uint32*)word;
-
-		if (len > Configuration.AutoStemmingOn)
-		{
-			len = Configuration.AutoStemmingOn;
-		}
-
-		//main len
-		uint32 count = len >> 2; // the same count = len / 4
-
-		uint32 i;
-		for (i = 0; i < count; i++)
-		{
-			key[i] = words[i];
-		}
-
-		//rest len, clear
-		for (uint32 i = count; i < haWordsHDD.KeyLen; i++)
-		{
-			key[i] = 0;
-		}
-
-		//fill last digits
-		for (i = count << 2; i < len; i++)
-		{
-			key[count] = (key[count] << 8) | (uchar8)word[i];
-		}
-	}
-
 	void searchMatch(WordRaiting& wordRaiting,
 		Dictionary& dictionary,
 		uint32 count,
