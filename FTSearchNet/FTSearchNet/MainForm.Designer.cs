@@ -56,6 +56,7 @@
             this.btnImportIndexes = new System.Windows.Forms.Button();
             this.btnCheckIndexes = new System.Windows.Forms.Button();
             this.btnStartJob = new System.Windows.Forms.Button();
+            this.btnTest = new System.Windows.Forms.Button();
             this.gbIOSpeed.SuspendLayout();
             this.gbIndexSpeed.SuspendLayout();
             this.gbScan.SuspendLayout();
@@ -340,11 +341,22 @@
             this.btnStartJob.UseVisualStyleBackColor = true;
             this.btnStartJob.Click += new System.EventHandler(this.btnStartJob_Click);
             // 
+            // btnTest
+            // 
+            this.btnTest.Location = new System.Drawing.Point(654, 329);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(75, 23);
+            this.btnTest.TabIndex = 19;
+            this.btnTest.Text = "Test";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.button3_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(965, 720);
+            this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnStartJob);
             this.Controls.Add(this.btnCheckIndexes);
             this.Controls.Add(this.btnImportIndexes);
@@ -404,6 +416,7 @@
         private System.Windows.Forms.Button btnImportIndexes;
         private System.Windows.Forms.Button btnCheckIndexes;
         private System.Windows.Forms.Button btnStartJob;
+        private System.Windows.Forms.Button btnTest;
     }
 }
 

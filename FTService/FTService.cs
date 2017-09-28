@@ -578,6 +578,11 @@ namespace FTServiceWCF
             _host.Abort();
         }
 
+        public void ClearInstance()
+        {
+            ActiveInstance.ClearInstance();
+        }
+
         #endregion
     }
 }

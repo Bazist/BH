@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "FTSServer.h"
+#include "HArrayTextFile.h"
 
 FTSInstance* instances[256];
 uint32 countInstances = 0;
@@ -47,34 +48,34 @@ void startInstance(FTSConfiguration configuration, bool onlyCheckIndex)
 //}
 
 RelevantResult* searchPhrase(uint32 instanceNumber,
-							 const char* phrase,
-							 uint32 phraseLen,
-							 const char* templateName,
-							 uint32 templateNameLen,
-							 uint32 minPage,
-							 uint32 maxPage,
-							 uint32 skip)
+	const char* phrase,
+	uint32 phraseLen,
+	const char* templateName,
+	uint32 templateNameLen,
+	uint32 minPage,
+	uint32 maxPage,
+	uint32 skip)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
 		if (instances[i]->Configuration.InstanceNumber == instanceNumber)
 		{
 			return instances[i]->searchPhrase(phrase,
-												phraseLen,
-												templateName,
-												templateNameLen,
-												minPage,
-												maxPage,
-												skip);
+				phraseLen,
+				templateName,
+				templateNameLen,
+				minPage,
+				maxPage,
+				skip);
 		}
 	}
 }
 
 RelevantResult* searchPhraseRel(uint32 instanceNumber,
-								const char* phrase,
-								uint32 phraseLen,
-								uint32 minPage,
-								uint32 maxPage)
+	const char* phrase,
+	uint32 phraseLen,
+	uint32 minPage,
+	uint32 maxPage)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -85,13 +86,13 @@ RelevantResult* searchPhraseRel(uint32 instanceNumber,
 	}
 }
 
-QueryResult* searchQuery(uint32 instanceNumber, 
-						 Selector** selectors,
-						 uint32 countSelectors,
-						 uint32 minPage,
-						 uint32 maxPage,
-						 uint32 skip,
-						 bool agregateBySubject)
+QueryResult* searchQuery(uint32 instanceNumber,
+	Selector** selectors,
+	uint32 countSelectors,
+	uint32 minPage,
+	uint32 maxPage,
+	uint32 skip,
+	bool agregateBySubject)
 {
 	/*
 	QueryResult* res = new QueryResult();
@@ -122,16 +123,16 @@ QueryResult* searchQuery(uint32 instanceNumber,
 	}
 }
 
-RelevantResult* searchNewMems(uint32 instanceNumber, 
-							   uint32 startDate1Year,
-							   uint32 startDate1Month,
-							   uint32 startDate2Year,
-							   uint32 startDate2Month,
-							   uint32 startDate2Day,
-							   uint32 endDate2Year,
-							   uint32 endDate2Month,
-							   uint32 endDate2Day,
-							   uint32 periodInDays)
+RelevantResult* searchNewMems(uint32 instanceNumber,
+	uint32 startDate1Year,
+	uint32 startDate1Month,
+	uint32 startDate2Year,
+	uint32 startDate2Month,
+	uint32 startDate2Day,
+	uint32 endDate2Year,
+	uint32 endDate2Month,
+	uint32 endDate2Day,
+	uint32 periodInDays)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -150,13 +151,13 @@ RelevantResult* searchNewMems(uint32 instanceNumber,
 	}
 }
 
-void calculateTrend(uint32 instanceNumber, 
-					const char* phrase,
-					uint32 phraseLen,
-					uint32* points,
-					uint32 count,
-					uint32 minPage,
-					uint32 maxPage)
+void calculateTrend(uint32 instanceNumber,
+	const char* phrase,
+	uint32 phraseLen,
+	uint32* points,
+	uint32 count,
+	uint32 minPage,
+	uint32 maxPage)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -251,13 +252,113 @@ void getDocumentNameByID(uint32 instanceNumber, uint32 id, char* name, uint32 si
 	}
 }
 
+void migrate(char* path)
+{
+	HArrayTextFile file;
+
+	file.init(path, "dictionary", 3, 12, true, true);
+
+	HArrayFixHDD ha;
+	ha.init(path, "", 12, 4, 24);
+
+	HArrayFixPair* pairs = HArrayFixPair::CreateArray(10000000, 3);
+
+	file.open();
+
+	ha.open(BIN_FILE_BUFFER_SIZE);
+
+	uint32 startHeader = 0;
+	bool isBufferNotEnough = false;
+
+	while (true)
+	{
+		uint32 count = ha.getKeysAndValuesByPortions(pairs, 10000000, startHeader, isBufferNotEnough);
+
+		if (!count || isBufferNotEnough)
+			break;
+
+		for (uint32 i = 0; i < count; i++)
+		{
+			file.insert(pairs[i].Key, pairs[i].Value);
+		}
+	}
+
+	ha.close();
+
+	file.close();
+
+	HArrayFixPair::DeleteArray(pairs);
+}
+
 void clearInstance()
 {
 	//instance.clearInstance("c:\\fts");
 
+	//HArrayTextFile file;
 
+	/*file.init("c:\\fts\\dic.ha", 3, 12, true, true);
 
+	for (uint32 i = 0; i < 1000000; i++)
+	{
+		char word[256];
 
+		sprintf(word, "%06u", i);
+
+		uint32 key[8];
+
+		HArrayVisitor::getPartWords(word, strlen(word), 8, key, 12);
+
+		file.insert(key, i);
+	}
+
+	file.close();*/
+
+	//file.init("c:\\fts\\dic.ha", 3, 12, false, false);
+
+	/*char word[256];
+
+	sprintf(word, "555555");
+
+	uint32 key[8];
+
+	HArrayVisitor::getPartWords(word, strlen(word), 8, key, 12);
+
+	uint32 val = file.getValueByKey(key);*/
+
+	//ulong64 blockNumber = 0;
+	//uint32 wordInBlock = 0;
+
+	//HArrayFixPair* pairs = HArrayFixPair::CreateArray(1000, 3);
+
+	//uint32 count = file.getKeysAndValuesByPortions(pairs, 1000, blockNumber, wordInBlock);
+
+	//for (int i = 0; i < 1000; i++)
+	//{
+	//	if (i != (uint32)pairs[i].Value)
+	//		i = i; //error
+	//}
+
+	//count = file.getKeysAndValuesByPortions(pairs, 1000, blockNumber, wordInBlock);
+
+	//for (int i = 0; i < 1000; i++)
+	//{
+	//	if (i != (uint32)pairs[i].Value - 1000)
+	//		i = i; //error
+	//}
+
+	migrate("i:\\FTS_Merged\\Instance3");
+	migrate("i:\\FTS_Merged\\Instance19");
+	migrate("i:\\FTS_Merged\\Instance23");
+	migrate("i:\\FTS_Merged\\Instance33");
+	migrate("i:\\FTS_Merged\\Instance47");
+	migrate("i:\\FTS_Merged\\Instance54");
+	migrate("i:\\FTS_Merged\\Instance57");
+	migrate("i:\\FTS_Merged\\Instance68");
+	migrate("i:\\FTS_Merged\\Instance74");
+	migrate("i:\\FTS_Merged\\Instance80");
+	migrate("i:\\FTS_Merged\\Instance81");
+	migrate("i:\\FTS_Merged\\Instance82");
+	migrate("i:\\FTS_Merged\\Instance83");
 }
 
 void saveIndex(uint32 instanceNumber)
@@ -274,8 +375,8 @@ void saveIndex(uint32 instanceNumber)
 }
 
 void importIndex(uint32 instanceNumber,
-				 const char* importPath,
-				 const bool isDeleteImportedIndex)
+	const char* importPath,
+	const bool isDeleteImportedIndex)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -295,7 +396,7 @@ void stopInstance(uint32 instanceNumber)
 		if (instances[i]->Configuration.InstanceNumber == instanceNumber)
 		{
 			instances[i]->stopInstance();
-			
+
 			delete instances[i];
 
 			instances[i] = instances[countInstances - 1];
