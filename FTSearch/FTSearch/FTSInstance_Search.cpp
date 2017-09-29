@@ -18,7 +18,7 @@ void FTSInstance::calcMatchDocuments(const char* word,
 {
 	HArrayVisitor::getPartWords(word,
 								strlen(word),
-								haWordsHDD.KeyLen,
+								haWordsRAM.KeyLen,
 								tempKey,
 								Configuration.AutoStemmingOn);
 			
@@ -94,7 +94,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 {
 	HArrayVisitor::getPartWords(word,
 								strlen(word),
-								haWordsHDD.KeyLen,
+								haWordsRAM.KeyLen,
 								tempKey,
 								Configuration.AutoStemmingOn);
 			
@@ -244,7 +244,7 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 																  Info.CountWordsHDD,
 																  0,
 																  0);
-			haWordsHDD.open(haWordsHDD.HeaderSize * 4);
+			haWordsHDD.open();
 		}
 		
 		if(Info.CountWordsRAM)
@@ -454,7 +454,7 @@ void FTSInstance::calculateTrend(const char* phrase,
 	//get DocumentsBlock
 	HArrayVisitor::getPartWords(phrase,
 								phraseLen,
-								haWordsHDD.KeyLen,
+								haWordsRAM.KeyLen,
 								tempKey,
 								Configuration.AutoStemmingOn);
 			
@@ -521,7 +521,7 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 
 		HArrayVisitor::getPartWords(dicWord.Word,
 									strlen(dicWord.Word),
-									haWordsHDD.KeyLen,
+									haWordsRAM.KeyLen,
 									tempKey,
 									Configuration.AutoStemmingOn);
 			
@@ -616,7 +616,7 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 
 		HArrayVisitor::getPartWords(dicWord.Word,
 									strlen(dicWord.Word),
-									haWordsHDD.KeyLen,
+									haWordsRAM.KeyLen,
 									tempKey,
 									Configuration.AutoStemmingOn);
 		
@@ -808,7 +808,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 							HArrayVisitor::getPartWords(phraseTemp,
 														i,
-														haWordsHDD.KeyLen,
+														haWordsRAM.KeyLen,
 														tempKey,
 														Configuration.AutoStemmingOn);
 						}
@@ -820,7 +820,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 							
 							HArrayVisitor::getPartWords(prevWord,
 														phraseLen,
-														haWordsHDD.KeyLen,
+														haWordsRAM.KeyLen,
 														tempKey,
 														Configuration.AutoStemmingOn);
 						}
@@ -834,7 +834,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 				{
 					HArrayVisitor::getPartWords(word,
 												currLen,
-												haWordsHDD.KeyLen,
+												haWordsRAM.KeyLen,
 												tempKey,
 												Configuration.AutoStemmingOn);
 				}
@@ -1210,7 +1210,7 @@ RelevantResult* FTSInstance::searchHtmlSeldomWords(char* text,
 					//word, currLen;
 					HArrayVisitor::getPartWords(word,
 												currLen,
-												haWordsHDD.KeyLen,
+												haWordsRAM.KeyLen,
 												tempKey,
 												Configuration.AutoStemmingOn);
 			
@@ -1427,7 +1427,7 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 
 			HArrayVisitor::getPartWords(dicWord.Word,
 										strlen(dicWord.Word),
-										haWordsHDD.KeyLen,
+										haWordsRAM.KeyLen,
 										tempKey,
 										Configuration.AutoStemmingOn);
 			

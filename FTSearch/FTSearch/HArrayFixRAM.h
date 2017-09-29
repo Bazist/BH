@@ -1,5 +1,6 @@
 #include "HArrayFixBase.h"
 #include "HArrayVisitor.h"
+#include "HArrayTextFile.h"
 
 class HArrayFixRAM
 {
@@ -161,7 +162,7 @@ public:
 		lastBlockOffset = 0;
 	}
 
-	void getPath(char* buff, char* fileName)
+	/*void getPath(char* buff, char* fileName)
 	{
 		getPath(buff, Path, fileName, TableName);
 	}
@@ -179,7 +180,7 @@ public:
 		{
 			sprintf(buff, "%s\\%s.pg", path, fileName);
 		}
-	}
+	}*/
 
 	ulong64 getHeaderSize()
 	{
@@ -234,7 +235,7 @@ public:
 		init(path, tableName, keyLen, valueLen, headerBase);
 	}
 
-	void saveInfo()
+	/*void saveInfo()
 	{
 		char infoPath[1024];
 		
@@ -265,8 +266,59 @@ public:
 				delete pInfoFile;
 			}
 		}
+	}*/
+
+	void load()
+	{
+		destroy();
+
+		HArrayTextFile file;
+
+		file.init(Path, TableName, KeyLen);
+				
+		HArrayFixPair* pairs = HArrayFixPair::CreateArray(1000000, 3);
+
+		file.open();
+
+		ulong64 blockNumber = 0;
+		uint32 wordInBlock = 0;
+
+		while (true)
+		{
+			//get portion
+			uint32 count = file.getKeysAndValuesByPortions(pairs, 1000000, blockNumber, wordInBlock);
+
+			if (!count)
+				break;
+
+			//insert portion of keys
+			for (uint32 i = 0; i < count; i++)
+			{
+				this->insert(pairs[i].Key, pairs[i].Value);
+			}
+		}
+		
+		file.close();
+
+		HArrayFixPair::DeleteArray(pairs);
 	}
 
+	void save()
+	{
+		HArrayTextFile file;
+
+		file.init(Path, TableName, KeyLen);
+
+		file.create();
+
+		InsertToTextFileVisitor visitor(&file);
+		
+		this->scanByVisitor(&visitor);
+
+		file.close();
+	}
+
+	/*
 	void load()
 	{
 		char path[1024];
@@ -280,7 +332,7 @@ public:
 		char branchPath[1024];
 		char blockPath[1024];
 
-		getPath(infoPath, "ha_info");
+		getPath(infoPath, "ha_dic");
 		getPath(headerPath, "ha_header");
 		getPath(contentPath, "ha_content_part1");
 		getPath(branchPath, "ha_branch_part1");
@@ -366,7 +418,7 @@ public:
 			delete pBlockPagesFile;
 		}
 	}
-
+	
 	void save()
 	{
 		saveInfo();
@@ -429,7 +481,8 @@ public:
 			delete pBlockPagesFile;
 		}
 	}
-	
+	*/
+
 	//types: 0-empty, 1..4 branches, 5 value, 6..9 blocks offset, 10 empty branch, 11 value
 #ifndef _RELEASE
 

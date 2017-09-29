@@ -338,8 +338,8 @@ public:
 	static void clearInstance(char* path)
 	{
 		//clear dictionary
-		HArrayFixHDD::deleteFiles(path, "");
-		HArrayFixHDD::deleteFiles(path, "temp");
+		HArrayTextFile::deleteFiles(path, "");
+		HArrayTextFile::deleteFiles(path, "temp");
 
 		//clear instance
 		char documentPath[1024];
@@ -438,7 +438,7 @@ private:
 	static uint32* pResultDocNumbers;
 
 	HArrayFixRAM haWordsRAM;
-	HArrayFixHDD haWordsHDD;
+	HArrayTextFile haWordsHDD;
 
 	FTSInstanceInfo Info;
 	static char LastErrorMessage[1024]; //last error message in instance
@@ -555,9 +555,7 @@ private:
 		
 		haWordsHDD.init(indexPath,
 			"",
-			Configuration.AutoStemmingOn,
-			4,
-			Configuration.WordsHeaderBase);
+			Configuration.AutoStemmingOn / 4);
 	}
 
 	inline void indexWord(char* word,

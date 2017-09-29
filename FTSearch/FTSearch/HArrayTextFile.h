@@ -15,7 +15,6 @@ private:
 	char templateWord[256];
 	ulong64 fileSize;
 	uint32 maxKeySegments;
-	uint32 autoStemmingOn;
 
 public:
 
@@ -24,28 +23,57 @@ public:
 		memset(this, 0, sizeof(HArrayTextFile));
 	}
 
-	void init(char* path,
-		char* name,
-		uint32 maxKeySegments,
-		uint32 autoStemmingOn,
-		bool isWritable,
-		bool isOverwrite)
+	char FullPath[1024];
+	char Path[1024];
+	char TableName[256];
+
+	void init(const char* path,
+			  const char* name,
+			  uint32 maxKeySegments)
 	{
-		char fullPath[1024];
+		if (!name[0])
+		{
+			sprintf(FullPath, "%s\\dictionary.ha", path);
+		}
+		else
+		{
+			sprintf(FullPath, "%s\\dictionary_%s.ha", path, name);
+		}
 
-		sprintf(fullPath, "%s\\%s.ha", path, name);
-
-		this->pFile = new BinaryFile(fullPath, isWritable, isOverwrite);
+		strcpy(Path, path);
+		strcpy(TableName, name);
 
 		this->maxKeySegments = maxKeySegments;
-		this->autoStemmingOn = autoStemmingOn;
 	}
 
 	void open()
 	{
+		this->pFile = new BinaryFile(FullPath, true, false);
+
 		this->pFile->open();
 
 		this->fileSize = pFile->getFileSize();
+	}
+
+	void create()
+	{
+		this->pFile = new BinaryFile(FullPath, true, true);
+
+		this->pFile->open();
+
+		this->fileSize = 0;
+	}
+
+	void openOrCreate()
+	{
+		if (BinaryFile::existsFile(FullPath))
+		{
+			open();
+		}
+		else
+		{
+			create();
+		}
 	}
 
 	void insert(const uint32* key,
@@ -53,7 +81,7 @@ public:
 	{
 		char word[256];
 
-		HArrayVisitor::getWord(word, key, autoStemmingOn);
+		HArrayVisitor::getWord(word, key, maxKeySegments * 4);
 
 		uint32 pos = 0;
 
@@ -96,14 +124,14 @@ public:
 
 			fileSize += len;
 
-			templateWord[0] = 0;
+			//templateWord[0] = 0;
 		}
 		else if (blockPos == 0) //new block will be started
 		{
 			currLen = wordLen;
 			startPos = 0;
 
-			templateWord[0] = 0;
+			//templateWord[0] = 0;
 		}
 
 		//if (pFile->getPosition() == 3563520)
@@ -120,7 +148,11 @@ public:
 		//write word
 		pFile->write(word + startPos, currLen);
 
-		uint32 valueLen = writeValue(value, pFile);
+		char bytes[5];
+
+		uint32 valueLen = setValue(value, bytes);
+
+		pFile->write(bytes, valueLen);
 
 		//header + word + value
 		fileSize += (1 + currLen + valueLen);
@@ -128,51 +160,56 @@ public:
 
 	ulong64 getValueByKey(const uint32* key)
 	{
-		HArrayVisitor::getWord(templateWord, key, autoStemmingOn);
+		HArrayVisitor::getWord(templateWord, key, maxKeySegments * 4);
 
 		ulong64 endPos = (fileSize & 0xFFFFFFFFFFFFF000) + HARRAY_TEXT_FILE_BLOCK_SIZE; //rounded to 4096
 
 		return getValueByKey(templateWord, 0, endPos);
 	}
 
-	uint32 getValue(char* data, ulong64& value)
+	uint32 getValue(char* bytes, ulong64& value)
 	{
-		if (data[0] >> 7) //5 bytes
+		uchar8 val = (uchar8)bytes[0];
+
+		if (val >> 7) //5 bytes
 		{
-			uchar8 val1 = (uchar8)data[0];
-
-			val1 &= 0x7F; //reset first bit
-
-			value = ((ulong64)val1 << 32) | *(uint32*)&data[1];
+			value = (((ulong64)(uchar8)bytes[0] & 0x7F) << 32 ) | //reset first byte
+					((ulong64)(uchar8)bytes[1] << 24) |
+					((ulong64)(uchar8)bytes[2] << 16) |
+					((ulong64)(uchar8)bytes[3] << 8) |
+					((ulong64)(uchar8)bytes[4]);
 
 			return 5;
 		}
 		else //4 bytes
 		{
-			value = *(uint32*)data;
+			value = ((ulong64)(uchar8)bytes[0] << 24) |
+					((ulong64)(uchar8)bytes[1] << 16) |
+					((ulong64)(uchar8)bytes[2] << 8) |
+					((ulong64)(uchar8)bytes[3]);
 
 			return 4;
 		}
 	}
 
-	uint32 writeValue(ulong64 value, BinaryFile* pFile)
+	uint32 setValue(ulong64 value, char* bytes)
 	{
 		if (value >> 31) //5 bytes
 		{
-			//write value
-			uchar8 val1 = (value >> 32) | 0x80; //set first bit
-			pFile->writeByte(&val1);
-
-			uint32 val2 = value & 0xFFFFFFFF;
-			pFile->writeInt(&val2);
+			bytes[0] = value << 24 >> 56 | 0x80; //set first bit
+			bytes[1] = value << 32 >> 56;
+			bytes[2] = value << 40 >> 56;
+			bytes[3] = value << 48 >> 56;
+			bytes[4] = value << 56 >> 56;
 
 			return 5;
 		}
 		else //4 bytes
 		{
-			uint32 val2 = (uint32)value;
-			
-			pFile->writeInt(&val2);
+			bytes[0] = value << 32 >> 56;
+			bytes[1] = value << 40 >> 56;
+			bytes[2] = value << 48 >> 56;
+			bytes[3] = value << 56 >> 56;
 
 			return 4;
 		}
@@ -338,6 +375,13 @@ public:
 
 				if (wordLen)
 				{
+					if (wordLen > maxKeySegments * 4)
+					{
+						printf("data corrupted\n");
+
+						return 0;
+					}
+
 					i++;
 
 					//word
@@ -355,13 +399,12 @@ public:
 													wordLen,
 													maxKeySegments,
 													pairs[count].Key,
-													autoStemmingOn);
+													maxKeySegments * 4);
 
+						i += getValue(data + i, pairs[count].Value);
 
 						//get value
 						count++;
-
-						i += getValue(data + i, pairs[count].Value);
 
 						wordInBlock = currWordInBlock + 1;
 
@@ -392,9 +435,78 @@ public:
 		return count;
 	}
 
+	static void deleteFiles(char* path, char* tableName)
+	{
+		char fullPath[1024];
+
+		if (!tableName[0])
+		{
+			sprintf(fullPath, "%s\\dictionary.ha", path);
+		}
+		else
+		{
+			sprintf(fullPath, "%s\\dictionary_%s.ha", path, tableName);
+		}
+
+		BinaryFile::deleteFile(fullPath);
+	}
+
+	static void renameFiles(char* path, char* oldTableName, char* newTableName)
+	{
+		char oldFullPath[1024];
+
+		if (!oldTableName[0])
+		{
+			sprintf(oldFullPath, "%s\\dictionary.ha", path);
+		}
+		else
+		{
+			sprintf(oldFullPath, "%s\\dictionary_%s.ha", path, oldTableName);
+		}
+
+		////clear files
+		//char oldInfoPath[1024];
+		//char oldHeaderPath[1024];
+
+		//getPath(oldInfoPath, path, "ha_info", oldTableName, 0);
+		//getPath(oldHeaderPath, path, "ha_header", oldTableName, 0);
+
+		//char newInfoPath[1024];
+		//char newHeaderPath[1024];
+
+		//getPath(newInfoPath, path, "ha_info", newTableName, 0);
+		//getPath(newHeaderPath, path, "ha_header", newTableName, 0);
+
+		//BinaryFile::renameFile(oldInfoPath, newInfoPath);
+		//BinaryFile::renameFile(oldHeaderPath, newHeaderPath);
+
+		//for (uint32 i = 0; i < MAX_HARRAY_PARTITIONS; i++)
+		//{
+		//	char oldContentPath[1024];
+		//	char oldBranchPath[1024];
+		//	char oldBlockPath[1024];
+
+		//	getPath(oldContentPath, path, "ha_content", oldTableName, i + 1);
+		//	getPath(oldBranchPath, path, "ha_branch", oldTableName, i + 1);
+		//	getPath(oldBlockPath, path, "ha_block", oldTableName, i + 1);
+
+		//	char newContentPath[1024];
+		//	char newBranchPath[1024];
+		//	char newBlockPath[1024];
+
+		//	getPath(newContentPath, path, "ha_content", newTableName, i + 1);
+		//	getPath(newBranchPath, path, "ha_branch", newTableName, i + 1);
+		//	getPath(newBlockPath, path, "ha_block", newTableName, i + 1);
+
+		//	BinaryFile::renameFile(oldContentPath, newContentPath);
+		//	BinaryFile::renameFile(oldBranchPath, newBranchPath);
+		//	BinaryFile::renameFile(oldBlockPath, newBlockPath);
+		//}
+	}
+
 	void close()
 	{
-		pFile->close();
+		destroy();
 	}
 
 	void flush()
@@ -417,6 +529,38 @@ public:
 	~HArrayTextFile()
 	{
 		destroy();
+	}
+};
+
+class InsertToTextFileVisitor : public HArrayVisitor
+{
+
+private:
+	HArrayTextFile* pTextFile;
+
+public:
+	InsertToTextFileVisitor(HArrayTextFile* pTextFile)
+	{
+		this->pTextFile = pTextFile;
+	}
+
+	virtual void onStartScan()
+	{
+	}
+
+	virtual bool onVisit(uint32* key, uint32 value)
+	{
+		this->pTextFile->insert(key, value);
+
+		return true;
+	}
+
+	virtual void onEndScan()
+	{
+	}
+
+	~InsertToTextFileVisitor()
+	{
 	}
 };
 

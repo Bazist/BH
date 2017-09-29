@@ -242,7 +242,7 @@ void FTSInstance::createIndex()
 void FTSInstance::updateIndex()
 {
 	//init
-	HArrayFixHDD haWordsHDDTemp;
+	HArrayTextFile haWordsHDDTemp;
 	uchar8* pSourceBuffer = 0;
 	HArrayFixPair* pKeysAndValuesRAM = 0;
 	HArrayFixPair* pKeysAndValuesHDD = 0;
@@ -335,21 +335,23 @@ void FTSInstance::updateIndex()
 	}
 
 	//========================================================
-	if(Configuration.MemoryMode == IN_MEMORY_MODE)
-	{
-		haWordsHDD.open();
-	}
-	else
-	{
-		haWordsHDD.open(BIN_FILE_BUFFER_SIZE); //1 gb on all
-	}
+	haWordsHDD.open();
+	//if(Configuration.MemoryMode == IN_MEMORY_MODE)
+	//{
+	//	haWordsHDD.open();
+	//}
+	//else
+	//{
+	//	haWordsHDD.open(); //1 gb on all
+	//}
 
 	//get data by portions from HDD
 	pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 
 	uint32 currKeyRAM = 0;
 
-	uint32 startHeaderHDD = 0;
+	ulong64 blockNumber = 0;
+	uint32 wordInBlock = 0;
 
 	char indexPath[1024];
 	Configuration.getIndexPath(indexPath);
@@ -357,14 +359,14 @@ void FTSInstance::updateIndex()
 	//create temp HDD table
 	haWordsHDDTemp.init(indexPath,
 						"temp", 
-						haWordsHDD.KeyLen * 4, 
-						haWordsHDD.ValueLen * 4, 
-						haWordsHDD.HeaderBase);
+						haWordsRAM.KeyLen);
 
-	haWordsHDDTemp.create(0, haWordsHDD.countPartitions);
+	haWordsHDDTemp.create();
+
+	//haWordsHDDTemp.create(0, haWordsRAM.countPartitions);
 
 	//copy schema partitions
-	if (haWordsHDD.countPartitions > 1)
+	/*if (haWordsHDD.countPartitions > 1)
 	{
 		HeaderCell* headerCells = new HeaderCell[haWordsHDD.HeaderSize];
 		haWordsHDD.readHeaderCellsHDD(headerCells, 0, haWordsHDD.HeaderSize);
@@ -380,7 +382,7 @@ void FTSInstance::updateIndex()
 		}
 
 		delete[] headerCells;
-	}
+	}*/
 
 	uint32 oldControlValue = 0;
 	uint32 newControlValue = 0;
@@ -388,18 +390,18 @@ void FTSInstance::updateIndex()
 	while(true)
 	{
 		//get data
-		bool isBufferNotEnough = false;
+		//bool isBufferNotEnough = false;
 
 		uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
 															  MAX_SIZE_BUFFER, 
-															  startHeaderHDD,
-															  isBufferNotEnough);
+															  blockNumber,
+															  wordInBlock);
 
-		if(isBufferNotEnough)
+		/*if(isBufferNotEnough)
 		{
 			logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 			goto destroy;
-		}
+		}*/
 
 		//check errors ===========================================
 		if(countHDD)
@@ -448,20 +450,20 @@ void FTSInstance::updateIndex()
 				break;
 			}
 
-			//check capacity, split partitions ===============================
-			char error[1024];
-			haWordsHDDTemp.checkCapacity(error);
+			////check capacity, split partitions ===============================
+			//char error[1024];
+			//haWordsHDDTemp.checkCapacity(error);
 
-			if (strlen(error))
-			{
-				logError(error);
-				goto destroy;
-			}
+			//if (strlen(error))
+			//{
+			//	logError(error);
+			//	goto destroy;
+			//}
 
 			//check errors ===========================================
 			if(compareResult == 0 || compareResult == 1)
 			{
-				for(uint32 j=0; j < haWordsHDD.KeyLen; j++)
+				for(uint32 j=0; j < haWordsRAM.KeyLen; j++)
 				{
 					oldControlValue += pKeysAndValuesHDD[currKeyHDD].Key[j];
 				}
@@ -489,7 +491,7 @@ void FTSInstance::updateIndex()
 				haWordsHDDTemp.insert(pKeysAndValuesRAM[currKeyRAM].Key, docTempPosition);
 				
 				//check errors ===========================================
-				for(uint32 i=0; i < haWordsHDDTemp.KeyLen; i++)
+				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
 				{
 					newControlValue += pKeysAndValuesRAM[currKeyRAM].Key[i];
 				}
@@ -539,7 +541,7 @@ void FTSInstance::updateIndex()
 				haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 				
 				//check errors ===========================================
-				for(uint32 i=0; i < haWordsHDDTemp.KeyLen; i++)
+				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
 				{
 					newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
 				}
@@ -608,7 +610,7 @@ void FTSInstance::updateIndex()
 				haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 				//check errors ===========================================
-				for(uint32 i=0; i < haWordsHDDTemp.KeyLen; i++)
+				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
 				{
 					newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
 				}
@@ -740,19 +742,19 @@ destroy:
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPath);
 		BinaryFile::deleteFile(documentNamePath);
-		HArrayFixHDD::deleteFiles(haWordsHDD.Path, haWordsHDD.TableName);
+		HArrayTextFile::deleteFiles(haWordsHDD.Path, haWordsHDD.TableName);
 
 		//3.Rename tables
 		BinaryFile::renameFile(documentPathTemp, documentPath);
 		BinaryFile::renameFile(documentNamePathTemp, documentNamePath);
-		HArrayFixHDD::renameFiles(haWordsHDD.Path, "temp", haWordsHDD.TableName);
+		HArrayTextFile::renameFiles(haWordsHDD.Path, "temp", haWordsHDD.TableName);
 	}
 	else
 	{
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPathTemp);
 		BinaryFile::deleteFile(documentNamePathTemp);
-		HArrayFixHDD::deleteFiles(haWordsHDDTemp.Path, haWordsHDDTemp.TableName);
+		HArrayTextFile::deleteFiles(haWordsHDDTemp.Path, haWordsHDDTemp.TableName);
 	}
 
 	//open new
@@ -800,8 +802,8 @@ void FTSInstance::importIndex(const char* importPath)
 
 	FTSInstanceInfo infoImport;
 
-	HArrayFixHDD haWordsHDDImport;
-	HArrayFixHDD haWordsHDDTemp;
+	HArrayTextFile haWordsHDDImport;
+	HArrayTextFile haWordsHDDTemp;
 	
 	uchar8* pSourceBuffer = 0;
 	uchar8* pSourceBufferImport = 0;
@@ -929,35 +931,35 @@ void FTSInstance::importIndex(const char* importPath)
 	uint32 countHDD = MAX_INT;
 	uint32 countHDDImport = MAX_INT;
 	
-	uint32 startHeaderHDD = 0;
-	uint32 startHeaderHDDImport = 0;
+	ulong64 blockNumber = 0;
+	uint32 wordInBlock = 0;
+
+	ulong64 blockNumberImport = 0;
+	uint32 wordInBlockImport = 0;
 
 	//open haWordsHDD
-	haWordsHDD.open(BIN_FILE_BUFFER_SIZE);
+	haWordsHDD.open();
 	
 	char indexPath[1024];
 	Configuration.getIndexPath(indexPath);
 
 	//create import HDD table
-	haWordsHDDImport.init(indexPath,
-						  "", 
-						   haWordsHDD.KeyLen * 4, 
-						   haWordsHDD.ValueLen * 4, 
-						   haWordsHDD.HeaderBase);
+	haWordsHDDImport.init(importPath,
+							"", 
+							Configuration.AutoStemmingOn / 4);
 
-	haWordsHDDImport.open(BIN_FILE_BUFFER_SIZE);
+	haWordsHDDImport.open();
 
 	//create temp HDD table
 	haWordsHDDTemp.init(indexPath,
 						"temp", 
-						haWordsHDD.KeyLen * 4, 
-						haWordsHDD.ValueLen * 4, 
-						haWordsHDD.HeaderBase);
+						Configuration.AutoStemmingOn / 4);
 
-	haWordsHDDTemp.create(BIN_FILE_BUFFER_SIZE, haWordsHDD.countPartitions);
+	haWordsHDDTemp.create();
+	//haWordsHDDTemp.create(BIN_FILE_BUFFER_SIZE, haWordsHDD.countPartitions);
 
 	//copy schema partitions
-	if (haWordsHDD.countPartitions > 1)
+	/*if (haWordsHDD.countPartitions > 1)
 	{
 		HeaderCell* headerCells = new HeaderCell[haWordsHDD.HeaderSize];
 		haWordsHDD.readHeaderCellsHDD(headerCells, 0, haWordsHDD.HeaderSize);
@@ -973,7 +975,7 @@ void FTSInstance::importIndex(const char* importPath)
 		}
 
 		delete[] headerCells;
-	}
+	}*/
 
 	uint32 oldControlValue = 0;
 	uint32 newControlValue = 0;
@@ -983,19 +985,19 @@ void FTSInstance::importIndex(const char* importPath)
 		//get data from hdd
 		if(currKeyHDD == countHDD && countHDD)
 		{
-			bool isBufferNotEnough = false;
+			//bool isBufferNotEnough = false;
 
 			currKeyHDD = 0;
 			countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
 															  MAX_SIZE_BUFFER, 
-															  startHeaderHDD,
-															  isBufferNotEnough);
+															  blockNumber,
+															  wordInBlock);
 
-			if(isBufferNotEnough)
+			/*if(isBufferNotEnough)
 			{
 				logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 				goto destroy;
-			}
+			}*/
 
 			//check errors ===========================================
 			if (countHDD)
@@ -1014,19 +1016,19 @@ void FTSInstance::importIndex(const char* importPath)
 		//get data from hdd import
 		if(currKeyHDDImport == countHDDImport && countHDDImport)
 		{
-			bool isBufferNotEnough = false;
+			//bool isBufferNotEnough = false;
 
 			currKeyHDDImport = 0;
 			countHDDImport = haWordsHDDImport.getKeysAndValuesByPortions(pKeysAndValuesHDDImport,
 																		MAX_SIZE_BUFFER, 
-																		startHeaderHDDImport,
-																		isBufferNotEnough);
+																		blockNumberImport,
+																		wordInBlockImport);
 
-			if(isBufferNotEnough)
+			/*if(isBufferNotEnough)
 			{
 				logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 				goto destroy;
-			}
+			}*/
 		}
 		
 		if(!countHDD && !countHDDImport)
@@ -1059,7 +1061,7 @@ void FTSInstance::importIndex(const char* importPath)
 		//check errors ===========================================
 		if(compareResult == 0 || compareResult == 1)
 		{
-			for(uint32 j=0; j < haWordsHDD.KeyLen; j++)
+			for(uint32 j=0; j < haWordsRAM.KeyLen; j++)
 			{
 				oldControlValue += pKeysAndValuesHDD[currKeyHDD].Key[j];
 			}
@@ -1079,7 +1081,7 @@ void FTSInstance::importIndex(const char* importPath)
 			haWordsHDDTemp.insert(pKeysAndValuesHDDImport[currKeyHDDImport].Key, docTempPosition);
 
 			//check errors ===========================================
-			for(uint32 i=0; i < haWordsHDDImport.KeyLen; i++)
+			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
 			{
 				newControlValue += pKeysAndValuesHDDImport[currKeyHDDImport].Key[i];
 			}
@@ -1132,7 +1134,7 @@ void FTSInstance::importIndex(const char* importPath)
 			haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 			//check errors ===========================================
-			for(uint32 i=0; i < haWordsHDDTemp.KeyLen; i++)
+			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
 			{
 				newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
 			}
@@ -1167,7 +1169,7 @@ void FTSInstance::importIndex(const char* importPath)
 			}
 			
 			//B. Save blocks from import
-			uint32 docPositionImport = pKeysAndValuesHDDImport[currKeyHDDImport].Value;
+			ulong64 docPositionImport = pKeysAndValuesHDDImport[currKeyHDDImport].Value;
 
 			if(docPositionImport == sourceFilePositionImport + sourceBuffPositionImport)
 			{
@@ -1201,7 +1203,7 @@ void FTSInstance::importIndex(const char* importPath)
 		else //KEY IS EXISTS ONLY ON HDD ===================================================
 		{
 			//get positions
-			uint32 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
+			ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
 
 			/*if(isWord("базист", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
 			{
@@ -1214,7 +1216,7 @@ void FTSInstance::importIndex(const char* importPath)
 			haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 			//check errors ===========================================
-			for(uint32 i=0; i < haWordsHDDTemp.KeyLen; i++)
+			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
 			{
 				newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
 			}
@@ -1253,14 +1255,14 @@ void FTSInstance::importIndex(const char* importPath)
 		}
 
 		//check capacity, split on partitions
-		char error[1024];
+		/*char error[1024];
 		haWordsHDDTemp.checkCapacity(error);
 
 		if (strlen(error))
 		{
 			logError(error);
 			goto destroy;
-		}
+		}*/
 	}
 
 	if(destBuffPosition > 0)
@@ -1343,19 +1345,19 @@ destroy:
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPath);
 		BinaryFile::deleteFile(documentNamePath);
-		HArrayFixHDD::deleteFiles(haWordsHDD.Path, haWordsHDD.TableName);
+		HArrayTextFile::deleteFiles(haWordsHDD.Path, haWordsHDD.TableName);
 
 		//3.Rename tables
 		BinaryFile::renameFile(documentPathTemp, documentPath);
 		BinaryFile::renameFile(documentNamePathTemp, documentNamePath);
-		HArrayFixHDD::renameFiles(haWordsHDD.Path, "temp", haWordsHDD.TableName);
+		HArrayTextFile::renameFiles(haWordsHDD.Path, "temp", haWordsHDD.TableName);
 	}
 	else
 	{
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPathTemp);
 		BinaryFile::deleteFile(documentNamePathTemp);
-		HArrayFixHDD::deleteFiles(haWordsHDDTemp.Path, haWordsHDDTemp.TableName);
+		HArrayTextFile::deleteFiles(haWordsHDDTemp.Path, haWordsHDDTemp.TableName);
 	}
 
 	//open new
@@ -1403,15 +1405,17 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 	BinaryFile::createDirectory(indexPath);
 
 	//dictionary
-	if(Configuration.MemoryMode == IN_MEMORY_MODE ||
-	   Configuration.MemoryMode == HDD_MEMORY_MODE)
-	{
-		haWordsHDD.openOrCreate();
-	}
-	else //if(Configuration.MemoryMode == HDD_BUFFERED_MEMORY_MODE)
-	{
-		haWordsHDD.openOrCreate(BIN_FILE_BUFFER_SIZE); //1 gb on all
-	}
+	haWordsHDD.openOrCreate();
+
+	//if(Configuration.MemoryMode == IN_MEMORY_MODE ||
+	//   Configuration.MemoryMode == HDD_MEMORY_MODE)
+	//{
+	//	haWordsHDD.openOrCreate();
+	//}
+	//else //if(Configuration.MemoryMode == HDD_BUFFERED_MEMORY_MODE)
+	//{
+	//	haWordsHDD.openOrCreate(); //1 gb on all
+	//}
 
 	//index
 	if(isExistsIndex())
@@ -1667,7 +1671,8 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 				uint32 currKeyRAM = 0;
 
-				uint32 startHeaderHDD = 0;
+				ulong64 blockNumber = 0;
+				uint32 wordInBlock = 0;
 
 				uint32 id;
 
@@ -1676,18 +1681,18 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 				while (true)
 				{
 					//get data
-					bool isBufferNotEnough = false;
+					//bool isBufferNotEnough = false;
 
 					uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
 																			MAX_SIZE_BUFFER,
-																			startHeaderHDD,
-																			isBufferNotEnough);
+																			blockNumber,
+																			wordInBlock);
 
-					if (isBufferNotEnough)
+					/*if (isBufferNotEnough)
 					{
 						logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
 						goto destroy2;
-					}
+					}*/
 
 					//check errors ===========================================
 					if (countHDD)
@@ -1809,29 +1814,29 @@ uint32 FTSInstance::getRecoveryIndexState()
 
 void FTSInstance::recoveryIndex()
 {
-	char indexPath[1024];
-	Configuration.getIndexPath(indexPath);
+	//char indexPath[1024];
+	//Configuration.getIndexPath(indexPath);
 
-	uint32 recoveryDictionaryState = HArrayFixHDD::getRecoveryIndexState(indexPath, "temp");
-	uint32 recoveryIndexState = getRecoveryIndexState();
-	
-	if(recoveryDictionaryState == 0 && recoveryIndexState == 0)
-	{
-		//normal
-		return;
-	}
-	else if(recoveryDictionaryState == 2 || recoveryIndexState == 2)
-	{
-		//rollback
-		HArrayFixHDD::recoveryIndex(indexPath, "", "temp", 2);
-		recoveryIndex(2);
-	}
-	else
-	{
-		//commit
-		HArrayFixHDD::recoveryIndex(indexPath, "", "temp", 1);
-		recoveryIndex(1);
-	}
+	//uint32 recoveryDictionaryState = HArrayTextFile::getRecoveryIndexState(indexPath, "temp");
+	//uint32 recoveryIndexState = getRecoveryIndexState();
+	//
+	//if(recoveryDictionaryState == 0 && recoveryIndexState == 0)
+	//{
+	//	//normal
+	//	return;
+	//}
+	//else if(recoveryDictionaryState == 2 || recoveryIndexState == 2)
+	//{
+	//	//rollback
+	//	HArrayFixHDD::recoveryIndex(indexPath, "", "temp", 2);
+	//	recoveryIndex(2);
+	//}
+	//else
+	//{
+	//	//commit
+	//	HArrayFixHDD::recoveryIndex(indexPath, "", "temp", 1);
+	//	recoveryIndex(1);
+	//}
 }
 
 void FTSInstance::recoveryIndex(uint32 recoveryIndexState)

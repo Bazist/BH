@@ -256,14 +256,14 @@ void migrate(char* path)
 {
 	HArrayTextFile file;
 
-	file.init(path, "dictionary", 3, 12, true, true);
+	file.init(path, "", 3);
 
 	HArrayFixHDD ha;
 	ha.init(path, "", 12, 4, 24);
 
 	HArrayFixPair* pairs = HArrayFixPair::CreateArray(10000000, 3);
 
-	file.open();
+	file.create();
 
 	ha.open(BIN_FILE_BUFFER_SIZE);
 
@@ -281,6 +281,8 @@ void migrate(char* path)
 		{
 			file.insert(pairs[i].Key, pairs[i].Value);
 		}
+
+		file.flush();
 	}
 
 	ha.close();
@@ -294,9 +296,11 @@ void clearInstance()
 {
 	//instance.clearInstance("c:\\fts");
 
-	//HArrayTextFile file;
+	/*HArrayTextFile file;
 
-	/*file.init("c:\\fts\\dic.ha", 3, 12, true, true);
+	file.init("c:\\fts\\", "dic", 3);
+
+	file.create();
 
 	for (uint32 i = 0; i < 1000000; i++)
 	{
@@ -346,8 +350,11 @@ void clearInstance()
 	//		i = i; //error
 	//}
 
+	/*
 	migrate("i:\\FTS_Merged\\Instance3");
 	migrate("i:\\FTS_Merged\\Instance19");
+	*/
+
 	migrate("i:\\FTS_Merged\\Instance23");
 	migrate("i:\\FTS_Merged\\Instance33");
 	migrate("i:\\FTS_Merged\\Instance47");
@@ -359,6 +366,10 @@ void clearInstance()
 	migrate("i:\\FTS_Merged\\Instance81");
 	migrate("i:\\FTS_Merged\\Instance82");
 	migrate("i:\\FTS_Merged\\Instance83");
+	
+	//migrate("i:\\FTS_Merged\\Instance3");
+
+	//importIndex(1, "C:\\FTS\\Inst2", false);
 }
 
 void saveIndex(uint32 instanceNumber)
