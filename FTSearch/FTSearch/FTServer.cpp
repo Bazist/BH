@@ -294,28 +294,54 @@ void migrate(char* path)
 
 void clearInstance()
 {
+	/*HArrayTextFile file;
+
+	for (ulong64 i = 2000000000; i < 0xFFFFFFFFFF; i++)
+	{
+		char bytes[5];
+
+		file.setValue(i, bytes);
+
+		ulong64 value = 0;
+
+		file.getValue(bytes, value);
+
+		if (value != i)
+			value = value;
+	}*/
+
 	//instance.clearInstance("c:\\fts");
 
-	/*HArrayTextFile file;
+	uint32 controlValue = 0;
+
+	HArrayTextFile file;
 
 	file.init("c:\\fts\\", "dic", 3);
 
 	file.create();
-
-	for (uint32 i = 0; i < 1000000; i++)
+	
+	for (ulong64 i = 0; i < 500000000; i++)
 	{
+		if (i == 214750728)
+			i = i;
+
 		char word[256];
 
-		sprintf(word, "%06u", i);
+		sprintf(word, "%u", i);
 
 		uint32 key[8];
 
 		HArrayVisitor::getPartWords(word, strlen(word), 8, key, 12);
 
-		file.insert(key, i);
+		controlValue += key[0];
+		controlValue += i * 10;
+
+		file.insert(key, i*10);
 	}
 
-	file.close();*/
+	file.close();
+
+	file.open();
 
 	//file.init("c:\\fts\\dic.ha", 3, 12, false, false);
 
@@ -329,13 +355,35 @@ void clearInstance()
 
 	uint32 val = file.getValueByKey(key);*/
 
-	//ulong64 blockNumber = 0;
-	//uint32 wordInBlock = 0;
+	/*ulong64 blockNumber = 0;
+	uint32 wordInBlock = 0;
 
-	//HArrayFixPair* pairs = HArrayFixPair::CreateArray(1000, 3);
+	HArrayFixPair* pairs = HArrayFixPair::CreateArray(1000000, 3);
 
-	//uint32 count = file.getKeysAndValuesByPortions(pairs, 1000, blockNumber, wordInBlock);
+	ulong64 val = 0;
 
+	uint32 controlValue2 = 0;
+
+	while (true)
+	{
+		uint32 count = file.getKeysAndValuesByPortions(pairs, 1000000, blockNumber, wordInBlock);
+
+		if (!count)
+			break;
+
+		for (ulong64 i = 0; i < count; i++, val++)
+		{
+			if (pairs[i].Value != val * 10)
+				i = i;
+
+			controlValue2 += pairs[i].Key[0];
+			controlValue2 += pairs[i].Value;
+		}
+	}
+
+	if (controlValue != controlValue2)
+		controlValue = controlValue;*/
+	
 	//for (int i = 0; i < 1000; i++)
 	//{
 	//	if (i != (uint32)pairs[i].Value)
@@ -355,7 +403,7 @@ void clearInstance()
 	migrate("i:\\FTS_Merged\\Instance19");
 	*/
 
-	migrate("i:\\FTS_Merged\\Instance23");
+	/*migrate("i:\\FTS_Merged\\Instance23");
 	migrate("i:\\FTS_Merged\\Instance33");
 	migrate("i:\\FTS_Merged\\Instance47");
 	migrate("i:\\FTS_Merged\\Instance54");
@@ -365,7 +413,7 @@ void clearInstance()
 	migrate("i:\\FTS_Merged\\Instance80");
 	migrate("i:\\FTS_Merged\\Instance81");
 	migrate("i:\\FTS_Merged\\Instance82");
-	migrate("i:\\FTS_Merged\\Instance83");
+	migrate("i:\\FTS_Merged\\Instance83");*/
 	
 	//migrate("i:\\FTS_Merged\\Instance3");
 

@@ -528,7 +528,7 @@ void FTSInstance::updateIndex()
 
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(id);
 		
-				uint32 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
+				ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
 
 				/*if(isWord("базист", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
 				{
@@ -597,7 +597,7 @@ void FTSInstance::updateIndex()
 			else //KEY IS EXISTS ONLY ON HDD ===================================================
 			{
 				//get positions
-				uint32 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
+				ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
 
 				/*if(isWord("базист", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
 				{
@@ -1272,15 +1272,15 @@ void FTSInstance::importIndex(const char* importPath)
 	}
 
 	//check errors ===========================================
-	if(Info.ControlValue != oldControlValue)
+	/*if(Info.ControlValue != oldControlValue)
 	{
 		logError("HDD Control value is wrong.");
 		goto destroy;
 	}
 	else
-	{
+	{*/
 		Info.ControlValue = newControlValue;
-	}
+	//}
 	//========================================================
 
 	//Save DocNames
@@ -1656,6 +1656,12 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 		}
 		else
 		{
+			/*HArrayFixHDD haWordsHDD2;
+
+			haWordsHDD2.init("c:\\fts\\instance1", "", 12, 4, 24);
+
+			haWordsHDD2.open();*/
+			
 			if (onlyCheckIndex)
 			{
 				uchar8* pSourceBuffer = (uchar8*)pBuffer;
@@ -1678,10 +1684,12 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
 
+				//uint32 startHeader = 0;
+
 				while (true)
 				{
 					//get data
-					//bool isBufferNotEnough = false;
+					bool isBufferNotEnough = false;
 
 					uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
 																			MAX_SIZE_BUFFER,

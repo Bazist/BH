@@ -52,7 +52,7 @@ namespace FTServiceWCF
 
         private List<FTSearch> Instances = new List<FTSearch>();
 
-        private long MaxSizeActiveInstance = 10L * 1024 * 1024 * 1024;
+        private long MaxSizeActiveInstance = 200L * 1024 * 1024 * 1024;
 
         private FTSearch ActiveInstance = null;
 
@@ -60,7 +60,7 @@ namespace FTServiceWCF
 
         private static ServiceHost _host;
 
-        public const string DEFAULT_FTS_PATH = @"C:\FTS";
+        public const string DEFAULT_FTS_PATH = @"i:\FTS_Merged";
 
         #endregion
 
@@ -362,7 +362,7 @@ namespace FTServiceWCF
 
                             fts.StopInstance();
 
-                            //Directory.Delete(path2, true);
+                            Directory.Delete(path2, true);
                         }
                         else
                         {
@@ -409,7 +409,7 @@ namespace FTServiceWCF
                     conf.InstanceNumber = instanceNumber;
                     //conf.OnlyCheckIndex = false;
 
-                    fts.StartInstance(conf);
+                    fts.StartInstance(conf, true);
 
                     fts.StopInstance();
                 }

@@ -403,6 +403,9 @@ public:
 
 						i += getValue(data + i, pairs[count].Value);
 
+						/*if (pairs[count].Value == 2147507280)
+							i = i;*/
+
 						//get value
 						count++;
 
@@ -425,11 +428,11 @@ public:
 				}
 				else //value in next block
 				{
-					wordInBlock = 0;
-
 					break;
 				}
 			}
+
+			wordInBlock = 0;
 		}
 
 		return count;
@@ -463,6 +466,19 @@ public:
 		{
 			sprintf(oldFullPath, "%s\\dictionary_%s.ha", path, oldTableName);
 		}
+
+		char newFullPath[1024];
+
+		if (!newTableName[0])
+		{
+			sprintf(newFullPath, "%s\\dictionary.ha", path);
+		}
+		else
+		{
+			sprintf(newFullPath, "%s\\dictionary_%s.ha", path, newTableName);
+		}
+
+		BinaryFile::renameFile(oldFullPath, newFullPath);
 
 		////clear files
 		//char oldInfoPath[1024];

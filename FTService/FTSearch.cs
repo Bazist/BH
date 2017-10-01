@@ -445,7 +445,7 @@ namespace FTServiceWCF
 
         #region Methods
 
-        public unsafe void StartInstance(ConfigurationDLL configuration)
+        public void StartInstance(ConfigurationDLL configuration, bool onlyCheckIndex = false)
         {
             /*
             ConfigurationDLL configuration = new ConfigurationDLL();
@@ -477,7 +477,7 @@ namespace FTServiceWCF
 
             InstanceNumber = configuration.InstanceNumber;
 
-            startInstanceDLL(configuration, false);
+            startInstanceDLL(configuration, onlyCheckIndex);
         }
 
         public void StopInstance()
