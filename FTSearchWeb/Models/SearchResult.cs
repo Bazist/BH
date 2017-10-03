@@ -16,16 +16,19 @@ namespace FTSearchWeb.Model
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var parts = value.ToString().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (value != null)
+            {
+                var parts = value.ToString().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if(parts.Length > 3)
-                return new ValidationResult("Max words in phrase: 3");
+                if (parts.Length > 3)
+                    return new ValidationResult("Max words in phrase: 3");
 
-            if(parts.Any(x => x.Length < 3))
-                return new ValidationResult("Min phrase len: 3");
+                if (parts.Any(x => x.Length < 3))
+                    return new ValidationResult("Min phrase len: 3");
 
-            if (parts.Any(x => !Regex.IsMatch(x, "^[a-zA-Z\\-0-9]+$")))
-                return new ValidationResult("Word in phrase has wrong symbols");
+                if (parts.Any(x => !Regex.IsMatch(x, "^[a-zA-Z\\-0-9]+$")))
+                    return new ValidationResult("Word in phrase has wrong symbols");
+            }
 
             return ValidationResult.Success;
         }

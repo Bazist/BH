@@ -312,7 +312,7 @@ void clearInstance()
 
 	//instance.clearInstance("c:\\fts");
 
-	uint32 controlValue = 0;
+	/*uint32 controlValue = 0;
 
 	HArrayTextFile file;
 
@@ -341,7 +341,7 @@ void clearInstance()
 
 	file.close();
 
-	file.open();
+	file.open();*/
 
 	//file.init("c:\\fts\\dic.ha", 3, 12, false, false);
 

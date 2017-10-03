@@ -43,8 +43,8 @@ namespace FTServiceWCF
             public uint LastNameIDRAM;
             public uint LastNameIDHDD;
 
-            public uint CountWordsRAM;
-            public uint CountWordsHDD;
+            public System.UInt64 CountWordsRAM;
+            public System.UInt64 CountWordsHDD;
 
             public System.UInt64 UsedMemory;
             public System.UInt64 TotalMemory;
@@ -60,11 +60,10 @@ namespace FTServiceWCF
 
             public uint RelevantLevel;
 
+            public uint CountWordInPhrase;
+
             public uint ReservedValue1;
             public uint ReservedValue2;
-            public uint ReservedValue3;
-            public uint ReservedValue4;
-            public uint ReservedValue5;
         }
 
         public struct ResultPosition
@@ -218,8 +217,8 @@ namespace FTServiceWCF
             public System.UInt32 LastNameIDRAM;
             public System.UInt32 LastNameIDHDD;
 
-            public System.UInt32 CountWordsRAM;
-            public System.UInt32 CountWordsHDD;
+            public System.UInt64 CountWordsRAM;
+            public System.UInt64 CountWordsHDD;
 
             public System.UInt64 UsedMemory;
             public System.UInt64 TotalMemory;
@@ -237,11 +236,10 @@ namespace FTServiceWCF
 
             public System.UInt32 RelevantLevel;
 
+            public System.UInt32 CountWordInPhrase;
+
             public System.UInt32 ReservedValue1;
             public System.UInt32 ReservedValue2;
-            public System.UInt32 ReservedValue3;
-            public System.UInt32 ReservedValue4;
-            public System.UInt32 ReservedValue5;
         }
 
         [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Ansi)]

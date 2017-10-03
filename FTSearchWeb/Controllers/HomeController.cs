@@ -38,7 +38,7 @@ namespace FTSearchWeb.Controllers
 
         public ActionResult Search(SearchResult result)
         {
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
             {
                 string sp = Request.Params["sp"];
 
@@ -110,10 +110,10 @@ namespace FTSearchWeb.Controllers
                     return View("File");
                 }
             }
-            else
-            {
-                return View("Index", new SearchResult { StartPage = 1, CurrentPage = 1 });
-            }
+            //else
+            //{
+            //    return View("Index", new SearchResult { StartPage = 1, CurrentPage = 1 });
+            //}
         }
     }
 }

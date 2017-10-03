@@ -160,11 +160,11 @@ public:
 
 	ulong64 getValueByKey(const uint32* key)
 	{
-		HArrayVisitor::getWord(templateWord, key, maxKeySegments * 4);
+		//HArrayVisitor::getWord(templateWord, key, maxKeySegments * 4);
 
 		ulong64 endPos = (fileSize & 0xFFFFFFFFFFFFF000) + HARRAY_TEXT_FILE_BLOCK_SIZE; //rounded to 4096
 
-		return getValueByKey(templateWord, 0, endPos);
+		return getValueByKey(key, 0, endPos);
 	}
 
 	uint32 getValue(char* bytes, ulong64& value)
@@ -215,9 +215,28 @@ public:
 		}
 	}
 
+	int compareKeys(const uint32* key1,
+					const uint32* key2,
+					uint32 countKeySegments)
+	{
+		for (uint32 i = 0; i < countKeySegments; i++)
+		{
+			if (key1[i] < key2[i])
+				return -1;
+
+			if (key1[i] > key2[i])
+				return 1;
+
+			if (!key1[i] && !key2[i])
+				return 0;
+		}
+
+		return 0;
+	}
+
 	int readBlock(ulong64 pos,
-		const char* findWord,
-		ulong64& value)
+				  const uint32* findKey,
+				  ulong64& value)
 	{
 		char currWord[256];
 
@@ -252,9 +271,13 @@ public:
 				}
 
 				currWord[startPos] = 0;
+								
+				uint32 currKey[8];
+				
+				HArrayVisitor::getPartWords(currWord, startPos, maxKeySegments, currKey, maxKeySegments * 4);
 
 				//check word
-				int res = strcmp(findWord, currWord);
+				int res = compareKeys(findKey, currKey, maxKeySegments);
 
 				if (res)
 				{
@@ -292,9 +315,9 @@ public:
 		}
 	}
 
-	ulong64 getValueByKey(const char* word,
-		ulong64 startPos,
-		ulong64 endPos)
+	ulong64 getValueByKey(const uint32* key,
+						ulong64 startPos,
+						ulong64 endPos)
 	{
 		if (endPos - startPos > HARRAY_TEXT_FILE_BLOCK_SIZE)
 		{
@@ -304,20 +327,20 @@ public:
 
 			ulong64 value;
 
-			int res = readBlock(midPos, word, value);
+			int res = readBlock(midPos, key, value);
 
 			if (res)
 			{
 				//left part
 				if (res < 0)
 				{
-					return getValueByKey(word, startPos, midPos);
+					return getValueByKey(key, startPos, midPos);
 				}
 
 				//right part
 				if (res > 0)
 				{
-					return getValueByKey(word, midPos, endPos);
+					return getValueByKey(key, midPos, endPos);
 				}
 			}
 			else //stop searching
@@ -329,7 +352,7 @@ public:
 		{
 			ulong64 value;
 
-			int res = readBlock(startPos, word, value);
+			int res = readBlock(startPos, key, value);
 
 			if (!res) //stop searching
 			{

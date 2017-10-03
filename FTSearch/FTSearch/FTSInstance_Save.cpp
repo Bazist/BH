@@ -1272,15 +1272,15 @@ void FTSInstance::importIndex(const char* importPath)
 	}
 
 	//check errors ===========================================
-	/*if(Info.ControlValue != oldControlValue)
+	if(Info.ControlValue != oldControlValue)
 	{
 		logError("HDD Control value is wrong.");
 		goto destroy;
 	}
 	else
-	{*/
+	{
 		Info.ControlValue = newControlValue;
-	//}
+	}
 	//========================================================
 
 	//Save DocNames
