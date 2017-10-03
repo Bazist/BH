@@ -25,14 +25,14 @@
                         {
                             <table cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td>
+                                    <td nowrap valign="top">
                                         Search text:&nbsp;
                                     </td>
                                     <td>
                                         @Html.EditorFor(model => model.Phrase)
-                                        @Html.ValidationMessageFor(model => model.Phrase)
+                                        @Html.ValidationMessageFor(model => model.Phrase, null, new { @class = "text-danger" })
                                     </td>
-                                    <td>
+                                    <td nowrap valign="top">
                                         &nbsp;<input type="submit" value="Search" />
                                     </td>
                                 </tr>
@@ -40,12 +40,12 @@
                                     <td colspan="3" style="height:5px;"></td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td nowrap valign="top">
                                         Name contains:&nbsp;
                                     </td>
                                     <td>
                                         @Html.EditorFor(model => model.TemplateName)
-                                        @Html.ValidationMessageFor(model => model.TemplateName)
+                                        @Html.ValidationMessageFor(model => model.TemplateName, null, new { @class = "text-danger" })
                                     </td>
                                     <td></td>
                                 </tr>

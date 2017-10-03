@@ -16,19 +16,44 @@ namespace FTSearchWeb.Model
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value != null)
-            {
-                var parts = value.ToString().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if(value == null)
+                return new ValidationResult("Phrase is empty");
 
-                if (parts.Length > 3)
-                    return new ValidationResult("Max words in phrase: 3");
+            var parts = value.ToString().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (parts.Any(x => x.Length < 3))
-                    return new ValidationResult("Min phrase len: 3");
+            if (parts.Length > 3)
+                return new ValidationResult("Max words in phrase: 3");
 
-                if (parts.Any(x => !Regex.IsMatch(x, "^[a-zA-Z\\-0-9]+$")))
-                    return new ValidationResult("Word in phrase has wrong symbols");
-            }
+            if (parts.Any(x => x.Length < 3))
+                return new ValidationResult("Min phrase len: 3");
+
+            if (parts.Any(x => !Regex.IsMatch(x, "^[a-zA-Z\\-0-9]+$")))
+                return new ValidationResult("Word in phrase has wrong symbols");
+
+
+            return ValidationResult.Success;
+        }
+    }
+
+    public class TemplateNameAttribute : ValidationAttribute
+    {
+        public TemplateNameAttribute()
+        {
+        }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            if (value == null)
+                return ValidationResult.Success;
+
+            var parts = value.ToString().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length > 1)
+                return new ValidationResult("Max words in phrase: 1");
+
+            if (parts.Any(x => !Regex.IsMatch(x, "^[a-zA-Z\\-0-9]+$")))
+                return new ValidationResult("Word in phrase has wrong symbols");
+
 
             return ValidationResult.Success;
         }
@@ -39,19 +64,17 @@ namespace FTSearchWeb.Model
         public const int PAGE_SIZE = 25;
 
         [Required]
-        [Range(1, 1000)]
+        [Range(0, 1000)]
         public int StartPage { get; set; }
 
         [Required]
-        [Range(1, 1000)]
+        [Range(0, 1000)]
         public int CurrentPage { get; set; }
 
-        [Required]
-        [StringLength(100)]
         [PhraseAttribute]
         public string Phrase { get; set; }
 
-        [StringLength(100)]
+        [TemplateNameAttribute]
         public string TemplateName { get; set; }
 
         public BH.FTSearchResult[] Results { get; set; }
