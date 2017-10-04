@@ -19,18 +19,18 @@ namespace FTWinService
         public WinService()
         {
 #if !DEBUG
-                InitializeComponent();
+            InitializeComponent();
 
-                this.ServiceName = @"BH.FTSearch";
-                this.EventLog.Source = this.ServiceName;
-                this.EventLog.Log = "Application";
+            this.ServiceName = @"BH.FTSearch";
+            this.EventLog.Source = this.ServiceName;
+            this.EventLog.Log = "Application";
 #endif
         }
 
-        private FTService _fts = new FTService();
-        private string _indexedArchives = string.Empty;
-        private long _readBytes = 0;
-        private int _amountDocuments = 0;
+        private static FTService _fts = new FTService();
+        private static string _indexedArchives = string.Empty;
+        private static long _readBytes = 0;
+        private static int _amountDocuments = 0;
 
         public void TestStart()
         {
@@ -42,38 +42,50 @@ namespace FTWinService
             OnStop();
         }
 
+        protected override void OnSessionChange(SessionChangeDescription changeDescription)
+        {
+            WriteLog("Session change Service", EventLogEntryType.Information);
+
+            base.OnSessionChange(changeDescription);
+        }
+
+        protected override void OnPause()
+        {
+            WriteLog("Pause Service", EventLogEntryType.Information);
+
+            base.OnPause();
+        }
+
         protected override void OnStart(string[] args)
         {
+            WriteLog("Start Service", EventLogEntryType.Information);
+
             //start web service
-            ThreadPool.QueueUserWorkItem(
-                x =>
-                {
-                    try
-                    {
-                        WriteLog("Start web service ...", EventLogEntryType.Information);
+            try
+            {
+                WriteLog("Start web service ...", EventLogEntryType.Information);
 
-                        var conf = _fts.GetDefaultConfiguration();
+                var conf = _fts.GetDefaultConfiguration();
 
-                        conf.SetIndexPath(ConfigurationManager.AppSettings["IndexPath"]);
-                        conf.LimitUsedMemory = ulong.Parse(ConfigurationManager.AppSettings["LimitUsedMemory"]);
+                conf.SetIndexPath(ConfigurationManager.AppSettings["IndexPath"]);
+                conf.LimitUsedMemory = ulong.Parse(ConfigurationManager.AppSettings["LimitUsedMemory"]);
 
-                        _fts.SetConfiguration(conf);
+                _fts.SetConfiguration(conf);
 
-                        _fts.Start();
+                _fts.Start();
 
-                        FTService.StartWebservice(ConfigurationManager.AppSettings["URL"]);
+                FTService.StartWebservice(ConfigurationManager.AppSettings["URL"]);
 
-                        WriteLog("Service started.", EventLogEntryType.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+                WriteLog("Service started.", EventLogEntryType.Information);
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
 
-                        Stop();
+                Stop();
 
-                        throw ex;
-                    }
-                });
+                throw ex;
+            }
 
             if (bool.Parse(ConfigurationManager.AppSettings["EnableJob"]))
             {
@@ -125,7 +137,7 @@ namespace FTWinService
 
         protected override void OnStop()
         {
-            WriteLog("Stop service ...", EventLogEntryType.Information);
+            WriteLog("Stop Service", EventLogEntryType.Information);
 
             //start web service
             ThreadPool.QueueUserWorkItem(
@@ -167,7 +179,7 @@ namespace FTWinService
 #endif
         }
 
-#region Index Files
+        #region Index Files
 
         private bool IndexFile(string name, string text)
         {
@@ -363,7 +375,7 @@ namespace FTWinService
                 //break;
             }
 
-            
+
         }
 
         private void SaveIndex(string logPath)

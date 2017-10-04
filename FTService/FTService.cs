@@ -289,7 +289,7 @@ namespace FTServiceWCF
 
                 result.IndexSize = Convert.ToUInt64(GetInstances().Sum(x => x.Item2));
                 result.AmountInstances = Convert.ToUInt32(Instances.Count);
-                result.TextSize = result.IndexSize * 43; //in average
+                result.TextSize = result.IndexSize * 123; //in average
 
                 return result;
             }
