@@ -18,7 +18,6 @@ void FTSInstance::calcMatchDocuments(const char* word,
 {
 	HArrayVisitor::getPartWords(word,
 								strlen(word),
-								haWordsRAM.KeyLen,
 								tempKey,
 								Configuration.AutoStemmingOn);
 			
@@ -39,6 +38,9 @@ void FTSInstance::calcMatchDocuments(const char* word,
 												maxPage);
 		}
 	}
+
+	uint32 minDocID = getDocHeaderSize();
+	uint32 maxDocID = Info.LastNameIDRAM;
 
 	//Read from HDD
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
@@ -63,12 +65,13 @@ void FTSInstance::calcMatchDocuments(const char* word,
 												sourceBuffPosition,
 												sourceBuffLength,
 												MAX_SIZE_BUFFER,
-												Info.LastNameIDRAM,
+												minDocID,
+												maxDocID,
 												isFormatCorrupted);
 
 			if (isFormatCorrupted)
 			{
-				printf("Format corrupted !");
+				printf("Read corrupted.");
 			}
 
 			pDocumentsBlock->calcMatchDocuments(pLevelBuffer,
@@ -94,7 +97,6 @@ void FTSInstance::markMatchDocuments(const char* word,
 {
 	HArrayVisitor::getPartWords(word,
 								strlen(word),
-								haWordsRAM.KeyLen,
 								tempKey,
 								Configuration.AutoStemmingOn);
 			
@@ -121,6 +123,9 @@ void FTSInstance::markMatchDocuments(const char* word,
 		}
 	}
 
+	uint32 minDocID = getDocHeaderSize();
+	uint32 maxDocID = Info.LastNameIDRAM;
+
 	//Read from HDD
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
@@ -145,9 +150,17 @@ void FTSInstance::markMatchDocuments(const char* word,
 												sourceBuffPosition,
 												sourceBuffLength,
 												MAX_SIZE_BUFFER,
-												Info.LastNameIDRAM,
+												minDocID,
+												maxDocID,
 												isFormatCorrupted);
 			delete[] pSourceBuffer;
+
+			if (isFormatCorrupted)
+			{
+				logError("Read corrupted.");
+
+				return;
+			}
 
 			pDocumentsBlock->markMatchDocuments(pWeightBuffer,
 												pLevelBuffer,
@@ -454,7 +467,6 @@ void FTSInstance::calculateTrend(const char* phrase,
 	//get DocumentsBlock
 	HArrayVisitor::getPartWords(phrase,
 								phraseLen,
-								haWordsRAM.KeyLen,
 								tempKey,
 								Configuration.AutoStemmingOn);
 			
@@ -473,6 +485,9 @@ void FTSInstance::calculateTrend(const char* phrase,
 									   maxPage);
 		}
 	}
+
+	uint32 minDocID = getDocHeaderSize();
+	uint32 maxDocID = Info.LastNameIDRAM;
 
 	//Read from HDD
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
@@ -497,9 +512,17 @@ void FTSInstance::calculateTrend(const char* phrase,
 												sourceBuffPosition,
 												sourceBuffLength,
 												MAX_SIZE_BUFFER,
-												Info.LastNameIDRAM,
+												minDocID,
+												maxDocID,
 												isFormatCorrupted);
 			delete[] pSourceBuffer;
+
+			if (isFormatCorrupted)
+			{
+				logError("Read corrupted.");
+
+				return;
+			}
 
 			pDocumentsBlock->markTrend(points,
 									   (maxPage - minPage) / count,
@@ -521,7 +544,6 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 
 		HArrayVisitor::getPartWords(dicWord.Word,
 									strlen(dicWord.Word),
-									haWordsRAM.KeyLen,
 									tempKey,
 									Configuration.AutoStemmingOn);
 			
@@ -541,6 +563,9 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 				dicWord.Weight = 0;
 			}
 		}
+
+		uint32 minDocID = getDocHeaderSize();
+		uint32 maxDocID = Info.LastNameIDRAM;
 
 		//Read from HDD
 		if(Configuration.MemoryMode != IN_MEMORY_MODE
@@ -565,9 +590,17 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 													sourceBuffPosition,
 													sourceBuffLength,
 													MAX_SIZE_BUFFER,
-													Info.LastNameIDRAM,
+													minDocID,
+													maxDocID,
 													isFormatCorrupted);
 				delete[] pSourceBuffer;
+
+				if (isFormatCorrupted)
+				{
+					logError("Read corrupted.");
+
+					return;
+				}
 
 				dicWord.Weight = pDocumentsBlock->CountDocuments;
 
@@ -616,7 +649,6 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 
 		HArrayVisitor::getPartWords(dicWord.Word,
 									strlen(dicWord.Word),
-									haWordsRAM.KeyLen,
 									tempKey,
 									Configuration.AutoStemmingOn);
 		
@@ -639,6 +671,9 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 													maxPage);
 			}
 		}
+
+		uint32 minDocID = getDocHeaderSize();
+		uint32 maxDocID = Info.LastNameIDRAM;
 
 		//Read from HDD
 		if(Configuration.MemoryMode != IN_MEMORY_MODE
@@ -663,10 +698,18 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 													sourceBuffPosition,
 													sourceBuffLength,
 													MAX_SIZE_BUFFER,
-													Info.LastNameIDRAM,
+													minDocID,
+													maxDocID,
 													isFormatCorrupted);
 
 				delete[] pSourceBuffer;
+
+				if (isFormatCorrupted)
+				{
+					logError("Read corrupted.");
+
+					return;
+				}
 
 				pDocumentsBlock->markMatchDocuments(pWeightBuffer,
 													pLevelBuffer,
@@ -756,6 +799,9 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 	uchar8 c = 0;
 
+	uint32 minDocID = getDocHeaderSize();
+	uint32 maxDocID = Info.LastNameIDRAM;
+
 	for(uint32 i = 0; i <= phraseLen; i++)
 	{
 		if(i < phraseLen)
@@ -808,7 +854,6 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 							HArrayVisitor::getPartWords(phraseTemp,
 														i,
-														haWordsRAM.KeyLen,
 														tempKey,
 														Configuration.AutoStemmingOn);
 						}
@@ -820,7 +865,6 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 							
 							HArrayVisitor::getPartWords(prevWord,
 														phraseLen,
-														haWordsRAM.KeyLen,
 														tempKey,
 														Configuration.AutoStemmingOn);
 						}
@@ -834,7 +878,6 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 				{
 					HArrayVisitor::getPartWords(word,
 												currLen,
-												haWordsRAM.KeyLen,
 												tempKey,
 												Configuration.AutoStemmingOn);
 				}
@@ -901,10 +944,18 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 																sourceBuffPosition,
 																sourceBuffLength,
 																MAX_SIZE_BUFFER,
-																Info.LastNameIDRAM,
+																minDocID,
+																maxDocID,
 																isFormatCorrupted);
 
 							delete[] pSourceBuffer;
+
+							if (isFormatCorrupted)
+							{
+								logError("Read corrupted.");
+
+								return 0;
+							}
 
 							//add docs
 							if(pDocumentsBlock->CountDocuments < minCountPages)
@@ -1210,7 +1261,6 @@ RelevantResult* FTSInstance::searchHtmlSeldomWords(char* text,
 					//word, currLen;
 					HArrayVisitor::getPartWords(word,
 												currLen,
-												haWordsRAM.KeyLen,
 												tempKey,
 												Configuration.AutoStemmingOn);
 			
@@ -1420,6 +1470,9 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 			haWordsRAM.scanByVisitor(pSelector);
 		}
 
+		uint32 minDocID = getDocHeaderSize();
+		uint32 maxDocID = Info.LastNameIDRAM;
+
 		for(uint32 j=0; j < pSelector->pDictionary->Count; j++)
 		{
 			//get DocumentsBlock
@@ -1427,7 +1480,6 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 
 			HArrayVisitor::getPartWords(dicWord.Word,
 										strlen(dicWord.Word),
-										haWordsRAM.KeyLen,
 										tempKey,
 										Configuration.AutoStemmingOn);
 			
@@ -1457,10 +1509,18 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 														sourceBuffPosition,
 														sourceBuffLength,
 														MAX_SIZE_BUFFER,
-														Info.LastNameIDRAM,
+														minDocID,
+														maxDocID,
 														isFormatCorrupted);
 
 					delete[] pSourceBuffer;
+
+					if (isFormatCorrupted)
+					{
+						logError("Read corrupted.");
+
+						return 0;
+					}
 
 					//mark documents
 					pDocumentsBlock->markSelectorDocuments(pPostSelectorBuffer,

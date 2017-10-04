@@ -306,9 +306,9 @@ void HArrayFixRAM::getValuesByRange(ulong64* values,
 
 
 uint32 HArrayFixRAM::getValuesByRange(ulong64* values,
-								uint32 size, 
-								uint32* minKey, 
-								uint32* maxKey)
+									  uint32 size, 
+									  uint32* minKey, 
+									  uint32* maxKey)
 {
 	uint32 count = 0;
 	uint32 startHeader = minKey[0] >> HeaderBits;

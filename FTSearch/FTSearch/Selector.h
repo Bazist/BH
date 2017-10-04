@@ -74,7 +74,7 @@ public:
 	{
 	}
 
-	virtual bool onVisit(uint32* key, uint32 value)
+	virtual bool onVisit(uint32* key, ulong64 value)
 	{
 		HArrayVisitor::getWord(tempWord, key, AutoStemmingOn);
 

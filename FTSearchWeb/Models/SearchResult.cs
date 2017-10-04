@@ -17,7 +17,7 @@ namespace FTSearchWeb.Model
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if(value == null)
-                return new ValidationResult("Phrase is empty");
+                return ValidationResult.Success;
 
             var parts = value.ToString().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 

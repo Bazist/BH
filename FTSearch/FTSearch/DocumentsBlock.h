@@ -351,6 +351,7 @@ public:
 							uint32& sourceBuffLength,
 
 							uint32 maxSizeBuffer,
+							uint32 minLastNameID,
 							uint32 maxLastNameID,
 			
 							bool& isFormatCorrupted)
@@ -388,7 +389,7 @@ public:
 				docNumber += rightHeaderPart;
 
 				//catch errors
-				if (docNumber > maxLastNameID)
+				if (docNumber < minLastNameID || docNumber > maxLastNameID)
 				{
 					isFormatCorrupted = true;
 

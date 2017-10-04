@@ -141,6 +141,8 @@ bool FTSInstance::indexText(const char* name,
 						  Info.LastNameIDRAM,
 						  Info.DocumentNameSize);
 	
+	needSaveIndex = true;
+
 	return checkMemory();
 }
 
@@ -261,6 +263,8 @@ bool FTSInstance::indexHtml(const char* name, uint32 nameLen, char* text, uint32
 						  Info.LastNameIDRAM, 
 						  Info.DocumentNameSize);
 
+	needSaveIndex = true;
+
 	return checkMemory();
 }
 
@@ -268,7 +272,7 @@ inline void FTSInstance::indexWord(char* word,
 								   uint32& len,
 								   uint32 docID)
 {
-	HArrayVisitor::getPartWords(word, len, haWordsRAM.KeyLen, tempKey, Configuration.AutoStemmingOn);
+	HArrayVisitor::getPartWords(word, len, tempKey, Configuration.AutoStemmingOn);
 
 	DocumentsBlock* pDocumentsBlock;
 

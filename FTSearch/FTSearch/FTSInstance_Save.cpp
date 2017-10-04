@@ -195,7 +195,7 @@ void FTSInstance::createIndex()
 	//save dictionary pages
 	haWordsHDD.close();
 
-	haWordsRAM.save();
+	haWordsRAM.save(Info.CountWordsRAM);
 
 	haWordsHDD.open();
 
@@ -1491,6 +1491,9 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 		//documentsName.FilePosition = (Info.LastNameID - INDEX_FILE_HEADER_SIZE) * Info.DocumentNameSize + INDEX_FILE_HEADER_SIZE;
 
 		Configuration.WordsHeaderBase = Info.WordsHeaderBase;
+
+		uint32 minDocID = getDocHeaderSize();
+		uint32 maxDocID = Info.LastNameIDRAM;
 		
 		//haWordsRAM
 		//reinit haWordsRAM
@@ -1562,12 +1565,13 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 														sourceBuffPosition,
 														sourceBuffLength,
 														MAX_SIZE_BUFFER,
-														Info.LastNameIDRAM,
+														minDocID,
+														maxDocID,
 														isFormatCorrupted);
 
 					if(isFormatCorrupted)
 					{
-						logError("Read corrupted.");
+						logError("Format corrupted.");
 						
 						goto destroy1;
 					}
@@ -1738,7 +1742,8 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 																sourceBuffPosition,
 																sourceBuffLength,
 																MAX_SIZE_BUFFER,
-																Info.LastNameIDRAM,
+																minDocID,
+																maxDocID,
 																isFormatCorrupted);
 
 							if (isFormatCorrupted)
@@ -1893,61 +1898,66 @@ void FTSInstance::recoveryIndex(uint32 recoveryIndexState)
 
 void FTSInstance::saveIndex()
 {
-	closeDicIndex();
-
-	closeDocIndex();
-
-	closeDocNameIndex();
-
-	if(Configuration.MemoryMode == IN_MEMORY_MODE)
+	if (needSaveIndex)
 	{
-		createIndex();
-
 		closeDicIndex();
 
 		closeDocIndex();
 
 		closeDocNameIndex();
-	}
-	else
-	{
-		char indexPath[1024];
-		Configuration.getIndexPath(indexPath);
 
-		//create if not exists
-		BinaryFile::createDirectory(indexPath);
+		if (Configuration.MemoryMode == IN_MEMORY_MODE)
+		{
+			createIndex();
 
-		if(isExistsIndex())
-		{
-			updateIndex();
-		}
-		else
-		{
-			createIndex();			
-		}
-
-		if (Configuration.IsCreateNewInstanceOnUpdate)
-		{
 			closeDicIndex();
 
 			closeDocIndex();
 
 			closeDocNameIndex();
-
-			Configuration.InstanceNumber++;
-
-			/*if (!BinaryFile::createDirectory(Configuration.getIndexPath()))
-			{
-				logError("Can't create directory.");
-
-				return;
-			}*/
-
-			Configuration.getIndexPath(haWordsRAM.Path);
-			Configuration.getIndexPath(haWordsHDD.Path);
-
-			Info.clear();
 		}
+		else
+		{
+			char indexPath[1024];
+			Configuration.getIndexPath(indexPath);
+
+			//create if not exists
+			BinaryFile::createDirectory(indexPath);
+
+			if (isExistsIndex())
+			{
+				updateIndex();
+			}
+			else
+			{
+				createIndex();
+			}
+
+			if (Configuration.IsCreateNewInstanceOnUpdate)
+			{
+				closeDicIndex();
+
+				closeDocIndex();
+
+				closeDocNameIndex();
+
+				Configuration.InstanceNumber++;
+
+				/*if (!BinaryFile::createDirectory(Configuration.getIndexPath()))
+				{
+					logError("Can't create directory.");
+
+					return;
+				}*/
+
+				Configuration.getIndexPath(haWordsRAM.Path);
+				Configuration.getIndexPath(haWordsHDD.Path);
+
+				Info.clear();
+			}
+		}
+
+		needSaveIndex = false;
 	}
 }
 

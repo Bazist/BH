@@ -75,7 +75,12 @@ namespace FTSearchWeb.Controllers
 
                 if (string.IsNullOrEmpty(f)) //search phrase
                 {
-                    var res = fts.SearchPhrase(result.Phrase, (result.TemplateName ?? string.Empty).Trim(), (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
+                    BH.FTSearchResult[] res = new BH.FTSearchResult[0];
+
+                    if (!string.IsNullOrEmpty(result.Phrase))
+                    {
+                        res = fts.SearchPhrase(result.Phrase, (result.TemplateName ?? string.Empty).Trim(), (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
+                    }
 
                     return View("Index", new SearchResult
                     {
@@ -97,6 +102,12 @@ namespace FTSearchWeb.Controllers
 
                     content = content.Replace("[TooManyMatches]",
                                               "<br/><br/>================= FILE CANNOT BE LOAD FULL IN WEB ===================== <br/>");
+
+                    content = content.Replace("<", "&lt;").Replace(">", "&gt;");
+
+                    content = content.Replace(" ", "&nbsp;");
+
+                    content = content.Replace("\n", "<br/>");
 
                     var words = result.Phrase.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 

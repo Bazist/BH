@@ -303,7 +303,7 @@ public:
 		HArrayFixPair::DeleteArray(pairs);
 	}
 
-	void save()
+	bool save(uint32 count)
 	{
 		HArrayTextFile file;
 
@@ -311,11 +311,30 @@ public:
 
 		file.create();
 
-		InsertToTextFileVisitor visitor(&file);
-		
-		this->scanByVisitor(&visitor);
+		HArrayFixPair* pKeysAndValuesRAM = HArrayFixPair::CreateArray(count, KeyLen);
 
+		//get keys
+		uint32 readCount = getKeysAndValuesByRange(pKeysAndValuesRAM,
+													count,
+													0,
+													0);
+
+		if (readCount != count)
+			return false;
+
+		//save keys
+		for (uint32 i = 0; i < count; i++)
+		{
+			file.insert(pKeysAndValuesRAM[i].Key,
+						pKeysAndValuesRAM[i].Value);
+		}
+		
+		
 		file.close();
+
+		HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
+
+		return true;
 	}
 
 	/*

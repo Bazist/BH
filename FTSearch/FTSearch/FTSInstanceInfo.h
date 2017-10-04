@@ -126,7 +126,7 @@ public:
 
 	void upgradeInfo(const char* path)
 	{
-		BinaryFile* file = new BinaryFile("I:\\FTS_Merged\\Instance23\\document.idx", true, false);
+		BinaryFile* file = new BinaryFile(path, true, false);
 		file->open();
 
 		FTSInstanceInfo_old info;

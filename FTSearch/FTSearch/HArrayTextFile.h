@@ -274,7 +274,7 @@ public:
 								
 				uint32 currKey[8];
 				
-				HArrayVisitor::getPartWords(currWord, startPos, maxKeySegments, currKey, maxKeySegments * 4);
+				HArrayVisitor::getPartWords(currWord, startPos, currKey, maxKeySegments * 4);
 
 				//check word
 				int res = compareKeys(findKey, currKey, maxKeySegments);
@@ -420,7 +420,6 @@ public:
 						//get word
 						HArrayVisitor::getPartWords(currWord,
 													wordLen,
-													maxKeySegments,
 													pairs[count].Key,
 													maxKeySegments * 4);
 
@@ -587,7 +586,7 @@ public:
 	{
 	}
 
-	virtual bool onVisit(uint32* key, uint32 value)
+	virtual bool onVisit(uint32* key, ulong64 value)
 	{
 		this->pTextFile->insert(key, value);
 

@@ -427,6 +427,7 @@ public:
 
 	FTSConfiguration Configuration;
 	uchar8 alphabet[256];
+	bool needSaveIndex;
 
 	~FTSInstance()
 	{

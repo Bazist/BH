@@ -52,7 +52,7 @@ namespace FTServiceWCF
 
         private List<FTSearch> Instances = new List<FTSearch>();
 
-        private long MaxSizeActiveInstance = 200L * 1024 * 1024 * 1024;
+        private long MaxSizeActiveInstance = 10L * 1024 * 1024 * 1024;
 
         private FTSearch ActiveInstance = null;
 
@@ -60,7 +60,9 @@ namespace FTServiceWCF
 
         private static ServiceHost _host;
 
-        public const string DEFAULT_FTS_PATH = @"i:\FTS_Merged";
+        private static object _lockObj = new object();
+        
+        public const string DEFAULT_FTS_PATH = @"c:\FTS";
 
         #endregion
 
@@ -80,7 +82,7 @@ namespace FTServiceWCF
         [OperationContract]
         public bool IsStarted()
         {
-            lock (this)
+            lock (_lockObj)
             {
                 return Instances.Count > 0;
             }
@@ -107,7 +109,7 @@ namespace FTServiceWCF
         [OperationContract]
         public FTSearch.ConfigurationDLL GetConfiguration()
         {
-            lock (this)
+            lock (_lockObj)
             {
                 return _configuration;
             }
@@ -116,7 +118,7 @@ namespace FTServiceWCF
         [OperationContract]
         public FTSearch.ConfigurationDLL GetDefaultConfiguration()
         {
-            lock (this)
+            lock (_lockObj)
             {
                 FTSearch.ConfigurationDLL conf = new FTSearch.ConfigurationDLL();
 
@@ -152,7 +154,7 @@ namespace FTServiceWCF
         [OperationContract]
         public void SetConfiguration(FTSearch.ConfigurationDLL configuration)
         {
-            lock (this)
+            lock (_lockObj)
             {
                 _configuration = configuration;
             }
@@ -161,7 +163,7 @@ namespace FTServiceWCF
         [OperationContract]
         public void Start(int instanceNumber = 0)
         {
-            lock (this)
+            lock (_lockObj)
             {
                 if (IsStarted())
                     Stop();
@@ -219,7 +221,7 @@ namespace FTServiceWCF
         [OperationContract]
         public List<FTSearch.Result> SearchPhrase(string phrase, string templateName, int skip, int take)
         {
-            lock (this)
+            lock (_lockObj)
             {
                 var result = new List<FTSearch.Result>();
 
@@ -264,7 +266,7 @@ namespace FTServiceWCF
         [OperationContract]
         public Info GetInfo()
         {
-            lock (this)
+            lock (_lockObj)
             {
                 var result = new Info();
 
@@ -296,7 +298,7 @@ namespace FTServiceWCF
         [OperationContract]
         public bool IndexText(string aliasName, string contentText)
         {
-            lock (this)
+            lock (_lockObj)
             {
                 return ActiveInstance.IndexContent(aliasName, contentText, FTSearch.ContentType.Text);
 
@@ -313,7 +315,7 @@ namespace FTServiceWCF
         [OperationContract]
         public void SaveIndex()
         {
-            lock (this)
+            lock (_lockObj)
             {
                 ActiveInstance.SaveIndex();
             }
@@ -322,7 +324,7 @@ namespace FTServiceWCF
         [OperationContract]
         public void MergeIndexes()
         {
-            lock (this)
+            lock (_lockObj)
             {
                 int skipedBySize = 0;
 
@@ -376,7 +378,7 @@ namespace FTServiceWCF
         [OperationContract]
         public void Stop()
         {
-            lock (this)
+            lock (_lockObj)
             {
                 foreach (var fts in Instances)
                 {
@@ -390,7 +392,7 @@ namespace FTServiceWCF
         [OperationContract]
         public void CheckIndexes()
         {
-            lock (this)
+            lock (_lockObj)
             {
                 var dirsLenSort = GetInstances();
 
@@ -441,7 +443,7 @@ namespace FTServiceWCF
         [OperationContract]
         public string LoadContent(string name, string aroundPhrase)
         {
-            lock (this)
+            lock (_lockObj)
             {
                 name = name.Replace(@"C:\FTS\Logs\Unpacked\", string.Empty);
 
@@ -580,7 +582,10 @@ namespace FTServiceWCF
 
         public void ClearInstance()
         {
-            ActiveInstance.ClearInstance();
+            lock (_lockObj)
+            {
+                ActiveInstance.ClearInstance();
+            }
         }
 
         #endregion

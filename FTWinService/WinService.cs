@@ -96,17 +96,17 @@ namespace FTWinService
                             {
                                 if (DateTime.Now >= dt)
                                 {
-                                    WriteLog("Start job service ...", EventLogEntryType.Information);
+                                    WriteLog("Start indexing ...", EventLogEntryType.Information);
 
                                     Index();
 
-                                    WriteLog("Job started.", EventLogEntryType.Information);
+                                    WriteLog("Indexing completed.", EventLogEntryType.Information);
 
                                     dt = dt.AddDays(1);
                                 }
                                 else
                                 {
-                                    Thread.Sleep(1000);
+                                    Thread.Sleep(30000);
                                 }
                             }
                         }
@@ -152,7 +152,7 @@ namespace FTWinService
 
         private void WriteLog(string message, EventLogEntryType eventType)
         {
-            message = $"[{DateTime.Now.ToString()}] {message}";
+            message = $"[{DateTime.Now.ToString()}] {message}; Memory: {System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024} mb.";
 #if DEBUG
             Trace.WriteLine(message);
 #else
@@ -350,15 +350,7 @@ namespace FTWinService
 
                 if (this.IndexFiles(_fts, rootPath, unpackPath)) //need save on disc
                 {
-                    WriteLog($"Start save index ...", EventLogEntryType.Information);
-
-                    _fts.SaveIndex();
-
-                    File.AppendAllText(logPath, _indexedArchives + "\r\n");
-
-                    WriteLog($"Index saved.", EventLogEntryType.Information);
-
-                    _indexedArchives = string.Empty;
+                    SaveIndex(logPath);
                 }
 
                 Directory.Delete(unpackPath, true);
@@ -366,17 +358,31 @@ namespace FTWinService
                 File.Delete(path);
 
                 //File.AppendAllText(logPath, archive + "\r\n");
-
+                SaveIndex(logPath);
 
                 //break;
             }
 
-            //save index
-            _fts.SaveIndex();
-
-            File.AppendAllText(logPath, _indexedArchives + "\r\n");
+            
         }
 
-#endregion
+        private void SaveIndex(string logPath)
+        {
+            if (!string.IsNullOrEmpty(_indexedArchives))
+            {
+                WriteLog($"Start save index ...", EventLogEntryType.Information);
+
+                //save index
+                _fts.SaveIndex();
+
+                File.AppendAllText(logPath, _indexedArchives + "\r\n");
+
+                WriteLog($"Index saved.", EventLogEntryType.Information);
+
+                _indexedArchives = string.Empty;
+            }
+        }
+
+        #endregion
     }
 }
