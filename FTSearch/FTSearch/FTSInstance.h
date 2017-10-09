@@ -90,6 +90,9 @@ public:
 
 	void startInstance(FTSConfiguration& configuration, bool onlyCheckIndex)
 	{
+		if (!checkStartedInstance(false))
+			return;
+
 		if (strlen(Configuration.IndexPath) > 0)
 		{
 			//destroy previous instance
@@ -219,6 +222,9 @@ public:
 
 	FTSInstanceInfo* getInfo()
 	{
+		if (!checkStartedInstance(true))
+			return 0;
+
 		Info.UsedMemory = getUsedMemory();
 		Info.TotalMemory = getTotalMemory();
 
@@ -251,6 +257,9 @@ public:
 
 	void getDocumentNameByID(uint32 id, char* name, uint32 sizeName)
 	{
+		if (!checkStartedInstance(true))
+			return;
+
 		uint32 docHeaderSize = getDocHeaderSize();
 
 		if (Configuration.MemoryMode == IN_MEMORY_MODE)
@@ -280,6 +289,9 @@ public:
 
 	bool hasDocumentNameHDD(const char* name, uint32 len, uint32 sizeName)
 	{
+		if (!checkStartedInstance(true))
+			return 0;
+
 		uint32 offset = DOC_NAME_HEADER_SIZE;
 
 		for (uint32 i = 0; i < Info.LastNameIDHDD; i++)
@@ -317,6 +329,9 @@ public:
 
 	bool hasDocumentName(const char* name, uint32 len)
 	{
+		if (!checkStartedInstance(true))
+			return 0;
+
 		uint32 docHeaderSize = getDocHeaderSize();
 
 		if (Configuration.MemoryMode == IN_MEMORY_MODE)
@@ -383,9 +398,33 @@ public:
 
 	bool isExistsIndex();
 
+	bool checkStartedInstance(bool requiredStart)
+	{
+		if (requiredStart && !isStarted)
+		{
+			logError("Method required start instance.");
+
+			return false;
+		}
+		
+		if(!requiredStart && isStarted)
+		{
+			logError("Method required stop instance.");
+
+			return false;
+		}
+
+		return true;
+	}
+
 	void stopInstance()
 	{
+		if (!checkStartedInstance(true))
+			return;
+
 		destroy();
+
+		isStarted = false;
 	}
 
 	ulong64 getUsedMemory();
@@ -428,6 +467,7 @@ public:
 	FTSConfiguration Configuration;
 	uchar8 alphabet[256];
 	bool needSaveIndex;
+	bool isStarted;
 
 	~FTSInstance()
 	{

@@ -70,7 +70,7 @@ namespace FTSearchWeb.Controllers
                 {
                     fts.Start(0);
                 }
-
+                
                 var f = Request.Params["f"];
 
                 if (string.IsNullOrEmpty(f)) //search phrase

@@ -47,20 +47,20 @@ namespace FTWinService
                 return;
             }
 
-//#if DEBUG
-//            //run console
+#if DEBUG
+            //run console
 
-//            var ws = new WinService();
-//            ws.TestStart();
+            var ws = new WinService();
+            ws.TestStart();
 
-//            while (true)
-//            {
-//                Thread.Sleep(60000);
-//            }
+            while (true)
+            {
+                Thread.Sleep(60000);
+            }
 
-//            //ws.TestStop();
-            
-//#else
+            //ws.TestStop();
+
+#else
             ServiceBase[] ServicesToRun;
 
                 ServicesToRun = new ServiceBase[]
@@ -69,7 +69,7 @@ namespace FTWinService
                 };
 
                 ServiceBase.Run(ServicesToRun);
-//#endif
+#endif
         }
     }
 }

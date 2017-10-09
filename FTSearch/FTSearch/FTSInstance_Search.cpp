@@ -16,6 +16,9 @@ void FTSInstance::calcMatchDocuments(const char* word,
 									 uint32& sourceBuffPosition,
 									 uint32& sourceBuffLength)
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	HArrayVisitor::getPartWords(word,
 								strlen(word),
 								tempKey,
@@ -95,6 +98,9 @@ void FTSInstance::markMatchDocuments(const char* word,
 									 uint32 minPage,
 									 uint32 maxPage)
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	HArrayVisitor::getPartWords(word,
 								strlen(word),
 								tempKey,
@@ -226,6 +232,9 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 								 uint32 minPage,
 								 uint32 maxPage)
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	if (!pAllKeysAndValuesRAM)
 	{
 		uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
@@ -432,6 +441,9 @@ double FTSInstance::calculateDistance(const char* word,
 									  uint32& sourceBuffPosition,
 									  uint32& sourceBuffLength)
 {
+	if (!checkStartedInstance(true))
+		return 0;
+
 	uint32 equals = 0;
 	uint32 notEquals = 0;
 	
@@ -462,6 +474,9 @@ void FTSInstance::calculateTrend(const char* phrase,
 								 uint32 minPage,
 								 uint32 maxPage)
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	memset(points, 0, sizeof(uint32) * count);
 
 	//get DocumentsBlock
@@ -537,6 +552,9 @@ void FTSInstance::calculateTrend(const char* phrase,
 
 void FTSInstance::relevantMatch(Dictionary& dictionary)
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	for(uint32 i=0; i<dictionary.Count; i++)
 	{
 		//get DocumentsBlock
@@ -624,6 +642,9 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 							  uint32 maxPage,
 							  uchar8* excluded)
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	//1. Parse phrase
 	//uint32 countResultDocNumbers = 0;
 
@@ -777,6 +798,9 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 										  uint32 maxPage,
 										  uint32 skip)
 {
+	if (!checkStartedInstance(true))
+		return 0;
+
 	RelevantResult* pResult = pRelevantResultPool->newObject();
 	pResult->CountMatches = 0;
 	pResult->FullCountMatches = 0;
@@ -1214,6 +1238,9 @@ RETURN_RESULT:
 RelevantResult* FTSInstance::searchHtmlSeldomWords(char* text,
 													uint32 textLen)
 {
+	if (!checkStartedInstance(true))
+		return 0;
+
 	WordRaiting wr(10);
 
 	bool isText = false;
@@ -1308,6 +1335,9 @@ RelevantResult* FTSInstance::searchPhraseRel(const char* phrase,
 											 uint32 minPage,
 											 uint32 maxPage)
 {
+	if (!checkStartedInstance(true))
+		return 0;
+
 	RelevantResult* pResult = pRelevantResultPool->newObject();
 	pResult->CountMatches = 0;
 	pResult->FullCountMatches = 0;
@@ -1415,6 +1445,9 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 									  uint32 skip,
 									  bool agregateBySubject)
 {
+	if (!checkStartedInstance(true))
+		return 0;
+
 	//1. Parse phrase
 	uint32 countUsedDocNumbers = 0;
 	uint32 countFilterSelectors = 0;
@@ -1804,6 +1837,9 @@ void FTSInstance::extractDocument(uint32 docNumber,
 								  char* docName,
 								  char* docText)
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	if(!pAllKeysAndValuesRAM)
 	{
 		uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
@@ -1849,6 +1885,9 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 										   uint32 endDate2Day,
 										   uint32 periodInDays)
 {
+	if (!checkStartedInstance(true))
+		return 0;
+
 	uint32 minSites = 2;
 	uint32 minWordsOnSite = 2;
 

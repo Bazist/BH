@@ -616,7 +616,7 @@ namespace FTSearchTest
             //               }
             //           });
 
-            fts.SetConfiguration(fts.GetDefaultConfiguration());
+            fts.SetConfiguration(FTService.GetDefaultConfiguration());
 
             FTService.StartWebservice("http://localhost:8080");
         }
@@ -641,6 +641,10 @@ namespace FTSearchTest
 
                 fts.Start();
             }
+
+            fts.Stop();
+
+            fts.Start();
 
             this.UpdateInstanceInfo(fts);
 

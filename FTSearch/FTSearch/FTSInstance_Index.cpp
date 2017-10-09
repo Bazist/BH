@@ -28,6 +28,9 @@ bool FTSInstance::indexText(const char* name,
 							char* text,
 							uint32 textLen)
 {
+	if (!checkStartedInstance(true))
+		return false;
+
 	initDictionaryRAM();
 
 	//calculate relevant parameters
@@ -148,6 +151,9 @@ bool FTSInstance::indexText(const char* name,
 
 bool FTSInstance::indexHtml(const char* name, uint32 nameLen, char* text, uint32 textLen)
 {
+	if (!checkStartedInstance(true))
+		return false;
+
 	initDictionaryRAM();
 
 	bool isText = false;

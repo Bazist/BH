@@ -50,13 +50,13 @@ namespace FTServiceWCF
 
         #region Members
 
-        private List<FTSearch> Instances = new List<FTSearch>();
+        private static List<FTSearch> Instances = new List<FTSearch>();
 
         private long MaxSizeActiveInstance = 10L * 1024 * 1024 * 1024;
 
-        private FTSearch ActiveInstance = null;
+        private static FTSearch ActiveInstance = null;
 
-        private FTSearch.ConfigurationDLL _configuration;
+        private static FTSearch.ConfigurationDLL _configuration;
 
         private static ServiceHost _host;
 
@@ -70,7 +70,7 @@ namespace FTServiceWCF
 
         #region Constructors
 
-        public FTService()
+        static FTService()
         {
             Instances = new List<FTSearch>();
 
@@ -118,7 +118,7 @@ namespace FTServiceWCF
         }
 
         [OperationContract]
-        public FTSearch.ConfigurationDLL GetDefaultConfiguration()
+        public static FTSearch.ConfigurationDLL GetDefaultConfiguration()
         {
             return TryCatch<FTSearch.ConfigurationDLL>(() =>
             {

@@ -3,6 +3,9 @@
 
 void FTSInstance::createIndex()
 {
+	if (!checkStartedInstance(false))
+		return;
+
 	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
 	HArrayFixPair* pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
@@ -237,10 +240,15 @@ void FTSInstance::createIndex()
 	memset(pBuffer, 0, MAX_SIZE_BUFFER);
 
 	HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
+
+	isStarted = true;
 }
 
 void FTSInstance::updateIndex()
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	//init
 	HArrayTextFile haWordsHDDTemp;
 	uchar8* pSourceBuffer = 0;
@@ -784,6 +792,9 @@ destroy:
 
 void FTSInstance::importIndex(const char* importPath)
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	//save index first
 	if(Info.CountWordsRAM)
 	{
@@ -1392,6 +1403,9 @@ destroy:
 
 void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 {
+	if (!checkStartedInstance(false))
+		return;
+
 	closeDicIndex();
 
 	closeDocIndex();
@@ -1435,6 +1449,9 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 
 void FTSInstance::openIndex(bool onlyCheckIndex)
 {
+	if (!checkStartedInstance(false))
+		return;
+
 	char documentPath[1024];
 	char documentNamePath[1024];
 	
@@ -1774,6 +1791,8 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 			Info.CountWordsRAM = 0;
 		}
+
+		isStarted = true;
 	}
 	else
 	{
@@ -1898,6 +1917,9 @@ void FTSInstance::recoveryIndex(uint32 recoveryIndexState)
 
 void FTSInstance::saveIndex()
 {
+	if (!checkStartedInstance(true))
+		return;
+
 	if (needSaveIndex)
 	{
 		closeDicIndex();

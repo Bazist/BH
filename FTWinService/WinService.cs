@@ -73,7 +73,7 @@ namespace FTWinService
             //start web service
             try
             {
-                var conf = _fts.GetDefaultConfiguration();
+                var conf = FTService.GetDefaultConfiguration();
 
                 conf.SetIndexPath(ConfigurationManager.AppSettings["IndexPath"]);
                 conf.LimitUsedMemory = ulong.Parse(ConfigurationManager.AppSettings["LimitUsedMemory"]);
