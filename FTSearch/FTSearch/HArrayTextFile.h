@@ -48,11 +48,14 @@ public:
 
 	void open()
 	{
-		this->pFile = new BinaryFile(FullPath, true, false);
+		if (!pFile)
+		{
+			this->pFile = new BinaryFile(FullPath, true, false);
 
-		this->pFile->open();
+			this->pFile->open();
 
-		this->fileSize = pFile->getFileSize();
+			this->fileSize = pFile->getFileSize();
+		}
 	}
 
 	void create()

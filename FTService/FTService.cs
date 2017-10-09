@@ -61,8 +61,10 @@ namespace FTServiceWCF
         private static ServiceHost _host;
 
         private static object _lockObj = new object();
-        
+
         public const string DEFAULT_FTS_PATH = @"c:\FTS";
+
+        private static Action<Exception> _errorHandler = null;
 
         #endregion
 
@@ -82,10 +84,10 @@ namespace FTServiceWCF
         [OperationContract]
         public bool IsStarted()
         {
-            lock (_lockObj)
+            return TryCatch<bool>(() =>
             {
                 return Instances.Count > 0;
-            }
+            });
         }
 
         private string GetPath()
@@ -109,16 +111,16 @@ namespace FTServiceWCF
         [OperationContract]
         public FTSearch.ConfigurationDLL GetConfiguration()
         {
-            lock (_lockObj)
+            return TryCatch<FTSearch.ConfigurationDLL>(() =>
             {
                 return _configuration;
-            }
+            });
         }
 
         [OperationContract]
         public FTSearch.ConfigurationDLL GetDefaultConfiguration()
         {
-            lock (_lockObj)
+            return TryCatch<FTSearch.ConfigurationDLL>(() =>
             {
                 FTSearch.ConfigurationDLL conf = new FTSearch.ConfigurationDLL();
 
@@ -148,25 +150,25 @@ namespace FTServiceWCF
                 conf.AutoSaveIndex = false;
 
                 return conf;
-            }
+            });
         }
 
         [OperationContract]
         public void SetConfiguration(FTSearch.ConfigurationDLL configuration)
         {
-            lock (_lockObj)
+            TryCatch(() =>
             {
                 _configuration = configuration;
-            }
+            });
         }
 
         [OperationContract]
         public void Start(int instanceNumber = 0)
         {
-            lock (_lockObj)
+            TryCatch(() =>
             {
                 if (IsStarted())
-                    Stop();
+                    throw new Exception("Service already started.");
 
                 var dirsLenSort = GetInstances(instanceNumber);
 
@@ -215,59 +217,65 @@ namespace FTServiceWCF
 
                     ActiveInstance = fts;
                 }
-            }
+            });
         }
 
         [OperationContract]
         public List<FTSearch.Result> SearchPhrase(string phrase, string templateName, int skip, int take)
         {
-            lock (_lockObj)
-            {
-                var result = new List<FTSearch.Result>();
+            return TryCatch<List<FTSearch.Result>>(() =>
+             {
+                 if (!IsStarted())
+                     throw new Exception("Service is not started.");
 
-                foreach (var fts in Instances)
-                {
-                    var sr = fts.SearchPhrase(phrase, templateName, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
+                 var result = new List<FTSearch.Result>();
 
-                    if (skip > sr.FullCountMatches) //skip all results
-                    {
-                        skip -= Convert.ToInt32(sr.FullCountMatches);
-                    }
-                    else
-                    {
-                        if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
-                        {
-                            result.AddRange(sr.Results.Take(take - result.Count));
+                 foreach (var fts in Instances)
+                 {
+                     var sr = fts.SearchPhrase(phrase, templateName, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
 
-                            break;
-                        }
-                        else //go to next instance
-                        {
-                            if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
-                            {
-                                result.AddRange(sr.Results);
+                     if (skip > sr.FullCountMatches) //skip all results
+                      {
+                         skip -= Convert.ToInt32(sr.FullCountMatches);
+                     }
+                     else
+                     {
+                         if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
+                          {
+                             result.AddRange(sr.Results.Take(take - result.Count));
 
-                                skip = 0;
-                            }
-                            else //take part results from current instance, exit
-                            {
-                                result.AddRange(sr.Results.Take(take - result.Count));
+                             break;
+                         }
+                         else //go to next instance
+                          {
+                             if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
+                              {
+                                 result.AddRange(sr.Results);
 
-                                break;
-                            }
-                        }
-                    }
-                }
+                                 skip = 0;
+                             }
+                             else //take part results from current instance, exit
+                              {
+                                 result.AddRange(sr.Results.Take(take - result.Count));
 
-                return result;
-            }
+                                 break;
+                             }
+                         }
+                     }
+                 }
+
+                 return result;
+             });
         }
 
         [OperationContract]
         public Info GetInfo()
         {
-            lock (_lockObj)
+            return TryCatch<Info>(() =>
             {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
+
                 var result = new Info();
 
                 foreach (var fts in Instances)
@@ -292,14 +300,17 @@ namespace FTServiceWCF
                 result.TextSize = result.IndexSize * 123; //in average
 
                 return result;
-            }
+            });
         }
 
         [OperationContract]
         public bool IndexText(string aliasName, string contentText)
         {
-            lock (_lockObj)
+            return TryCatch<bool>(() =>
             {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
+
                 return ActiveInstance.IndexContent(aliasName, contentText, FTSearch.ContentType.Text);
 
                 //{
@@ -309,23 +320,29 @@ namespace FTServiceWCF
                 //                           string.Format(@"[{0}] {1}", DateTime.Now.ToString(), file));
                 //    }
                 //}
-            }
+            });
         }
 
         [OperationContract]
         public void SaveIndex()
         {
-            lock (_lockObj)
+            TryCatch(() =>
             {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
+
                 ActiveInstance.SaveIndex();
-            }
+            });
         }
 
         [OperationContract]
         public void MergeIndexes()
         {
-            lock (_lockObj)
+            TryCatch(() =>
             {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
+
                 int skipedBySize = 0;
 
                 while (true)
@@ -372,28 +389,37 @@ namespace FTServiceWCF
                         }
                     }
                 }
-            }
+            });
         }
 
         [OperationContract]
         public void Stop()
         {
-            lock (_lockObj)
+            TryCatch(() =>
             {
-                foreach (var fts in Instances)
-                {
-                    fts.StopInstance();
-                }
+                if (!IsStarted())
+                    throw new Exception("Service already stopped.");
 
-                Instances.Clear();
-            }
+                if (Instances.Count > 0)
+                {
+                    foreach (var fts in Instances)
+                    {
+                        fts.StopInstance();
+                    }
+
+                    Instances.Clear();
+                }
+            });
         }
 
         [OperationContract]
         public void CheckIndexes()
         {
-            lock (_lockObj)
+            TryCatch(() =>
             {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
+
                 var dirsLenSort = GetInstances();
 
                 for (int i = 0; i < dirsLenSort.Length; i++)
@@ -415,7 +441,7 @@ namespace FTServiceWCF
 
                     fts.StopInstance();
                 }
-            }
+            });
         }
 
         static void Unpack(string archive, string file, string dest)
@@ -443,7 +469,7 @@ namespace FTServiceWCF
         [OperationContract]
         public string LoadContent(string name, string aroundPhrase)
         {
-            lock (_lockObj)
+            return TryCatch<string>(() =>
             {
                 name = name.Replace(@"C:\FTS\Logs\Unpacked\", string.Empty);
 
@@ -556,36 +582,83 @@ namespace FTServiceWCF
                 //File.Delete(fullPath);
 
                 return content.ToString();
+            });
+        }
+
+        private static T TryCatch<T>(Func<T> action)
+        {
+            try
+            {
+                lock (_lockObj)
+                {
+                    return action();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (_errorHandler != null)
+                {
+                    _errorHandler(ex);
+                }
+
+                throw;
             }
         }
 
-        public static void StartWebservice(string url)
+        private static void TryCatch(Action action)
         {
-            Type serviceType = typeof(FTService);
-            Uri serviceUri = new Uri(url);
+            try
+            {
+                lock (_lockObj)
+                {
+                    action();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (_errorHandler != null)
+                {
+                    _errorHandler(ex);
+                }
 
-            _host = new ServiceHost(serviceType, serviceUri);
+                throw;
+            }
+        }
 
-            var basicHttpBinding = new BasicHttpBinding();
-            basicHttpBinding.MaxReceivedMessageSize = int.MaxValue;
-            basicHttpBinding.MaxBufferSize = int.MaxValue;
+        public static void StartWebservice(string url, Action<Exception> errorHandler = null)
+        {
+            _errorHandler = errorHandler;
 
+            TryCatch(() =>
+            {
+                Type serviceType = typeof(FTService);
+                Uri serviceUri = new Uri(url);
 
-            _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
-            _host.Open();
+                _host = new ServiceHost(serviceType, serviceUri);
+
+                var basicHttpBinding = new BasicHttpBinding();
+                basicHttpBinding.MaxReceivedMessageSize = int.MaxValue;
+                basicHttpBinding.MaxBufferSize = int.MaxValue;
+
+                _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
+                _host.Open();
+            });
         }
 
         public static void StopWebService()
         {
-            _host.Abort();
+            TryCatch(() =>
+            {
+                _host.Abort();
+            });
         }
 
         public void ClearInstance()
         {
-            lock (_lockObj)
+            TryCatch(() =>
             {
                 ActiveInstance.ClearInstance();
-            }
+            });
         }
 
         #endregion

@@ -12,7 +12,10 @@ namespace FTSearchWeb
 
             BH.FTServiceClient fts = new BH.FTServiceClient();
 
-            fts.Start(0);
+            if (!fts.IsStarted())
+            {
+                fts.Start(0);
+            }
         }
     }
 }

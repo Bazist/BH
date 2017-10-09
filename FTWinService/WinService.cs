@@ -24,13 +24,23 @@ namespace FTWinService
             this.ServiceName = @"BH.FTSearch";
             this.EventLog.Source = this.ServiceName;
             this.EventLog.Log = "Application";
+
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception ex = (Exception)e.ExceptionObject;
+
+            WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
         }
 
         private static FTService _fts = new FTService();
         private static string _indexedArchives = string.Empty;
         private static long _readBytes = 0;
         private static int _amountDocuments = 0;
+        private static Thread _job;
 
         public void TestStart()
         {
@@ -63,8 +73,6 @@ namespace FTWinService
             //start web service
             try
             {
-                WriteLog("Start web service ...", EventLogEntryType.Information);
-
                 var conf = _fts.GetDefaultConfiguration();
 
                 conf.SetIndexPath(ConfigurationManager.AppSettings["IndexPath"]);
@@ -74,7 +82,10 @@ namespace FTWinService
 
                 _fts.Start();
 
-                FTService.StartWebservice(ConfigurationManager.AppSettings["URL"]);
+                FTService.StartWebservice(ConfigurationManager.AppSettings["URL"],
+                                          ex => {
+                                                    WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+                                                });
 
                 WriteLog("Service started.", EventLogEntryType.Information);
             }
@@ -89,49 +100,53 @@ namespace FTWinService
 
             if (bool.Parse(ConfigurationManager.AppSettings["EnableJob"]))
             {
-                //start job service
-                ThreadPool.QueueUserWorkItem(
-                    x =>
-                    {
-                        try
-                        {
-                            var parts = ConfigurationManager.AppSettings["StartJobTime"].Split(':');
+                WriteLog("Start Job", EventLogEntryType.Information);
 
-                            DateTime dt = new DateTime(DateTime.Now.Year,
-                                                       DateTime.Now.Month,
-                                                       DateTime.Now.Day,
-                                                       int.Parse(parts[0]),
-                                                       int.Parse(parts[1]),
-                                                       0);
+                _job = new Thread(() =>
+                   {
+                       try
+                       {
+                           var parts = ConfigurationManager.AppSettings["StartJobTime"].Split(':');
 
-                            while (true)
-                            {
-                                if (DateTime.Now >= dt)
-                                {
-                                    WriteLog("Start indexing ...", EventLogEntryType.Information);
+                           DateTime dt = new DateTime(DateTime.Now.Year,
+                                                      DateTime.Now.Month,
+                                                      DateTime.Now.Day,
+                                                      int.Parse(parts[0]),
+                                                      int.Parse(parts[1]),
+                                                      0);
 
-                                    Index();
+                           while (true)
+                           {
+                               if (DateTime.Now >= dt)
+                               {
+                                   WriteLog("Start indexing ...", EventLogEntryType.Information);
 
-                                    WriteLog("Indexing completed.", EventLogEntryType.Information);
+                                   Index();
 
-                                    dt = dt.AddDays(1);
-                                }
-                                else
-                                {
-                                    Thread.Sleep(30000);
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+                                   WriteLog("Indexing completed.", EventLogEntryType.Information);
 
-                            Stop();
+                                   dt = dt.AddDays(1);
+                               }
+                               else
+                               {
+                                   Thread.Sleep(30000);
+                               }
+                           }
+                       }
+                       catch (Exception ex)
+                       {
+                           WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
 
-                            throw ex;
-                        }
-                    }
+                           Stop();
+
+                           throw ex;
+                       }
+                   }
                 );
+
+                _job.Start();
+
+                WriteLog("Job Started.", EventLogEntryType.Information);
             }
         }
 
@@ -140,26 +155,25 @@ namespace FTWinService
             WriteLog("Stop Service", EventLogEntryType.Information);
 
             //start web service
-            ThreadPool.QueueUserWorkItem(
-                x =>
+            try
+            {
+                if (_job != null)
                 {
-                    try
-                    {
-                        FTService.StopWebService();
+                    _job.Abort();
+                }
 
-                        _fts.Stop();
+                FTService.StopWebService();
 
-                        WriteLog("Service stoped.", EventLogEntryType.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+                _fts.Stop();
 
-                        Stop();
+                WriteLog("Service stoped.", EventLogEntryType.Information);
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
 
-                        throw ex;
-                    }
-                });
+                throw ex;
+            }
         }
 
         private void WriteLog(string message, EventLogEntryType eventType)
@@ -370,12 +384,11 @@ namespace FTWinService
                 File.Delete(path);
 
                 //File.AppendAllText(logPath, archive + "\r\n");
-                SaveIndex(logPath);
 
                 //break;
             }
 
-
+            SaveIndex(logPath);
         }
 
         private void SaveIndex(string logPath)

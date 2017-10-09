@@ -350,7 +350,7 @@ namespace FTServiceWCF
         const string DLL_PATH = @"FTSearch.dll";
 #endif
 
-        //[DllImport(DLL_PATH, EntryPoint = "startDefaultInstance", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        //[DllImport(DLL_PATH, EntryPoint = "startDefaultInstance", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         //private static unsafe extern void startDefaultInstanceDLL(byte* path,
         //                                                          System.UInt32 instance,
         //                                                          MemoryMode memoryMode,
@@ -361,16 +361,16 @@ namespace FTServiceWCF
         //                                                          System.UInt32 countWordInPhrase,
         //                                                          bool isUseNumberAlphabet);
 
-        [DllImport(DLL_PATH, EntryPoint = "startInstance", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "startInstance", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void startInstanceDLL(ConfigurationDLL configuration, bool onlyCheckIndex);
 
-        [DllImport(DLL_PATH, EntryPoint = "stopInstance", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "stopInstance", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void stopInstanceDLL(System.UInt32 instanceNumber);
 
-        [DllImport(DLL_PATH, EntryPoint = "getInfo", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "getInfo", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern IntPtr getInfoDLL(System.UInt32 instanceNumber);
 
-        [DllImport(DLL_PATH, EntryPoint = "searchPhrase", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "searchPhrase", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static unsafe extern IntPtr searchPhraseDLL(System.UInt32 instanceNumber,
                                                             byte* phrase,
                                                             System.UInt32 phraseLen,
@@ -380,13 +380,13 @@ namespace FTServiceWCF
                                                             System.UInt32 maxPage,
                                                             uint skip);
 
-        [DllImport(DLL_PATH, EntryPoint = "searchPhraseRel", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "searchPhraseRel", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static unsafe extern IntPtr searchPhraseRelDLL(System.UInt32 instanceNumber, byte* phrase, System.UInt32 phraseLen, System.UInt32 minPage, System.UInt32 maxPage);
 
-        [DllImport(DLL_PATH, EntryPoint = "searchQuery", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "searchQuery", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static unsafe extern IntPtr searchQueryDLL(System.UInt32 instanceNumber, IntPtr[] selectors, System.UInt32 countSelectors, System.UInt32 minPage, System.UInt32 maxPage, System.UInt32 skip, System.Boolean agregateBySubject);
 
-        [DllImport(DLL_PATH, EntryPoint = "searchNewMems", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "searchNewMems", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private unsafe static extern IntPtr searchNewMemsDLL(System.UInt32 instanceNumber,
                                                            System.UInt32 startDate1Year,
                                                            System.UInt32 startDate1Month,
@@ -398,36 +398,36 @@ namespace FTServiceWCF
                                                            System.UInt32 endDate2Day,
                                                            System.UInt32 periodInDays);
 
-        [DllImport(DLL_PATH, EntryPoint = "calculateTrend", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "calculateTrend", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static unsafe extern IntPtr calculateTrendDLL(System.UInt32 instanceNumber, byte* word, System.UInt32 phraseLen, System.UInt32* points, System.UInt32 count, System.UInt32 minPage, System.UInt32 maxPage);
 
-        [DllImport(DLL_PATH, EntryPoint = "getDocumentNameByID", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "getDocumentNameByID", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static unsafe extern void getDocumentNameByIDDLL(System.UInt32 instanceNumber, System.UInt32 id, byte* name, System.UInt32 sizeName);
 
-        [DllImport(DLL_PATH, EntryPoint = "releaseRelevantResult", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "releaseRelevantResult", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void releaseRelevantResultDLL(System.UInt32 instanceNumber, System.IntPtr pRelevantResult);
 
-        [DllImport(DLL_PATH, EntryPoint = "releaseQueryResult", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "releaseQueryResult", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void releaseQueryResultDLL(System.UInt32 instanceNumber, System.IntPtr pQueryResult);
 
-        [DllImport(DLL_PATH, EntryPoint = "clearInstance", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "clearInstance", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void clearInstanceDLL(System.UInt32 instanceNumber);
 
-        [DllImport(DLL_PATH, EntryPoint = "indexText", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "indexText", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         [return: MarshalAs(UnmanagedType.I1)]
         private unsafe static extern bool indexTextDLL(System.UInt32 instanceNumber, byte* name, System.UInt32 nameLen, byte* text, System.UInt32 textLen);
 
-        [DllImport(DLL_PATH, EntryPoint = "indexHtml", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "indexHtml", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         [return: MarshalAs(UnmanagedType.I1)]
         private unsafe static extern bool indexHtmlDLL(System.UInt32 instanceNumber, byte* name, System.UInt32 nameLen, byte* text, System.UInt32 textLen);
 
-        [DllImport(DLL_PATH, EntryPoint = "saveIndex", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "saveIndex", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void saveIndexDLL(System.UInt32 instanceNumber);
 
-        [DllImport(DLL_PATH, EntryPoint = "importIndex", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "importIndex", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private unsafe static extern void importIndexDLL(System.UInt32 instanceNumber, byte* importPath, bool isDeleteImportedIndex);
 
-        [DllImport(DLL_PATH, EntryPoint = "saveIndex", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(DLL_PATH, EntryPoint = "saveIndex", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         [return: MarshalAs(UnmanagedType.I1)]
         private unsafe static extern bool isNameExistsDLL(System.UInt32 instanceNumber, byte* name, System.UInt32 nameLen);
 

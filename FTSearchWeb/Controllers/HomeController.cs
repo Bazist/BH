@@ -97,18 +97,18 @@ namespace FTSearchWeb.Controllers
 
                     var content = fts.LoadContent(f, result.Phrase);
 
-                    content = content.Replace("[BREAK]",
-                                              "<br/><br/>================= BREAK =====================<br/>");
-
-                    content = content.Replace("[TooManyMatches]",
-                                              "<br/><br/>================= FILE CANNOT BE LOAD FULL IN WEB ===================== <br/>");
-
                     content = content.Replace("<", "&lt;").Replace(">", "&gt;");
 
                     content = content.Replace(" ", "&nbsp;");
 
                     content = content.Replace("\n", "<br/>");
 
+                    content = content.Replace("[BREAK]",
+                                              "<br/><br/>================= BREAK =====================<br/>");
+
+                    content = content.Replace("[TooManyMatches]",
+                                              "<br/><br/>================= FILE CANNOT BE LOAD FULL IN WEB ===================== <br/>");
+                    
                     var words = result.Phrase.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                     foreach (var word in words)
