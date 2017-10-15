@@ -148,6 +148,9 @@
     <ClInclude Include="HArrayTextFile.h">
       <Filter>Header Files\HArray</Filter>
     </ClInclude>
+    <ClInclude Include="DocumentsNameTextFile.h">
+      <Filter>Header Files\Document</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

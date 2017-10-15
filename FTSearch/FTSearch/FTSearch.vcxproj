@@ -35,7 +35,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -162,6 +162,7 @@
     <ClInclude Include="DocumentsBlock.h" />
     <ClInclude Include="DocumentsBlockPool.h" />
     <ClInclude Include="DocumentsName.h" />
+    <ClInclude Include="DocumentsNameTextFile.h" />
     <ClInclude Include="FTSConfiguration.h" />
     <ClInclude Include="FTSInstance.h" />
     <ClInclude Include="FTSInstanceInfo.h" />
