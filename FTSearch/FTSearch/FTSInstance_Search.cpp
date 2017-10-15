@@ -1142,7 +1142,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 			getDocumentNameByID(id, pName, Info.DocumentNameSize);
 
-			if (templateNameLen == 0 || strstr(pName, templateName))
+			if (templateNameLen == 0 || wildCardCompare(templateName, pName))
 			{
 				if (pPrevName)
 				{

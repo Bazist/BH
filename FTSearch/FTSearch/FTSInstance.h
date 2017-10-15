@@ -911,6 +911,51 @@ private:
 		}
 	}
 
+	bool wildCardCompare(const char* strTemplate, const char* str)
+	{
+		int posStr = 0;
+		int posStrTemplate = 0;
+
+		bool anySymbol = false;
+
+		while (str[posStr])
+		{
+			//skip symbols
+			while (strTemplate[posStrTemplate] == '*')
+			{
+				posStrTemplate++;
+
+				anySymbol = true;
+			}
+
+			//exact symbols
+			if (str[posStr] == strTemplate[posStrTemplate])
+			{
+				posStr++;
+				posStrTemplate++;
+
+				anySymbol = false;
+			}
+			else if (anySymbol)
+			{
+				posStr++;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		//skip last symbols
+		while (strTemplate[posStrTemplate] == '*')
+		{
+			posStrTemplate++;
+		}
+
+		//reached end of template
+		return !strTemplate[posStrTemplate];
+	}
+
 	void destroy()
 	{
 		closeDicIndex();
