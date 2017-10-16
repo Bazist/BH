@@ -11,7 +11,6 @@ private:
 	BinaryFile* pFile;
 	char templateWord[1024];
 	ulong64 fileSize;
-	uint32 maxKeySegments;
 
 public:
 
@@ -25,22 +24,19 @@ public:
 	char TableName[256];
 
 	void init(const char* path,
-		const char* name,
-		uint32 maxKeySegments)
+			  const char* name)
 	{
 		if (!name[0])
 		{
-			sprintf(FullPath, "%s\\dictionary.ha", path);
+			sprintf(FullPath, "%s\\documentNames.ha", path);
 		}
 		else
 		{
-			sprintf(FullPath, "%s\\dictionary_%s.ha", path, name);
+			sprintf(FullPath, "%s\\documentNames_%s.ha", path, name);
 		}
 
 		strcpy(Path, path);
 		strcpy(TableName, name);
-
-		this->maxKeySegments = maxKeySegments;
 	}
 
 	void open()
@@ -77,7 +73,8 @@ public:
 	}
 
 	void addDocumentName(const char* name,
-		uint32 id)
+						 uint32 nameLen,
+						 uint32 id)
 	{
 		uint32 pos = 0;
 
@@ -90,7 +87,7 @@ public:
 		//fill rest of string by current word
 		uint32 startPos = pos;
 
-		for (; name[pos] != 0; pos++)
+		for (; pos < nameLen; pos++)
 		{
 			templateWord[pos] = name[pos];
 		}
@@ -146,33 +143,34 @@ public:
 		//}
 
 		//1. Write header
-		//4 bits for position of prefix + 4 bits for rest of word
-		uchar8 header = (startPos << 4) | currLen;
+		//8 bits for position of prefix + 8 bits for rest of word
+		ushort16 header = (startPos << 8) | currLen;
 
-		pFile->writeBuffered(&header, fileSize, 1);
+		pFile->writeBuffered(&header, fileSize, 2);
 
-		//write word
+		fileSize += 2;
+
+		//write name
 		pFile->writeBuffered(name + startPos, fileSize, currLen);
 
-		//header + word + value
-		fileSize += (1 + currLen);
+		fileSize += currLen;
 	}
 
 	bool getDocumentName(uint32 id,
 		char* name,
-		uint32 nameLen)
+		uint32 sizeName)
 	{
 		//HArrayVisitor::getWord(templateWord, key, maxKeySegments * 4);
 
 		ulong64 endPos = (fileSize & 0xFFFFFFFFFFFFF000) + DOCUMENTS_NAME_TEXT_FILE_BLOCK_SIZE; //rounded to 4096
 
-		getDocumentName(id, name, nameLen, 0, endPos);
+		return getDocumentName(id, name, sizeName, 0, endPos);
 	}
 
 	int readBlock(ulong64 pos,
 		uint32 id,
 		char* name,
-		uint32 nameLen)
+		uint32 sizeName)
 	{
 		char data[DOCUMENTS_NAME_TEXT_FILE_BLOCK_SIZE];
 
@@ -185,10 +183,10 @@ public:
 		for (uint32 i = 4; i < len; blockId++)
 		{
 			//heaer
-			uchar8 header = data[i];
+			ushort16 header = *(ushort16*)(data + i);
 
-			uchar8 startPos = header >> 4;
-			uchar8 wordLen = startPos + (header & 0xF);
+			ushort16 startPos = header >> 8;
+			ushort16 wordLen = startPos + (header & 0xFF);
 
 			if (bFirst && startPos)
 			{
@@ -239,7 +237,7 @@ public:
 
 	bool getDocumentName(uint32 id,
 		char* name,
-		uint32 nameLen,
+		uint32 sizeName,
 		ulong64 startPos,
 		ulong64 endPos)
 	{
@@ -251,18 +249,18 @@ public:
 
 			ulong64 value;
 
-			int res = readBlock(midPos, id, name, nameLen);
+			int res = readBlock(midPos, id, name, sizeName);
 
 			switch (res)
 			{
 				case -2: //not found
 					return false; 
 				case -1: //in left part
-					return getDocumentName(id, name, nameLen, startPos, midPos);
+					return getDocumentName(id, name, sizeName, startPos, midPos);
 				case 0:  //found
 					return true; 
 				case 1:  //in right part
-					return getDocumentName(id, name, nameLen, midPos, endPos);
+					return getDocumentName(id, name, sizeName, midPos, endPos);
 				default:
 					return false;
 			}
@@ -271,7 +269,7 @@ public:
 		{
 			ulong64 value;
 
-			int res = readBlock(startPos, id, name, nameLen);
+			int res = readBlock(startPos, id, name, sizeName);
 
 			switch (res)
 			{
@@ -490,6 +488,16 @@ public:
 	void clear()
 	{
 		pFile->clear();
+	}
+
+	bool hasDocumentName(const char* name, uint32 len)
+	{
+		return false;
+	}
+
+	void loadIntoRAM()
+	{
+
 	}
 
 	ulong64 getUsedMemory()

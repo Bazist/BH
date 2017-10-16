@@ -51,8 +51,6 @@ namespace FTServiceWCF
 
             public uint WordsHeaderBase;
 
-            public uint DocumentNameSize;
-
             public string LastErrorMessage;
             public bool HasError;
 
@@ -171,8 +169,6 @@ namespace FTServiceWCF
 
             public System.UInt32 WordsHeaderBase;
 
-            public System.UInt32 DocumentNameSize;
-            
             public System.UInt32 LimitTopResults;
             public System.UInt64 LimitUsedMemory;
 
@@ -225,8 +221,6 @@ namespace FTServiceWCF
 
             public System.UInt32 WordsHeaderBase;
 
-            public System.UInt32 DocumentNameSize;
-
             public IntPtr LastErrorMessage;
 
             [MarshalAs(UnmanagedType.I1)]
@@ -245,7 +239,7 @@ namespace FTServiceWCF
         [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct RelevantResultNameDLL
         {
-            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 256)]
+            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = MAX_DOC_NAME_LENGTH)]
             public string Name;
         }
 
@@ -311,8 +305,8 @@ namespace FTServiceWCF
         {
             public System.UInt32 DocNumber;
 
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = DOC_NAME_LENGTH)]
-            public byte[] DocName = new byte[DOC_NAME_LENGTH];
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_DOC_NAME_LENGTH)]
+            public byte[] DocName = new byte[MAX_DOC_NAME_LENGTH];
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] Text = new byte[128];
@@ -436,7 +430,7 @@ namespace FTServiceWCF
 
         #region Members
 
-        public const int DOC_NAME_LENGTH = 256;
+        public const int MAX_DOC_NAME_LENGTH = 256;
         public static Encoding Encoding = Encoding.GetEncoding("windows-1251");
 
         #endregion
@@ -458,7 +452,6 @@ namespace FTServiceWCF
             configuration.AutoStemmingOn = autoStemmingOn;
             configuration.MinLenWord = minLenWord;
             configuration.MaxLenWord = maxLenWord;
-            configuration.DocumentNameSize = documentNameSize;
             configuration.CountWordInPhrase = countWordInPhrase;
             configuration.IsUseNumberAlphabet = isUseNumberAlphabet;
             configuration.IsUseRussianAlphabet = true;
@@ -665,7 +658,7 @@ namespace FTServiceWCF
                 foreach (uint id in ids.Distinct())
                 {
                     //get name of document
-                    getDocumentNameByIDDLL(InstanceNumber, id, pName, 256);
+                    getDocumentNameByIDDLL(InstanceNumber, id, pName, MAX_DOC_NAME_LENGTH);
 
                     Result result = new Result();
 
@@ -681,7 +674,7 @@ namespace FTServiceWCF
         public unsafe List<uint> SearchIDByPhrase(string phrase, string templateName, uint minPage, uint maxPage)
         {
             List<uint> results = new List<uint>();
-            byte[] nameBytes = new byte[256];
+            byte[] nameBytes = new byte[MAX_DOC_NAME_LENGTH];
 
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase),
                          pTemplateName = Encoding.GetBytes(templateName),
@@ -891,7 +884,7 @@ namespace FTServiceWCF
             QueryResultDLL queryResultDLL = (QueryResultDLL)Marshal.PtrToStructure(pQueryResult, typeof(QueryResultDLL));
             int rowSize = Marshal.SizeOf(typeof(QueryRowDLL));
 
-            byte[] nameBytes = new byte[256];
+            byte[] nameBytes = new byte[MAX_DOC_NAME_LENGTH];
 
             fixed (Byte* pName = nameBytes)
             {
@@ -982,8 +975,6 @@ namespace FTServiceWCF
             info.TotalMemory = dllInfo.TotalMemory;
 
             info.WordsHeaderBase = dllInfo.WordsHeaderBase;
-
-            info.DocumentNameSize = dllInfo.DocumentNameSize;
 
             info.LastErrorMessage = Marshal.PtrToStringAnsi(dllInfo.LastErrorMessage);
             info.HasError = dllInfo.HasError;

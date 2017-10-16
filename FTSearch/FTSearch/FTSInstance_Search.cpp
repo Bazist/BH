@@ -1131,7 +1131,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 	}
 	else
 	{
-		char* pPrevName = new char[Info.DocumentNameSize];
+		char* pPrevName = new char[1024];
 		char* pName = 0;
 		
 		for(int i = 0; i < countResultDocNumbers; i++)
@@ -1140,7 +1140,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 			pName = pResult->Matches[pResult->CountMatches];
 
-			getDocumentNameByID(id, pName, Info.DocumentNameSize);
+			getDocumentNameByID(id, pName, 1024);
 
 			if (templateNameLen == 0 || wildCardCompare(templateName, pName))
 			{
@@ -1430,7 +1430,7 @@ RelevantResult* FTSInstance::searchPhraseRel(const char* phrase,
 	
 	for(uint32 i=0; i < docRaiting.dictionary.Count; i++)
 	{
-		getDocumentNameByID(docRaiting.dictionary.Words[i].DocID, pResult->Matches[i], Info.DocumentNameSize);
+		getDocumentNameByID(docRaiting.dictionary.Words[i].DocID, pResult->Matches[i], MAX_DOC_NAME_LENGTH);
 
 		pResult->CountMatches++;
 	}

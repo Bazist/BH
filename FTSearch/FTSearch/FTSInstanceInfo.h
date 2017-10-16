@@ -26,8 +26,6 @@ public:
 
 	uint32 WordsHeaderBase;
 
-	uint32 DocumentNameSize;
-
 	char* LastErrorMessage;
 	bool HasError;
 
@@ -58,8 +56,6 @@ public:
 	
 	uint32 WordsHeaderBase;
 	
-	uint32 DocumentNameSize;
-
 	char* LastErrorMessage;
 	bool HasError;
 
@@ -73,13 +69,11 @@ public:
 	uint32 Reserved2;
 
 	void init(uint32 wordsHeaderBase,
-			  uint32 documentNameSize,
 			  uint32 relevantLevel,
 			  uint32 countWordInPhrase,
 			  char* lastErrorMessage)
 	{
 		WordsHeaderBase = wordsHeaderBase;
-		DocumentNameSize = documentNameSize;
 		RelevantLevel = relevantLevel;
 		CountWordInPhrase = countWordInPhrase;
 		LastErrorMessage = lastErrorMessage;
@@ -99,8 +93,6 @@ public:
 
 		printf("Used Memory: %d bytes\n", UsedMemory);
 		printf("Total Memory: %d bytes\n", TotalMemory);
-
-		printf("DocumentNameSize: %u bytes\n", DocumentNameSize);
 
 		printf("LastErrorMessage %s\n", LastErrorMessage);
 	}
@@ -144,7 +136,6 @@ public:
 		info2.CountWordInPhrase = info.CountWordInPhrase;
 		info2.CountWordsHDD = info.CountWordsHDD;
 		info2.CountWordsRAM = info.CountWordsRAM;
-		info2.DocumentNameSize = info.DocumentNameSize;
 		info2.HasError = info.HasError;
 		info2.LastErrorMessage = info.LastErrorMessage;
 		info2.LastNameIDHDD = info.LastNameIDHDD;

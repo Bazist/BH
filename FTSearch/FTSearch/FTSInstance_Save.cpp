@@ -190,10 +190,13 @@ void FTSInstance::createIndex()
 		buffFilledLength = 0;
 	}
 
+	/*
 	documentsName.writeBlocksToFile(pDocNameFile,
 									(uchar8*)pBuffer,
 									MAX_SIZE_BUFFER,
 									buffFilledLength);
+	*/
+	documentsName.flush();
 
 	//save dictionary pages
 	haWordsHDD.close();
@@ -698,10 +701,14 @@ void FTSInstance::updateIndex()
 	BinaryFile::copyFile(pDocNameFile, pDocNameFileTemp);
 
 	//B. Save blocks from RAM
+	/*
 	documentsName.writeBlocksToFile(pDocNameFileTemp,
 									pDestBuffer,
 									MAX_SIZE_BUFFER,
 									destBuffPosition);
+	*/
+
+	//NEED APPEND SOMEHOW FILE !!
 
 	pDocNameFileTemp->flush();
 	
@@ -899,8 +906,7 @@ void FTSInstance::importIndex(const char* importPath)
 
 	if(uniqueIdentifierImport != UNIQUE_IDENTIFIER ||
 	   codeVersionImport != CODE_VERSION ||
-	   Info.Version != infoImport.Version ||
-	   Info.DocumentNameSize != infoImport.DocumentNameSize)
+	   Info.Version != infoImport.Version)
 	{
 		logError("Indexes doesn't match with settings.");
 		goto destroy;
@@ -1627,13 +1633,15 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 				}
 			}
 
+			documentsName.loadIntoRAM();
+
 			//move doc name file to memory
-			sourceFilePosition = pDocNameFile->getPosition(); //version + unique identifier
-			moveDocNameFileBlocksToRAM(pDocNameFile,
-										&documentsName,
-										sourceFilePosition,
-										pSourceBuffer,
-										MAX_SIZE_BUFFER);
+			//sourceFilePosition = pDocNameFile->getPosition(); //version + unique identifier
+			//moveDocNameFileBlocksToRAM(pDocNameFile,
+			//							&documentsName,
+			//							sourceFilePosition,
+			//							pSourceBuffer,
+			//							MAX_SIZE_BUFFER);
 			
 			////get top words
 			//for(uint32 i = 0; i < Info.CountWordsRAM; i++)
