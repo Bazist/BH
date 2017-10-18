@@ -31,19 +31,19 @@ void FTSInstance::createIndex()
 		return;
 	}
 
-	if(documentsName.create(UINT_MAX))
-	{
-		logError("File %s is not open.", documentsName.FullPath);
-		
-		pDocFile->close();
-		delete pDocFile;
+	//if(documentsName.create(UINT_MAX))
+	//{
+	//	logError("File %s is not open.", documentsName.FullPath);
+	//	
+	//	pDocFile->close();
+	//	delete pDocFile;
 
-		//delete pDocNameFile;
+	//	//delete pDocNameFile;
 
-		HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
+	//	HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 
-		return;
-	}
+	//	return;
+	//}
 
 	//save version and info
 	pDocFile->setPosition(getDocHeaderSize());
@@ -224,7 +224,7 @@ void FTSInstance::createIndex()
 		
 		Info.CountWordsRAM = 0;
 
-		documentsName.clear();
+		//documentsName.clear();
 		//documentsName.FilePosition = pDocNameFile->getPosition();
 	}
 	
@@ -287,11 +287,11 @@ void FTSInstance::updateIndex()
 		goto destroy;
 	}
 
-	if(!documentsName.open(UINT_MAX))
+	/*if(!documentsName.open(UINT_MAX))
 	{
 		logError("File %s is not open.", documentsName.FullPath);
 		goto destroy;
-	}
+	}*/
 
 	if(!pDocFileTemp->open())
 	{
@@ -717,7 +717,7 @@ void FTSInstance::updateIndex()
 		
 		Info.CountWordsRAM = 0;
 
-		documentsName.clear();
+		//documentsName.clear();
 		//documentsName.FilePosition = pDocNameFile->getPosition();
 	}
 
@@ -740,7 +740,7 @@ destroy:
 
 	closeDocIndex();
 
-	closeDocNameIndex();
+	//closeDocNameIndex();
 
 	pDocFileTemp->close();
 	delete pDocFileTemp;
@@ -790,7 +790,7 @@ destroy:
 
 	openDocIndex();
 
-	openDocNameIndex();
+	//openDocNameIndex();
 }
 
 void FTSInstance::importIndex(const char* importPath)
@@ -808,7 +808,7 @@ void FTSInstance::importIndex(const char* importPath)
 
 	closeDocIndex();
 
-	closeDocNameIndex();
+	//closeDocNameIndex();
 
 	//init
 	FTSConfiguration configurationImport;
@@ -1330,7 +1330,7 @@ destroy:
 	
 	closeDocIndex();
 
-	closeDocNameIndex();
+	//closeDocNameIndex();
 	
 	//close import index
 	pDocFileImport->close();
@@ -1394,7 +1394,7 @@ destroy:
 
 	openDocIndex();
 
-	openDocNameIndex();
+	//openDocNameIndex();
 }
 
 void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
@@ -1406,7 +1406,7 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 
 	closeDocIndex();
 
-	closeDocNameIndex();
+	//closeDocNameIndex();
 
 	char indexPath[1024];
 	Configuration.getIndexPath(indexPath);
@@ -1416,6 +1416,8 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 
 	//dictionary
 	haWordsHDD.openOrCreate();
+
+	documentsName.openOrCreate(UINT_MAX);
 
 	//if(Configuration.MemoryMode == IN_MEMORY_MODE ||
 	//   Configuration.MemoryMode == HDD_MEMORY_MODE)
@@ -1439,7 +1441,7 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 
 		closeDocIndex();
 
-		closeDocNameIndex();
+		//closeDocNameIndex();
 	}
 }
 
@@ -1457,8 +1459,6 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 	pDocFile = new BinaryFile(documentPath, false, false);
 	//pDocNameFile = new BinaryFile(documentNamePath, false, false);
 
-	documentsName.init(Configuration.IndexPath, "");
-		
 	if(!pDocFile->open())
 	{
 		logError("File %s is not open.", documentPath);
@@ -1470,17 +1470,17 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 		return;
 	}
 		
-	if(!documentsName.open(UINT_MAX))
-	{
-		logError("File %s is not open.", documentsName.FullPath);
-		
-		pDocFile->close();
-		delete pDocFile;
+	//if(!documentsName.open(UINT_MAX))
+	//{
+	//	logError("File %s is not open.", documentsName.FullPath);
+	//	
+	//	pDocFile->close();
+	//	delete pDocFile;
 
-		//delete pDocNameFile;
+	//	//delete pDocNameFile;
 
-		return;
-	}
+	//	return;
+	//}
 
 	//read repository version
 	uint32 uniqueIdentifier1;
@@ -1514,8 +1514,6 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 		//reinit haWordsRAM
 		if(Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
-			documentsName.loadIntoRAM();
-
 			//load data to ram from hdd pages
 			haWordsHDD.close();
 
@@ -1928,7 +1926,7 @@ void FTSInstance::saveIndex()
 
 		closeDocIndex();
 
-		closeDocNameIndex();
+		//closeDocNameIndex();
 
 		if (Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
@@ -1938,7 +1936,7 @@ void FTSInstance::saveIndex()
 
 			closeDocIndex();
 
-			closeDocNameIndex();
+			//closeDocNameIndex();
 		}
 		else
 		{
@@ -1963,7 +1961,7 @@ void FTSInstance::saveIndex()
 
 				closeDocIndex();
 
-				closeDocNameIndex();
+				//closeDocNameIndex();
 
 				Configuration.InstanceNumber++;
 

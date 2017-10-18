@@ -863,9 +863,10 @@ private:
 		}
 	}
 
+	/*
 	void openDocNameIndex()
 	{
-		/*if (!pDocNameFile)
+		if (!pDocNameFile)
 		{
 			char documentNamePath[1024];
 
@@ -876,10 +877,9 @@ private:
 			{
 				pDocNameFile = 0;
 			}
-		}*/
-
-		documentsName.openOrCreate(UINT_MAX);
+		}
 	}
+	*/
 
 	void closeDicIndex()
 	{
@@ -898,19 +898,19 @@ private:
 		}
 	}
 
+	/*
 	void closeDocNameIndex()
 	{
-		/*if (pDocNameFile)
+		if (pDocNameFile)
 		{
 			pDocNameFile->close();
 
 			delete pDocNameFile;
 
 			pDocNameFile = 0;
-		}*/
-
-		documentsName.close();
+		}
 	}
+	*/
 
 	void initDictionaryRAM()
 	{
@@ -978,7 +978,9 @@ private:
 
 		closeDocIndex();
 
-		closeDocNameIndex();
+		//closeDocNameIndex();
+
+		documentsName.close();
 
 		haWordsRAM.destroy();
 		haWordsHDD.destroy();		
