@@ -172,6 +172,10 @@ public:
 
 	const char* getFilePath();
 
+	void loadIntoRAM();
+
+	void append(BinaryFile* pFile);
+
 	~BinaryFile();
 };
 

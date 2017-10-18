@@ -600,6 +600,37 @@ const char* BinaryFile::getFilePath()
 	return m_fileName;
 }
 
+void BinaryFile::loadIntoRAM()
+{
+	for (ulong64 page = 0; ; page++)
+	{
+		if (page >= m_pagesSize)
+		{
+			reallocatePages(page);
+		}
+
+		BinaryFilePage* pPage = new BinaryFilePage();
+
+		uint32 n = read(pPage->pContent, page << BIN_FILE_RIGHT_BITS, BIN_FILE_RIGHT_MASK + 1);
+
+		if (!n)
+		{
+			delete pPage;
+
+			break;
+		}
+
+		pPages[page] = pPage;
+
+		m_countPages++;
+	}
+}
+
+void BinaryFile::append(BinaryFile* pFile)
+{
+
+}
+
 BinaryFile::~BinaryFile()
 {
 	if(m_countPages)

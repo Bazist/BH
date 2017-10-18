@@ -39,36 +39,46 @@ public:
 		strcpy(TableName, name);
 	}
 
-	void open()
+	bool open(uint32 bufferSize)
 	{
 		if (!pFile)
 		{
-			this->pFile = new BinaryFile(FullPath, true, false);
+			this->pFile = new BinaryFile(FullPath, true, false, bufferSize);
 
-			this->pFile->open();
+			if (this->pFile->open())
+			{
+				this->fileSize = pFile->getFileSize();
 
-			this->fileSize = pFile->getFileSize();
+				return true;
+			}
 		}
+
+		return false;
 	}
 
-	void create()
+	bool create(uint32 bufferSize)
 	{
-		this->pFile = new BinaryFile(FullPath, true, true);
+		this->pFile = new BinaryFile(FullPath, true, true, bufferSize);
 
-		this->pFile->open();
+		if (this->pFile->open())
+		{
+			this->fileSize = 0;
 
-		this->fileSize = 0;
+			return true;
+		}
+
+		return false;
 	}
 
-	void openOrCreate()
+	void openOrCreate(uint32 bufferSize)
 	{
 		if (BinaryFile::existsFile(FullPath))
 		{
-			open();
+			open(bufferSize);
 		}
 		else
 		{
-			create();
+			create(bufferSize);
 		}
 	}
 
@@ -477,6 +487,8 @@ public:
 	{
 		if (pFile)
 		{
+			pFile->flush();
+
 			pFile->close();
 
 			delete pFile;
@@ -497,7 +509,15 @@ public:
 
 	void loadIntoRAM()
 	{
+		pFile->loadIntoRAM();
+	}
 
+	void append(DocumentsNameTextFile* pDocumentsName)
+	{
+		this->flush();
+		pDocumentsName->flush();
+
+		this->pFile->append(pDocumentsName->pFile);
 	}
 
 	ulong64 getUsedMemory()

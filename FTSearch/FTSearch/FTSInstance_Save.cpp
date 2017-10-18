@@ -10,13 +10,13 @@ void FTSInstance::createIndex()
 	HArrayFixPair* pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
 	char documentPath[1024];
-	char documentNamePath[1024];
+	//char documentNamePath[1024];
 	
 	Configuration.getDocumentPath(documentPath);
-	Configuration.getDocumentNamePath(documentNamePath);
+	//Configuration.getDocumentNamePath(documentNamePath);
 	
 	pDocFile = new BinaryFile(documentPath, true, true);
-	pDocNameFile = new BinaryFile(documentNamePath, true, true);
+	//pDocNameFile = new BinaryFile(documentNamePath, true, true);
 
 	if(!pDocFile->open())
 	{
@@ -24,21 +24,21 @@ void FTSInstance::createIndex()
 		
 		delete pDocFile;
 		
-		delete pDocNameFile;
+		//delete pDocNameFile;
 
 		HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 
 		return;
 	}
-		
-	if(!pDocNameFile->open())
+
+	if(documentsName.create(UINT_MAX))
 	{
-		logError("File %s is not open.", documentNamePath);
+		logError("File %s is not open.", documentsName.FullPath);
 		
 		pDocFile->close();
 		delete pDocFile;
 
-		delete pDocNameFile;
+		//delete pDocNameFile;
 
 		HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 
@@ -48,8 +48,8 @@ void FTSInstance::createIndex()
 	//save version and info
 	pDocFile->setPosition(getDocHeaderSize());
 	
-	pDocNameFile->writeInt(&UNIQUE_IDENTIFIER);
-	pDocNameFile->writeInt(&Info.Version);
+	//pDocNameFile->writeInt(&UNIQUE_IDENTIFIER);
+	//pDocNameFile->writeInt(&Info.Version);
 	
 	uint32 count;
 	
@@ -236,7 +236,9 @@ void FTSInstance::createIndex()
 	pDocFile->writeInt(&Info.Version);
 	pDocFile->write(&Info, sizeof(Info));
 
-	pDocNameFile->flush();
+	//pDocNameFile->flush();
+	documentsName.flush();
+
 	pDocFile->flush();
 
 	//destroy
@@ -262,22 +264,22 @@ void FTSInstance::updateIndex()
 	pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
 	char documentPath[1024];
-	char documentNamePath[1024];
+	//char documentNamePath[1024];
 	char documentPathTemp[1024];
-	char documentNamePathTemp[1024];
+	//char documentNamePathTemp[1024];
 
 	Configuration.getDocumentPath(documentPath);
-	Configuration.getDocumentNamePath(documentNamePath);
+	//Configuration.getDocumentNamePath(documentNamePath);
 
 	Configuration.getDocumentTempPath(documentPathTemp);
-	Configuration.getDocumentNameTempPath(documentNamePathTemp);
+	//Configuration.getDocumentNameTempPath(documentNamePathTemp);
 
 	pDocFile = new BinaryFile(documentPath, false, false); //only read
-	pDocNameFile = new BinaryFile(documentNamePath, false, false); //only read
+	//pDocNameFile = new BinaryFile(documentNamePath, false, false); //only read
 
 	BinaryFile* pDocFileTemp = new BinaryFile(documentPathTemp, true, true); //create new
-	BinaryFile* pDocNameFileTemp = new BinaryFile(documentNamePathTemp, true, true); //create new
-	
+	//BinaryFile* pDocNameFileTemp = new BinaryFile(documentNamePathTemp, true, true); //create new
+
 	//open doc files
 	if(!pDocFile->open())
 	{
@@ -285,21 +287,15 @@ void FTSInstance::updateIndex()
 		goto destroy;
 	}
 
-	if(!pDocNameFile->open())
+	if(!documentsName.open(UINT_MAX))
 	{
-		logError("File %s is not open.", documentNamePath);
+		logError("File %s is not open.", documentsName.FullPath);
 		goto destroy;
 	}
 
 	if(!pDocFileTemp->open())
 	{
 		logError("File %s is not open.", documentPathTemp);
-		goto destroy;
-	}
-
-	if(!pDocNameFileTemp->open())
-	{
-		logError("File %s is not open.", documentNamePathTemp);
 		goto destroy;
 	}
 
@@ -695,10 +691,12 @@ void FTSInstance::updateIndex()
 
 	//Save DocNames
 	//A. Save blocks from HDD
-	pDocNameFile->setPosition(0);
-	pDocNameFileTemp->setPosition(0);
+	//pDocNameFile->setPosition(0);
+	//pDocNameFileTemp->setPosition(0);
 
-	BinaryFile::copyFile(pDocNameFile, pDocNameFileTemp);
+	//BinaryFile::copyFile(documentsName.File, documentsNameTemp.File);
+
+	//documentsNameTemp.append(documentsName);
 
 	//B. Save blocks from RAM
 	/*
@@ -708,9 +706,7 @@ void FTSInstance::updateIndex()
 									destBuffPosition);
 	*/
 
-	//NEED APPEND SOMEHOW FILE !!
-
-	pDocNameFileTemp->flush();
+	documentsName.flush();
 	
 	//save info
 	haWordsHDDTemp.flush();
@@ -749,26 +745,26 @@ destroy:
 	pDocFileTemp->close();
 	delete pDocFileTemp;
 
-	pDocNameFileTemp->close();
-	delete pDocNameFileTemp;
+	/*pDocNameFileTemp->close();
+	delete pDocNameFileTemp;*/
 	
 	if(!Info.HasError)
 	{
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPath);
-		BinaryFile::deleteFile(documentNamePath);
+		//BinaryFile::deleteFile(documentNamePath);
 		HArrayTextFile::deleteFiles(haWordsHDD.Path, haWordsHDD.TableName);
 
 		//3.Rename tables
 		BinaryFile::renameFile(documentPathTemp, documentPath);
-		BinaryFile::renameFile(documentNamePathTemp, documentNamePath);
+		//BinaryFile::renameFile(documentNamePathTemp, documentNamePath);
 		HArrayTextFile::renameFiles(haWordsHDD.Path, "temp", haWordsHDD.TableName);
 	}
 	else
 	{
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPathTemp);
-		BinaryFile::deleteFile(documentNamePathTemp);
+		//BinaryFile::deleteFile(documentNamePathTemp);
 		HArrayTextFile::deleteFiles(haWordsHDDTemp.Path, haWordsHDDTemp.TableName);
 	}
 
@@ -830,31 +826,33 @@ void FTSInstance::importIndex(const char* importPath)
 	HArrayFixPair* pKeysAndValuesHDD = 0;
 
 	char documentPath[1024];
-	char documentNamePath[1024];
+	//char documentNamePath[1024];
 
 	char documentPathImport[1024];
-	char documentNamePathImport[1024];
+	//char documentNamePathImport[1024];
 
 	char documentPathTemp[1024];
-	char documentNamePathTemp[1024];
+	//char documentNamePathTemp[1024];
 
 	Configuration.getDocumentPath(documentPath);
-	Configuration.getDocumentNamePath(documentNamePath);
+	//Configuration.getDocumentNamePath(documentNamePath);
 
 	configurationImport.getDocumentPath(documentPathImport);
-	configurationImport.getDocumentNamePath(documentNamePathImport);
+	//configurationImport.getDocumentNamePath(documentNamePathImport);
 
 	Configuration.getDocumentTempPath(documentPathTemp);
-	Configuration.getDocumentNameTempPath(documentNamePathTemp);
+	//Configuration.getDocumentNameTempPath(documentNamePathTemp);
 
 	pDocFile = new BinaryFile(documentPath, false, false); //only read
-	pDocNameFile = new BinaryFile(documentNamePath, false, false); //only read
+	//pDocNameFile = new BinaryFile(documentNamePath, false, false); //only read
 
 	BinaryFile* pDocFileImport = new BinaryFile(documentPathImport, false, false); //only read
-	BinaryFile* pDocNameFileImport = new BinaryFile(documentNamePathImport, false, false); //only read
+	//BinaryFile* pDocNameFileImport = new BinaryFile(documentNamePathImport, false, false); //only read
+	DocumentsNameTextFile documentsNameImport;
+	documentsNameImport.init(configurationImport.IndexPath, "");
 
 	BinaryFile* pDocFileTemp = new BinaryFile(documentPathTemp, true, true); //create new
-	BinaryFile* pDocNameFileTemp = new BinaryFile(documentNamePathTemp, true, true); //create new
+	//BinaryFile* pDocNameFileTemp = new BinaryFile(documentNamePathTemp, true, true); //create new
 	
 	//open doc files
 	if(!pDocFile->open())
@@ -863,9 +861,9 @@ void FTSInstance::importIndex(const char* importPath)
 		goto destroy;
 	}
 
-	if(!pDocNameFile->open())
+	if(!documentsName.open(0))
 	{
-		logError("File %s is not open.", documentNamePath);
+		logError("File %s is not open.", documentsName.FullPath);
 		goto destroy;
 	}
 
@@ -875,21 +873,15 @@ void FTSInstance::importIndex(const char* importPath)
 		goto destroy;
 	}
 
-	if(!pDocNameFileImport->open())
+	if(!documentsNameImport.open(0))
 	{
-		logError("File %s is not open.", documentNamePathImport);
+		logError("File %s is not open.", documentsNameImport.FullPath);
 		goto destroy;
 	}
 
 	if(!pDocFileTemp->open())
 	{
 		logError("File %s is not open.", documentPathTemp);
-		goto destroy;
-	}
-
-	if(!pDocNameFileTemp->open())
-	{
-		logError("File %s is not open.", documentNamePathTemp);
 		goto destroy;
 	}
 
@@ -1302,16 +1294,17 @@ void FTSInstance::importIndex(const char* importPath)
 
 	//Save DocNames
 	//A. Save blocks from HDD
-	BinaryFile::copyFile(pDocNameFile, pDocNameFileTemp);
+	//BinaryFile::copyFile(pDocNameFile, pDocNameFileTemp);
 
 	//B. Save blocks from import HDD
-	pDocNameFileImport->setPosition(DOC_NAME_HEADER_SIZE);
-	BinaryFile::copyFile(pDocNameFileImport, pDocNameFileTemp);
+	//pDocNameFileImport->setPosition(DOC_NAME_HEADER_SIZE);
+	//BinaryFile::copyFile(pDocNameFileImport, pDocNameFileTemp);
 
-	pDocNameFileTemp->flush();
+	//pDocNameFileTemp->flush();
+	documentsName.append(&documentsNameImport);
 	
 	//save info
-	haWordsHDDTemp.flush();
+	//haWordsHDDTemp.flush();
 
 	if(Configuration.MemoryMode != IN_MEMORY_MODE)
 	{
@@ -1344,36 +1337,33 @@ destroy:
 	delete pDocFileImport;
 	pDocFileImport = 0;
 
-	pDocNameFileImport->close();
-	delete pDocNameFileImport;
-	pDocNameFileImport = 0;
+	//pDocNameFileImport->close();
+	//delete pDocNameFileImport;
+	//pDocNameFileImport = 0;
+	documentsNameImport.close();
 
 	//close temp index
 	pDocFileTemp->close();
 	delete pDocFileTemp;
 	pDocFileTemp = 0;
 
-	pDocNameFileTemp->close();
-	delete pDocNameFileTemp;
-	pDocNameFileTemp = 0;
-	
 	if(!Info.HasError)
 	{
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPath);
-		BinaryFile::deleteFile(documentNamePath);
+		//BinaryFile::deleteFile(documentNamePath);
 		HArrayTextFile::deleteFiles(haWordsHDD.Path, haWordsHDD.TableName);
 
 		//3.Rename tables
 		BinaryFile::renameFile(documentPathTemp, documentPath);
-		BinaryFile::renameFile(documentNamePathTemp, documentNamePath);
+		//BinaryFile::renameFile(documentNamePathTemp, documentNamePath);
 		HArrayTextFile::renameFiles(haWordsHDD.Path, "temp", haWordsHDD.TableName);
 	}
 	else
 	{
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPathTemp);
-		BinaryFile::deleteFile(documentNamePathTemp);
+		//BinaryFile::deleteFile(documentNamePathTemp);
 		HArrayTextFile::deleteFiles(haWordsHDDTemp.Path, haWordsHDDTemp.TableName);
 	}
 
@@ -1459,13 +1449,15 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 		return;
 
 	char documentPath[1024];
-	char documentNamePath[1024];
-	
+	//char documentNamePath[1024];
+
 	Configuration.getDocumentPath(documentPath);
-	Configuration.getDocumentNamePath(documentNamePath);
-	
+	//Configuration.getDocumentNamePath(documentNamePath);
+
 	pDocFile = new BinaryFile(documentPath, false, false);
-	pDocNameFile = new BinaryFile(documentNamePath, false, false);
+	//pDocNameFile = new BinaryFile(documentNamePath, false, false);
+
+	documentsName.init(Configuration.IndexPath, "");
 		
 	if(!pDocFile->open())
 	{
@@ -1473,19 +1465,19 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 		
 		delete pDocFile;
 		
-		delete pDocNameFile;
+		//delete pDocNameFile;
 
 		return;
 	}
 		
-	if(!pDocNameFile->open())
+	if(!documentsName.open(UINT_MAX))
 	{
-		logError("File %s is not open.", documentNamePath);
+		logError("File %s is not open.", documentsName.FullPath);
 		
 		pDocFile->close();
 		delete pDocFile;
 
-		delete pDocNameFile;
+		//delete pDocNameFile;
 
 		return;
 	}
@@ -1497,16 +1489,16 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 	uint32 codeVersion1;
 	pDocFile->readInt(&codeVersion1);
 
-	uint32 uniqueIdentifier2;
-	pDocNameFile->readInt(&uniqueIdentifier2);
+	//uint32 uniqueIdentifier2;
+	//pDocNameFile->readInt(&uniqueIdentifier2);
 
-	uint32 codeVersion2;
-	pDocNameFile->readInt(&codeVersion2);
+	//uint32 codeVersion2;
+	//pDocNameFile->readInt(&codeVersion2);
 
 	if(uniqueIdentifier1 == UNIQUE_IDENTIFIER 
-	   && codeVersion1 == CODE_VERSION
-	   && uniqueIdentifier2 == UNIQUE_IDENTIFIER 
-	   && codeVersion2 == CODE_VERSION)
+	   && codeVersion1 == CODE_VERSION)
+	   //&& uniqueIdentifier2 == UNIQUE_IDENTIFIER 
+	   //&& codeVersion2 == CODE_VERSION)
 	{
 		pDocFile->read(&Info, sizeof(Info));
 		
@@ -1522,6 +1514,8 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 		//reinit haWordsRAM
 		if(Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
+			documentsName.loadIntoRAM();
+
 			//load data to ram from hdd pages
 			haWordsHDD.close();
 

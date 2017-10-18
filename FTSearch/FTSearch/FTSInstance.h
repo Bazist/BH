@@ -502,7 +502,7 @@ private:
 	DocumentsNameTextFile documentsName;
 
 	BinaryFile* pDocFile;
-	BinaryFile* pDocNameFile;
+	//BinaryFile* pDocNameFile;
 
 	HArrayFixPair* pAllKeysAndValuesRAM;
 	uint32 pAllKeysAndValuesRAMCount;
@@ -586,8 +586,7 @@ private:
 		initAlphabet();
 
 		pDocFile = 0;
-		pDocNameFile = 0;
-
+		
 		pAllKeysAndValuesRAM = 0;
 
 		Info.init(Configuration.WordsHeaderBase,
@@ -866,7 +865,7 @@ private:
 
 	void openDocNameIndex()
 	{
-		if (!pDocNameFile)
+		/*if (!pDocNameFile)
 		{
 			char documentNamePath[1024];
 
@@ -877,7 +876,9 @@ private:
 			{
 				pDocNameFile = 0;
 			}
-		}
+		}*/
+
+		documentsName.openOrCreate(UINT_MAX);
 	}
 
 	void closeDicIndex()
@@ -899,14 +900,16 @@ private:
 
 	void closeDocNameIndex()
 	{
-		if (pDocNameFile)
+		/*if (pDocNameFile)
 		{
 			pDocNameFile->close();
 
 			delete pDocNameFile;
 
 			pDocNameFile = 0;
-		}
+		}*/
+
+		documentsName.close();
 	}
 
 	void initDictionaryRAM()
