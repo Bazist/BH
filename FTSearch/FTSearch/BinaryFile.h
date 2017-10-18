@@ -174,8 +174,6 @@ public:
 
 	void loadIntoRAM();
 
-	void append(BinaryFile* pFile);
-
 	~BinaryFile();
 };
 

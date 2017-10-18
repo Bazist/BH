@@ -626,11 +626,6 @@ void BinaryFile::loadIntoRAM()
 	}
 }
 
-void BinaryFile::append(BinaryFile* pFile)
-{
-
-}
-
 BinaryFile::~BinaryFile()
 {
 	if(m_countPages)

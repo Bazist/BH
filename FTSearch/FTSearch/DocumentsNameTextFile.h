@@ -514,10 +514,36 @@ public:
 
 	void append(DocumentsNameTextFile* pDocumentsName)
 	{
+		//flush on disc files
 		this->flush();
 		pDocumentsName->flush();
 
-		this->pFile->append(pDocumentsName->pFile);
+		//set position
+		this->pFile->setPosition(fileSize);
+		pDocumentsName->pFile->setPosition(0);
+
+		//align block
+		uint32 restToBlock = fileSize % DOCUMENTS_NAME_TEXT_FILE_BLOCK_SIZE;
+
+		if (restToBlock)
+		{
+			this->pFile->writeZero(DOCUMENTS_NAME_TEXT_FILE_BLOCK_SIZE - restToBlock);
+		}
+
+		//append data
+		char* buff = new char[DOCUMENTS_NAME_TEXT_FILE_BLOCK_SIZE];
+
+		while (true)
+		{
+			uint32 len = pDocumentsName->pFile->read(buff, DOCUMENTS_NAME_TEXT_FILE_BLOCK_SIZE);
+
+			if (!len)
+				break;
+
+			this->pFile->write(buff, len);
+
+			fileSize += len;
+		}
 	}
 
 	ulong64 getUsedMemory()
