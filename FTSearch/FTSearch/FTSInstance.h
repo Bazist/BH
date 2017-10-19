@@ -9,7 +9,7 @@
 #include "FTSConfiguration.h"
 #include "FTSInstanceInfo.h"
 #include "RelevantResult.h"
-#include "DocumentsNameTextFile.h"
+#include "DocumentsName.h"
 #include "DocumentsDict.h"
 #include "Dictionary.h"
 #include "WordRaiting.h"
@@ -499,7 +499,7 @@ private:
 	static RelevantResultPool* pRelevantResultPool;
 	static PostSelectorPool* pPostSelectorPool;
 
-	DocumentsNameTextFile documentsName;
+	DocumentsName documentsName;
 
 	BinaryFile* pDocFile;
 	//BinaryFile* pDocNameFile;

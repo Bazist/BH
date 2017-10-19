@@ -31,6 +31,19 @@ void FTSInstance::createIndex()
 		return;
 	}
 
+	if (!haWordsHDD.create())
+	{
+		logError("File %s is not open.", haWordsHDD.FullPath);
+
+		delete pDocFile;
+
+		//delete pDocNameFile;
+
+		HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
+
+		return;
+	}
+
 	//if(documentsName.create(UINT_MAX))
 	//{
 	//	logError("File %s is not open.", documentsName.FullPath);
@@ -97,31 +110,34 @@ void FTSInstance::createIndex()
 		}*/
 
 		//update position to save pages later
-		haWordsRAM.insert(pKeysAndValuesRAM[i].Key,
-						  position);
+		//haWordsRAM.insert(pKeysAndValuesRAM[i].Key,
+		//					position);
 
-		//check errors ===========================================
-		for(uint32 j=0; j < haWordsRAM.KeyLen; j++)
-		{
-			controlValue += pKeysAndValuesRAM[i].Key[j];
-		}
-
-		controlValue += position;
-		//========================================================
-		
 		//save doc
 		uint32 id = pKeysAndValuesRAM[i].Value;
 
 		DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(id);
 
-		pDocumentsBlock->writeBlocksToFile(pDocFile,
-											(uchar8*)pBuffer,
-											MAX_SIZE_BUFFER,
-											buffFilledLength, 
-											0,
-											0); 
+		if (!haWordsHDD.insert(pKeysAndValuesRAM[i].Key, position, pDocumentsBlock)) //position or block inserted ?
+		{
+			//check errors ===========================================
+			for (uint32 j = 0; j < haWordsRAM.KeyLen; j++)
+			{
+				controlValue += pKeysAndValuesRAM[i].Key[j];
+			}
 
-		pBuffer[buffFilledLength++] = 0; //null terminated
+			controlValue += position;
+			//========================================================
+
+			pDocumentsBlock->writeBlocksToFile(pDocFile,
+				(uchar8*)pBuffer,
+				MAX_SIZE_BUFFER,
+				buffFilledLength,
+				0,
+				0);
+
+			pBuffer[buffFilledLength++] = 0; //null terminated
+		}
 		
 		/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
 		{
@@ -199,11 +215,7 @@ void FTSInstance::createIndex()
 	documentsName.flush();
 
 	//save dictionary pages
-	haWordsHDD.close();
-
-	haWordsRAM.save(Info.CountWordsRAM);
-
-	haWordsHDD.open();
+	haWordsHDD.flush();
 
 	Info.CountWordsHDD = Info.CountWordsRAM;
 
@@ -495,7 +507,7 @@ void FTSInstance::updateIndex()
 				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
 		
 				//insert or update
-				haWordsHDDTemp.insert(pKeysAndValuesRAM[currKeyRAM].Key, docTempPosition);
+				haWordsHDDTemp.insertValue(pKeysAndValuesRAM[currKeyRAM].Key, docTempPosition);
 				
 				//check errors ===========================================
 				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
@@ -545,7 +557,7 @@ void FTSInstance::updateIndex()
 				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
 		
 				//update
-				haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
+				haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 				
 				//check errors ===========================================
 				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
@@ -614,7 +626,7 @@ void FTSInstance::updateIndex()
 				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
 		
 				//update
-				haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
+				haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 				//check errors ===========================================
 				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
@@ -848,7 +860,7 @@ void FTSInstance::importIndex(const char* importPath)
 
 	BinaryFile* pDocFileImport = new BinaryFile(documentPathImport, false, false); //only read
 	//BinaryFile* pDocNameFileImport = new BinaryFile(documentNamePathImport, false, false); //only read
-	DocumentsNameTextFile documentsNameImport;
+	DocumentsName documentsNameImport;
 	documentsNameImport.init(configurationImport.IndexPath, "");
 
 	BinaryFile* pDocFileTemp = new BinaryFile(documentPathTemp, true, true); //create new
@@ -1087,7 +1099,7 @@ void FTSInstance::importIndex(const char* importPath)
 			ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
 
 			//update
-			haWordsHDDTemp.insert(pKeysAndValuesHDDImport[currKeyHDDImport].Key, docTempPosition);
+			haWordsHDDTemp.insertValue(pKeysAndValuesHDDImport[currKeyHDDImport].Key, docTempPosition);
 
 			//check errors ===========================================
 			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
@@ -1140,7 +1152,7 @@ void FTSInstance::importIndex(const char* importPath)
 			ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
 		
 			//update
-			haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
+			haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 			//check errors ===========================================
 			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
@@ -1222,7 +1234,7 @@ void FTSInstance::importIndex(const char* importPath)
 			ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
 
 			//update
-			haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
+			haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 			//check errors ===========================================
 			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)

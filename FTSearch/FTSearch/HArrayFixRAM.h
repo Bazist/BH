@@ -325,7 +325,7 @@ public:
 		//save keys
 		for (uint32 i = 0; i < count; i++)
 		{
-			file.insert(pKeysAndValuesRAM[i].Key,
+			file.insertValue(pKeysAndValuesRAM[i].Key,
 						pKeysAndValuesRAM[i].Value);
 		}
 		

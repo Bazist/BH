@@ -279,7 +279,7 @@ void migrate(char* path)
 
 		for (uint32 i = 0; i < count; i++)
 		{
-			file.insert(pairs[i].Key, pairs[i].Value);
+			file.insertValue(pairs[i].Key, pairs[i].Value);
 		}
 
 		file.flush();

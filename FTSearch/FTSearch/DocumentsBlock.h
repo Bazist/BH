@@ -313,34 +313,129 @@ public:
 		//pBinaryFile->write(pBuffer, length);
 	}
 
-	void writeBlocksToBuffer(uchar8* pBuffer, uint32 bufferSize)
+	void writeBlocksToBuffer(char* pBuffer,
+							 uint32 bufferSize,
+							 uint32& writedLen)
 	{
-		uint32 buffFilledLength = 0;
+		writedLen = 0;
+
 		BlockMemory* pBlockMemory = pHeadBlockMemory;
 
-		while(buffFilledLength < bufferSize)
+		while(writedLen < bufferSize)
 		{
 			if(pBlockMemory->pNextBlockMemory)
 			{
-				for(uchar8 i = 0; i < BLOCK_SIZE; i++)
+				for(uchar8 i = 0; i < BLOCK_SIZE && writedLen < bufferSize; i++)
 				{
-					pBuffer[buffFilledLength++] = pBlockMemory->pMemory[i];
+					pBuffer[writedLen++] = pBlockMemory->pMemory[i];
 				}
 				
 				pBlockMemory = pBlockMemory->pNextBlockMemory;
 			}
 			else
 			{
-				for(uchar8 i = 0; i < CurrentSize; i++)
+				for(uchar8 i = 0; i < CurrentSize && writedLen < bufferSize; i++)
 				{
-					pBuffer[buffFilledLength++] = pBlockMemory->pMemory[i];
+					pBuffer[writedLen++] = pBlockMemory->pMemory[i];
 				}
 
 				break;
 			}
 		}
 
-		pBuffer[buffFilledLength++] = 0; //null terminated
+		if (writedLen < bufferSize)
+		{
+			pBuffer[writedLen++] = 0; //null terminated
+		}
+	}
+
+	void writeBlocksToFile(BinaryFile* pFile, uint32& writedLen)
+	{
+		//write blocks
+		writedLen = 0;
+
+		BlockMemory* pBlockMemory = pHeadBlockMemory;
+
+		while (true)
+		{
+			if (pBlockMemory->pNextBlockMemory)
+			{
+				pFile->write(pBlockMemory->pMemory, BLOCK_SIZE);
+
+				pBlockMemory = pBlockMemory->pNextBlockMemory;
+
+				writedLen += BLOCK_SIZE;
+			}
+			else
+			{
+				pFile->write(pBlockMemory->pMemory, CurrentSize);
+
+				writedLen += CurrentSize;
+
+				break;
+			}
+		}
+
+		//zero terminated
+		pFile->writeZero(1);
+
+		writedLen++;
+	}
+
+	void readBlocksFromBuffer(char* buffer)
+	{
+		uint32 bufferPosition = 0;
+
+		bool isFirstIteration = true;
+		
+		uint32 docNumber = 0;
+
+		while (true)
+		{
+			//read document number
+			uchar8 header = buffer[bufferPosition++];
+			uint32 leftHeaderPart = (header >> 6);
+			uint32 rightHeaderPart = (header & 0x3F);
+
+			uint32 deltaDocNumber = 0;
+
+			if (leftHeaderPart == 2)
+			{
+				docNumber += rightHeaderPart;
+				
+				addWord(docNumber);
+			}
+			else
+			{
+				uint32 sizeNumber = bufferPosition + leftHeaderPart + 1;
+				uint32 deltaDocNumber = 0;
+
+				while (bufferPosition < sizeNumber)
+				{
+					uchar8 byte = buffer[bufferPosition++];
+					deltaDocNumber = (deltaDocNumber << 8) | byte;
+				}
+
+				docNumber += deltaDocNumber;
+
+				//add next
+				for (uint32 i = 0; i < rightHeaderPart; i++, docNumber++)
+				{
+					addWord(docNumber);
+				}
+
+				docNumber--;
+			}
+
+			if (buffer[bufferPosition]) //is last
+			{
+				bufferPosition++; //with null terminated
+				return;
+			}
+		}
+
+		return;
+
 	}
 
 	void readBlocksFromFile(BinaryFile* pSourceDocFile,

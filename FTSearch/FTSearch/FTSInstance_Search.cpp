@@ -136,36 +136,51 @@ void FTSInstance::markMatchDocuments(const char* word,
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
-		ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
+		bool isBlockValue;
+		char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+		uint32 valueBlockLen;
+
+		ulong64 sourceFilePosition;
 		
-		if(sourceFilePosition)
+		if(haWordsHDD.getValueByKey(tempKey,
+									isBlockValue,
+									sourceFilePosition,
+									valueBlock,
+									valueBlockLen))
 		{
 			//read docs
 			uint32 id;
 			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-			uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
-			
-			uint32 sourceBuffPosition = 0;
-			uint32 sourceBuffLength = 0;
-						
-			bool isFormatCorrupted = false;
-			pDocumentsBlock->readBlocksFromFile(pDocFile,
-												pSourceBuffer,
-												sourceFilePosition,
-												sourceBuffPosition,
-												sourceBuffLength,
-												MAX_SIZE_BUFFER,
-												minDocID,
-												maxDocID,
-												isFormatCorrupted);
-			delete[] pSourceBuffer;
-
-			if (isFormatCorrupted)
+			if (isBlockValue)
 			{
-				logError("Read corrupted.");
+				pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+			}
+			else
+			{
+				uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 
-				return;
+				uint32 sourceBuffPosition = 0;
+				uint32 sourceBuffLength = 0;
+
+				bool isFormatCorrupted = false;
+				pDocumentsBlock->readBlocksFromFile(pDocFile,
+					pSourceBuffer,
+					sourceFilePosition,
+					sourceBuffPosition,
+					sourceBuffLength,
+					MAX_SIZE_BUFFER,
+					minDocID,
+					maxDocID,
+					isFormatCorrupted);
+				delete[] pSourceBuffer;
+
+				if (isFormatCorrupted)
+				{
+					logError("Read corrupted.");
+
+					return;
+				}
 			}
 
 			pDocumentsBlock->markMatchDocuments(pWeightBuffer,
@@ -508,35 +523,50 @@ void FTSInstance::calculateTrend(const char* phrase,
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
-		ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
+		bool isBlockValue;
+		char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+		uint32 valueBlockLen;
 
-		if(sourceFilePosition)
+		ulong64 sourceFilePosition;
+
+		if(haWordsHDD.getValueByKey(tempKey,
+									isBlockValue,
+									sourceFilePosition,
+									valueBlock,
+									valueBlockLen))
 		{
 			//read docs
 			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-			uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
-			
-			uint32 sourceBuffPosition = 0;
-			uint32 sourceBuffLength = 0;
-						
-			bool isFormatCorrupted = false;
-			pDocumentsBlock->readBlocksFromFile(pDocFile,
-												pSourceBuffer,
-												sourceFilePosition,
-												sourceBuffPosition,
-												sourceBuffLength,
-												MAX_SIZE_BUFFER,
-												minDocID,
-												maxDocID,
-												isFormatCorrupted);
-			delete[] pSourceBuffer;
-
-			if (isFormatCorrupted)
+			if (isBlockValue)
 			{
-				logError("Read corrupted.");
+				pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+			}
+			else
+			{
+				uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 
-				return;
+				uint32 sourceBuffPosition = 0;
+				uint32 sourceBuffLength = 0;
+
+				bool isFormatCorrupted = false;
+				pDocumentsBlock->readBlocksFromFile(pDocFile,
+					pSourceBuffer,
+					sourceFilePosition,
+					sourceBuffPosition,
+					sourceBuffLength,
+					MAX_SIZE_BUFFER,
+					minDocID,
+					maxDocID,
+					isFormatCorrupted);
+				delete[] pSourceBuffer;
+
+				if (isFormatCorrupted)
+				{
+					logError("Read corrupted.");
+
+					return;
+				}
 			}
 
 			pDocumentsBlock->markTrend(points,
@@ -589,35 +619,50 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 		if(Configuration.MemoryMode != IN_MEMORY_MODE
 			&& Info.CountWordsHDD)
 		{
-			ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
+			bool isBlockValue;
+			char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+			uint32 valueBlockLen;
 
-			if(sourceFilePosition)
+			ulong64 sourceFilePosition;
+
+			if(haWordsHDD.getValueByKey(tempKey,
+										isBlockValue,
+										sourceFilePosition,
+										valueBlock,
+										valueBlockLen))
 			{
-				//read docs
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
-
-				uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
-			
-				uint32 sourceBuffPosition = 0;
-				uint32 sourceBuffLength = 0;
-						
-				bool isFormatCorrupted = false;
-				pDocumentsBlock->readBlocksFromFile(pDocFile,
-													pSourceBuffer,
-													sourceFilePosition,
-													sourceBuffPosition,
-													sourceBuffLength,
-													MAX_SIZE_BUFFER,
-													minDocID,
-													maxDocID,
-													isFormatCorrupted);
-				delete[] pSourceBuffer;
-
-				if (isFormatCorrupted)
+				
+				if (isBlockValue)
 				{
-					logError("Read corrupted.");
+					pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+				}
+				else
+				{
+					//read docs
+					uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 
-					return;
+					uint32 sourceBuffPosition = 0;
+					uint32 sourceBuffLength = 0;
+
+					bool isFormatCorrupted = false;
+					pDocumentsBlock->readBlocksFromFile(pDocFile,
+						pSourceBuffer,
+						sourceFilePosition,
+						sourceBuffPosition,
+						sourceBuffLength,
+						MAX_SIZE_BUFFER,
+						minDocID,
+						maxDocID,
+						isFormatCorrupted);
+					delete[] pSourceBuffer;
+
+					if (isFormatCorrupted)
+					{
+						logError("Read corrupted.");
+
+						return;
+					}
 				}
 
 				dicWord.Weight = pDocumentsBlock->CountDocuments;
@@ -700,36 +745,51 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 		if(Configuration.MemoryMode != IN_MEMORY_MODE
 			&& Info.CountWordsHDD)
 		{
-			ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
+			bool isBlockValue;
+			char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+			uint32 valueBlockLen;
 
-			if(sourceFilePosition)
+			ulong64 sourceFilePosition;
+
+			if(haWordsHDD.getValueByKey(tempKey,
+										isBlockValue,
+										sourceFilePosition,
+										valueBlock,
+										valueBlockLen))
 			{
 				//read docs
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-				uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
-		
-				uint32 sourceBuffPosition = 0;
-				uint32 sourceBuffLength = 0;
-					
-				bool isFormatCorrupted = false;
-				pDocumentsBlock->readBlocksFromFile(pDocFile,
-													pSourceBuffer,
-													sourceFilePosition,
-													sourceBuffPosition,
-													sourceBuffLength,
-													MAX_SIZE_BUFFER,
-													minDocID,
-													maxDocID,
-													isFormatCorrupted);
-
-				delete[] pSourceBuffer;
-
-				if (isFormatCorrupted)
+				if (isBlockValue)
 				{
-					logError("Read corrupted.");
+					pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+				}
+				else
+				{
+					uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 
-					return;
+					uint32 sourceBuffPosition = 0;
+					uint32 sourceBuffLength = 0;
+
+					bool isFormatCorrupted = false;
+					pDocumentsBlock->readBlocksFromFile(pDocFile,
+														pSourceBuffer,
+														sourceFilePosition,
+														sourceBuffPosition,
+														sourceBuffLength,
+														MAX_SIZE_BUFFER,
+														minDocID,
+														maxDocID,
+														isFormatCorrupted);
+
+					delete[] pSourceBuffer;
+
+					if (isFormatCorrupted)
+					{
+						logError("Read corrupted.");
+
+						return;
+					}
 				}
 
 				pDocumentsBlock->markMatchDocuments(pWeightBuffer,
@@ -948,37 +1008,52 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 					if(Configuration.MemoryMode != IN_MEMORY_MODE
 						&& Info.CountWordsHDD)
 					{
-						ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
+						bool isBlockValue;
+						char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+						uint32 valueBlockLen;
 
-						if(sourceFilePosition)
+						ulong64 sourceFilePosition;
+
+						if (haWordsHDD.getValueByKey(tempKey,
+													isBlockValue,
+													sourceFilePosition,
+													valueBlock,
+													valueBlockLen))
 						{
 							//read docs
 							uint32 id;
 							DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
 
-							uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
-			
-							uint32 sourceBuffPosition = 0;
-							uint32 sourceBuffLength = 0;
-	
-							bool isFormatCorrupted = false;
-							pDocumentsBlock->readBlocksFromFile(pDocFile,
-																pSourceBuffer,
-																sourceFilePosition,
-																sourceBuffPosition,
-																sourceBuffLength,
-																MAX_SIZE_BUFFER,
-																minDocID,
-																maxDocID,
-																isFormatCorrupted);
-
-							delete[] pSourceBuffer;
-
-							if (isFormatCorrupted)
+							if (isBlockValue)
 							{
-								logError("Read corrupted.");
+								pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+							}
+							else
+							{
+								uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 
-								return 0;
+								uint32 sourceBuffPosition = 0;
+								uint32 sourceBuffLength = 0;
+
+								bool isFormatCorrupted = false;
+								pDocumentsBlock->readBlocksFromFile(pDocFile,
+																	pSourceBuffer,
+																	sourceFilePosition,
+																	sourceBuffPosition,
+																	sourceBuffLength,
+																	MAX_SIZE_BUFFER,
+																	minDocID,
+																	maxDocID,
+																	isFormatCorrupted);
+
+								delete[] pSourceBuffer;
+
+								if (isFormatCorrupted)
+								{
+									logError("Read corrupted.");
+
+									return 0;
+								}
 							}
 
 							//add docs
@@ -1523,36 +1598,51 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 			if(Configuration.MemoryMode != IN_MEMORY_MODE
 				&& Info.CountWordsHDD)
 			{
-				ulong64 sourceFilePosition = haWordsHDD.getValueByKey(tempKey);
+				bool isBlockValue;
+				char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+				uint32 valueBlockLen;
 
-				if(sourceFilePosition)
+				ulong64 sourceFilePosition;
+
+				if (haWordsHDD.getValueByKey(tempKey,
+											isBlockValue,
+											sourceFilePosition,
+											valueBlock,
+											valueBlockLen))
 				{
 					//read docs
 					DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-					uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
-			
-					uint32 sourceBuffPosition = 0;
-					uint32 sourceBuffLength = 0;
-						
-					bool isFormatCorrupted = false;
-					pDocumentsBlock->readBlocksFromFile(pDocFile,
-														pSourceBuffer,
-														sourceFilePosition,
-														sourceBuffPosition,
-														sourceBuffLength,
-														MAX_SIZE_BUFFER,
-														minDocID,
-														maxDocID,
-														isFormatCorrupted);
-
-					delete[] pSourceBuffer;
-
-					if (isFormatCorrupted)
+					if (isBlockValue)
 					{
-						logError("Read corrupted.");
+						pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+					}
+					else
+					{
+						uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 
-						return 0;
+						uint32 sourceBuffPosition = 0;
+						uint32 sourceBuffLength = 0;
+
+						bool isFormatCorrupted = false;
+						pDocumentsBlock->readBlocksFromFile(pDocFile,
+															pSourceBuffer,
+															sourceFilePosition,
+															sourceBuffPosition,
+															sourceBuffLength,
+															MAX_SIZE_BUFFER,
+															minDocID,
+															maxDocID,
+															isFormatCorrupted);
+
+						delete[] pSourceBuffer;
+
+						if (isFormatCorrupted)
+						{
+							logError("Read corrupted.");
+
+							return 0;
+						}
 					}
 
 					//mark documents

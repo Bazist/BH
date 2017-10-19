@@ -61,9 +61,6 @@
     <ClInclude Include="DocumentsBlock.h">
       <Filter>Header Files\Document</Filter>
     </ClInclude>
-    <ClInclude Include="DocumentsName.h">
-      <Filter>Header Files\Document</Filter>
-    </ClInclude>
     <ClInclude Include="FTSInstance.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
@@ -148,7 +145,7 @@
     <ClInclude Include="HArrayTextFile.h">
       <Filter>Header Files\HArray</Filter>
     </ClInclude>
-    <ClInclude Include="DocumentsNameTextFile.h">
+    <ClInclude Include="DocumentsName.h">
       <Filter>Header Files\Document</Filter>
     </ClInclude>
   </ItemGroup>

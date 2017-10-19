@@ -162,7 +162,6 @@
     <ClInclude Include="DocumentsBlock.h" />
     <ClInclude Include="DocumentsBlockPool.h" />
     <ClInclude Include="DocumentsName.h" />
-    <ClInclude Include="DocumentsNameTextFile.h" />
     <ClInclude Include="FTSConfiguration.h" />
     <ClInclude Include="FTSInstance.h" />
     <ClInclude Include="FTSInstanceInfo.h" />

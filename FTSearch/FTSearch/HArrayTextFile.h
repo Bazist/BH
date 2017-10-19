@@ -4,9 +4,12 @@
 #include "HArrayFixBase.h"
 #include "HArrayVisitor.h"
 #include "BinaryFile.h"
+#include "DocumentsBlock.h"
 #include "stdafx.h"
 
 const uint32 HARRAY_TEXT_FILE_BLOCK_SIZE = 4096;
+const uint32 HARRAY_TEXT_FILE_MAX_WORD_LEN = 16;
+const uint32 HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN = 16;
 
 class HArrayTextFile
 {
@@ -46,25 +49,35 @@ public:
 		this->maxKeySegments = maxKeySegments;
 	}
 
-	void open()
+	bool open()
 	{
 		if (!pFile)
 		{
 			this->pFile = new BinaryFile(FullPath, true, false);
 
-			this->pFile->open();
+			if (this->pFile->open())
+			{
+				this->fileSize = pFile->getFileSize();
 
-			this->fileSize = pFile->getFileSize();
+				return true;
+			}
 		}
+
+		return false;
 	}
 
-	void create()
+	bool create()
 	{
 		this->pFile = new BinaryFile(FullPath, true, true);
 
-		this->pFile->open();
+		if (this->pFile->open())
+		{
+			this->fileSize = 0;
 
-		this->fileSize = 0;
+			return true;
+		}
+
+		return false;
 	}
 
 	void openOrCreate()
@@ -79,8 +92,41 @@ public:
 		}
 	}
 
-	void insert(const uint32* key,
-		ulong64 value)
+	bool insert(const uint32* key,
+				ulong64 value,
+				DocumentsBlock* pDocumentsBlock)
+	{
+		if (pDocumentsBlock)
+		{
+			char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+
+			uint32 valueBlockLen = 0;
+
+			pDocumentsBlock->writeBlocksToBuffer(valueBlock, HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN, valueBlockLen);
+
+			if (valueBlockLen < HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN) //max 16 bytes
+			{
+				insertBlock(key, valueBlock, valueBlockLen);
+
+				return true;
+			}
+			else
+			{
+				insertValue(key, value);
+
+				return false;
+			}
+		}
+		else
+		{
+			insertValue(key, value);
+
+			return false;
+		}
+	}
+
+	void insertValue(const uint32* key,
+					 ulong64 value)
 	{
 		char word[256];
 
@@ -89,7 +135,7 @@ public:
 		uint32 pos = 0;
 
 		//find position of two equals string
-		while (templateWord[pos] == word[pos])
+		while (templateWord[pos] == word[pos] && pos < 8)
 		{
 			pos++;
 		}
@@ -151,6 +197,7 @@ public:
 		//write word
 		pFile->write(word + startPos, currLen);
 
+		//write value
 		char bytes[5];
 
 		uint32 valueLen = setValue(value, bytes);
@@ -161,13 +208,103 @@ public:
 		fileSize += (1 + currLen + valueLen);
 	}
 
-	ulong64 getValueByKey(const uint32* key)
+	void insertBlock(const uint32* key,
+					 char* valueBlock,
+					 uint32 valueBlockLen)
+	{
+		char word[HARRAY_TEXT_FILE_MAX_WORD_LEN];
+
+		HArrayVisitor::getWord(word, key, maxKeySegments * 4);
+
+		uint32 pos = 0;
+
+		//find position of two equals string
+		while (templateWord[pos] == word[pos] && pos < 8) //max 8 symbols could be skipped
+		{
+			pos++;
+		}
+
+		//fill rest of string by current word
+		uint32 startPos = pos;
+
+		for (; word[pos] != 0; pos++)
+		{
+			templateWord[pos] = word[pos];
+		}
+
+		uint32 wordLen = pos;
+
+		//fill zero of tail
+		while (templateWord[pos])
+		{
+			templateWord[pos] = 0;
+			pos++;
+		}
+
+		uint32 currLen = wordLen - startPos;
+
+		//can be writed in current block ?
+		uint32 blockPos = fileSize % HARRAY_TEXT_FILE_BLOCK_SIZE;
+
+		if (blockPos + (1 + currLen + valueBlockLen) > HARRAY_TEXT_FILE_BLOCK_SIZE) //No, start from new block
+		{
+			currLen = wordLen;
+			startPos = 0;
+
+			uint32 len = HARRAY_TEXT_FILE_BLOCK_SIZE - blockPos;
+
+			pFile->writeZero(len);
+
+			fileSize += len;
+
+			//templateWord[0] = 0;
+		}
+		else if (blockPos == 0) //new block will be started
+		{
+			currLen = wordLen;
+			startPos = 0;
+
+			//templateWord[0] = 0;
+		}
+
+		//if (pFile->getPosition() == 3563520)
+		//{
+		//	startPos = startPos;
+		//}
+
+		//1. Write header
+		//format [1bit: 1-document block, 0-offset][3bit: skip symbols by template][4bit: len of word]
+		uchar8 header = 0x10 | (startPos << 3) | currLen;
+		
+		pFile->writeByte(&header);
+
+		//write word
+		pFile->write(word + startPos, currLen);
+
+		//write block
+		pFile->write(valueBlock, valueBlockLen);
+		
+		//header + word + block
+		fileSize += (1 + currLen + valueBlockLen);
+	}
+
+	bool getValueByKey(const uint32* key,
+					   bool& isBlockValue,
+					   ulong64& value,
+					   char* valueBlock,
+					   uint32& valueBlockLen)
 	{
 		//HArrayVisitor::getWord(templateWord, key, maxKeySegments * 4);
 
 		ulong64 endPos = (fileSize & 0xFFFFFFFFFFFFF000) + HARRAY_TEXT_FILE_BLOCK_SIZE; //rounded to 4096
 
-		return getValueByKey(key, 0, endPos);
+		return getValueByKey(key,
+							 0,
+							 endPos,
+							 isBlockValue,
+							 value,
+							 valueBlock,
+							 valueBlockLen);
 	}
 
 	uint32 getValue(char* bytes, ulong64& value)
@@ -239,8 +376,14 @@ public:
 
 	int readBlock(ulong64 pos,
 				  const uint32* findKey,
-				  ulong64& value)
+				  bool& isBlockValue,
+				  ulong64& value,
+				  char* valueBlock,
+				  uint32& valueBlockLen)
 	{
+		isBlockValue = false;
+		valueBlockLen = 0;
+
 		char currWord[256];
 
 		char data[HARRAY_TEXT_FILE_BLOCK_SIZE];
@@ -254,7 +397,9 @@ public:
 			//heaer
 			uchar8 header = data[i];
 
-			uchar8 startPos = header >> 4;
+			isBlockValue = header >> 7;
+
+			uchar8 startPos = header << 1 >> 5;
 			uchar8 wordLen = startPos + (header & 0xF);
 
 			if (bFirst && startPos)
@@ -299,12 +444,41 @@ public:
 					}
 					else //if(res > 0) 
 					{
-						i += getValue(data + i, value); //skip value						
+						if (isBlockValue)
+						{
+							while (data[i]) //skip block
+							{
+								i++;
+							}
+
+							i++; //skip null terminated
+						}
+						else
+						{
+							i += getValue(data + i, value); //skip value						
+						}
 					}
 				}
 				else //found !
 				{
-					getValue(data + i, value);
+					if (isBlockValue)
+					{
+						while (data[i]) //block
+						{
+							valueBlock[valueBlockLen] = data[i];
+
+							valueBlockLen++;
+							i++;
+						}
+
+						//null terminated
+						valueBlockLen++;
+						i++; 
+					}
+					else
+					{
+						getValue(data + i, value);
+					}
 
 					return 0;
 				}
@@ -318,9 +492,13 @@ public:
 		}
 	}
 
-	ulong64 getValueByKey(const uint32* key,
-						ulong64 startPos,
-						ulong64 endPos)
+	bool getValueByKey(const uint32* key,
+					    ulong64 startPos,
+						ulong64 endPos,
+						bool& isBlock,
+						ulong64& value,
+						char* valueBlock,
+						uint32& valueBlockLen)
 	{
 		if (endPos - startPos > HARRAY_TEXT_FILE_BLOCK_SIZE)
 		{
@@ -328,50 +506,68 @@ public:
 
 			ulong64 midPos = startPos + ((endPos - startPos) >> 1 & 0xFFFFFFFFFFFFF000);
 
-			ulong64 value;
-
-			int res = readBlock(midPos, key, value);
+			int res = readBlock(midPos,
+								key,
+								isBlock,
+								value,
+								valueBlock,
+								valueBlockLen);
 
 			if (res)
 			{
 				//left part
 				if (res < 0)
 				{
-					return getValueByKey(key, startPos, midPos);
+					return getValueByKey(key,
+										 startPos,
+										 midPos,
+										 isBlock,
+										 value,
+										 valueBlock,
+										 valueBlockLen);
 				}
 
 				//right part
 				if (res > 0)
 				{
-					return getValueByKey(key, midPos, endPos);
+					return getValueByKey(key,
+										 midPos,
+										 endPos,
+										 isBlock,
+										 value,
+										 valueBlock,
+										 valueBlockLen);
 				}
 			}
 			else //stop searching
 			{
-				return value;
+				return true;
 			}
 		}
 		else //last block
 		{
-			ulong64 value;
-
-			int res = readBlock(startPos, key, value);
+			int res = readBlock(startPos,
+								key,
+								isBlock,
+								value,
+								valueBlock,
+								valueBlockLen);
 
 			if (!res) //stop searching
 			{
-				return value;
+				return true;
 			}
 			else
 			{
-				return 0;
+				return false;
 			}
 		}
 	}
 
 	uint32 getKeysAndValuesByPortions(HArrayFixPair* pairs,
-		uint32 size,
-		ulong64& blockNumber,
-		uint32& wordInBlock)
+									  uint32 size,
+									  ulong64& blockNumber,
+									  uint32& wordInBlock)
 	{
 		uint32 count = 0;
 
@@ -591,7 +787,7 @@ public:
 
 	virtual bool onVisit(uint32* key, ulong64 value)
 	{
-		this->pTextFile->insert(key, value);
+		this->pTextFile->insertValue(key, value);
 
 		return true;
 	}
