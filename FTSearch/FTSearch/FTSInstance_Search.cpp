@@ -273,7 +273,7 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 			
 			haWordsHDD.close();
 
-			pTempHAWordsRAM->load();
+			//pTempHAWordsRAM->load();
 
 			uint32 count = pTempHAWordsRAM->getKeysAndValuesByRange(pAllKeysAndValuesRAM,
 																  Info.CountWordsHDD,

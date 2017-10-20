@@ -82,7 +82,7 @@ void FTSInstance::createIndex()
 	{
 		for(uint32 i=0; i < count - 1; i++)
 		{
-			if(pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i+1], countKeySegments) != -1)
+			if(pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i+1].Key, countKeySegments) != -1)
 			{
 				logError("createIndex.haWordsRAM. Array is not sorted.");
 			}
@@ -261,6 +261,380 @@ void FTSInstance::createIndex()
 	isStarted = true;
 }
 
+void FTSInstance::openIndex(bool onlyCheckIndex)
+{
+	if (!checkStartedInstance(false))
+		return;
+
+	char documentPath[1024];
+	//char documentNamePath[1024];
+
+	Configuration.getDocumentPath(documentPath);
+	//Configuration.getDocumentNamePath(documentNamePath);
+
+	pDocFile = new BinaryFile(documentPath, false, false);
+	//pDocNameFile = new BinaryFile(documentNamePath, false, false);
+
+	if (!pDocFile->open())
+	{
+		logError("File %s is not open.", documentPath);
+
+		delete pDocFile;
+
+		//delete pDocNameFile;
+
+		return;
+	}
+
+	//if(!documentsName.open(UINT_MAX))
+	//{
+	//	logError("File %s is not open.", documentsName.FullPath);
+	//	
+	//	pDocFile->close();
+	//	delete pDocFile;
+
+	//	//delete pDocNameFile;
+
+	//	return;
+	//}
+
+	//read repository version
+	uint32 uniqueIdentifier1;
+	pDocFile->readInt(&uniqueIdentifier1);
+
+	uint32 codeVersion1;
+	pDocFile->readInt(&codeVersion1);
+
+	//uint32 uniqueIdentifier2;
+	//pDocNameFile->readInt(&uniqueIdentifier2);
+
+	//uint32 codeVersion2;
+	//pDocNameFile->readInt(&codeVersion2);
+
+	if (uniqueIdentifier1 == UNIQUE_IDENTIFIER
+		&& codeVersion1 == CODE_VERSION)
+		//&& uniqueIdentifier2 == UNIQUE_IDENTIFIER 
+		//&& codeVersion2 == CODE_VERSION)
+	{
+		pDocFile->read(&Info, sizeof(Info));
+
+		Info.LastErrorMessage = LastErrorMessage;
+		//documentsName.FilePosition = (Info.LastNameID - INDEX_FILE_HEADER_SIZE) * Info.DocumentNameSize + INDEX_FILE_HEADER_SIZE;
+
+		Configuration.WordsHeaderBase = Info.WordsHeaderBase;
+
+		uint32 minDocID = getDocHeaderSize();
+		uint32 maxDocID = Info.LastNameIDRAM;
+
+		//haWordsRAM
+		//reinit haWordsRAM
+		if (Configuration.MemoryMode == IN_MEMORY_MODE)
+		{
+			//load data to ram from hdd pages
+			//haWordsHDD.close();
+
+			//haWordsRAM.load();
+
+			Info.CountWordsRAM = Info.CountWordsHDD;
+
+			haWordsHDD.open();
+
+			//load documents
+			uchar8* pSourceBuffer = pBuffer;
+
+			ulong64 sourceFilePosition = pDocFile->getPosition(); //version + unique identifier + info
+			uint32 sourceBuffPosition = 0;
+			uint32 sourceBuffLength = 0;
+
+			uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+
+			HArrayTextFilePair* pKeysAndValuesHDD = HArrayTextFilePair::CreateArray(Info.CountWordsRAM, countKeySegments);
+
+			ulong64 blockNumber = 0;
+			uint32 wordInBlock = 0;
+
+			uint32 count = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
+																 Info.CountWordsRAM,
+																 blockNumber,
+																 wordInBlock);
+
+			if (count != Info.CountWordsRAM)
+			{
+				logError("Count != Info.CountWordsRAM");
+
+				goto destroy1;
+			}
+
+			for (uint32 i = 0; i < count - 1; i++)
+			{
+				if (pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i + 1].Key, countKeySegments) != -1)
+				{
+					logError("openIndex.haWordsHDD. Array is not sorted.");
+				}
+			}
+
+			bool isFormatCorrupted = false;
+
+			uint32 id;
+
+			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
+
+			for (uint32 i = 0; i < Info.CountWordsRAM; i++)
+			{
+				//check errors ================
+				//checkKeyAndValue("readIndex.haWordsRAM", prevKey, key, value, MAX_INT);
+				//prevKey = key;
+				//=============================
+
+				/*if(key == getCode("базист", 6))
+				{
+				key = key;
+				}*/
+
+				if (pKeysAndValuesHDD[i].ValueBlockLen) //read block
+				{
+					pDocumentsBlock->readBlocksFromBuffer(pKeysAndValuesHDD[i].ValueBlock,
+														  pKeysAndValuesHDD[i].ValueBlockLen);
+				}
+				else  //read value
+				{
+					if (pKeysAndValuesHDD[i].Value == sourceFilePosition + sourceBuffPosition)
+					{
+						pDocumentsBlock->readBlocksFromFile(pDocFile,
+															pSourceBuffer,
+															sourceFilePosition,
+															sourceBuffPosition,
+															sourceBuffLength,
+															MAX_SIZE_BUFFER,
+															minDocID,
+															maxDocID,
+															isFormatCorrupted);
+
+						if (isFormatCorrupted)
+						{
+							logError("Format corrupted.");
+
+							goto destroy1;
+						}
+					}
+					else
+					{
+						logError("Read corrupted.");
+
+						goto destroy1;
+					}
+				}
+
+				if (!onlyCheckIndex)
+				{
+					haWordsRAM.insert(pKeysAndValuesHDD[i].Key, id);
+				}
+				else
+				{
+					//FOR TESTING !!! =====================================
+					pDocumentsBlock->clear();
+					//pDocumentsBlockPool->releaseObject(pDocumentsBlock);
+				}
+
+				//pKeysAndValuesRAM[i].Value = pDocumentsBlock->CountDocuments;
+				//=====================================================
+
+				if (getUsedMemory() >= Configuration.LimitUsedMemory)
+				{
+					logError("Configuration.LimitUsedMemory is exceed.");
+
+					goto destroy1;
+				}
+
+				if (Info.HasError)
+				{
+					goto destroy1;
+				}
+			}
+
+			documentsName.loadIntoRAM();
+
+			//move doc name file to memory
+			//sourceFilePosition = pDocNameFile->getPosition(); //version + unique identifier
+			//moveDocNameFileBlocksToRAM(pDocNameFile,
+			//							&documentsName,
+			//							sourceFilePosition,
+			//							pSourceBuffer,
+			//							MAX_SIZE_BUFFER);
+
+			////get top words
+			//for(uint32 i = 0; i < Info.CountWordsRAM; i++)
+			//{
+			//	printf("\r%u", i);
+
+			//	for(uint32 j = i + 1; j < Info.CountWordsRAM; j++)
+			//	{
+			//		if(pKeysAndValuesRAM[i].Value < pKeysAndValuesRAM[j].Value)
+			//		{
+			//			HArrayFixPair tempPair = pKeysAndValuesRAM[j];
+			//			pKeysAndValuesRAM[j] = pKeysAndValuesRAM[i];
+			//			pKeysAndValuesRAM[i] = tempPair;
+			//		}
+			//	}
+			//}
+
+			//BinaryFile bf("c:\\fts\\top.txt", true, true);
+			//bf.open();
+
+			//for(uint32 i = 0; i < Info.CountWordsRAM; i++)
+			//{
+			//	char word[10];
+			//	pKeysAndValuesRAM[i].getWord(word);
+
+			//	char buff[256];
+			//	sprintf(buff, "%s\t%u\n", word,  pKeysAndValuesRAM[i].Value);
+
+			//	bf.write(buff, strlen(buff));
+			//}
+
+			//bf.close();
+
+		destroy1:
+
+			memset(pBuffer, 0, MAX_SIZE_BUFFER);
+
+			HArrayTextFilePair::DeleteArray(pKeysAndValuesHDD);
+
+			//documentsName.FilePosition = 0;
+		}
+		else
+		{
+			/*HArrayFixHDD haWordsHDD2;
+
+			haWordsHDD2.init("c:\\fts\\instance1", "", 12, 4, 24);
+
+			haWordsHDD2.open();*/
+
+			if (onlyCheckIndex)
+			{
+				uchar8* pSourceBuffer = (uchar8*)pBuffer;
+
+				ulong64 sourceFilePosition = getDocHeaderSize(); //version + unique identifier + info
+				uint32 sourceBuffPosition = 0;
+				uint32 sourceBuffLength = 0;
+
+
+				//get data by portions from HDD
+				uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+				HArrayTextFilePair* pKeysAndValuesHDD = HArrayTextFilePair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
+
+				uint32 currKeyRAM = 0;
+
+				ulong64 blockNumber = 0;
+				uint32 wordInBlock = 0;
+
+				uint32 id;
+
+				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
+
+				//uint32 startHeader = 0;
+
+				while (true)
+				{
+					//get data
+					bool isBufferNotEnough = false;
+
+					uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
+																			MAX_SIZE_BUFFER,
+																			blockNumber,
+																			wordInBlock);
+
+					/*if (isBufferNotEnough)
+					{
+					logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
+					goto destroy2;
+					}*/
+
+					//check errors ===========================================
+					if (countHDD)
+					{
+						for (uint32 i = 0; i < countHDD - 1; i++)
+						{
+							if (pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i + 1].Key, countKeySegments) != -1)
+							{
+								logError("createIndex.haWordsHDD. Array is not sorted.");
+								goto destroy2;
+							}
+						}
+					}
+
+					//========================================================
+
+					if (countHDD == 0)
+					{
+						//exit
+						break;
+					}
+
+					uint32 currKeyHDD = 0;
+
+					while (currKeyHDD < countHDD)
+					{
+						if (pKeysAndValuesHDD[currKeyHDD].ValueBlockLen)
+						{
+							pDocumentsBlock->readBlocksFromBuffer(pKeysAndValuesHDD[currKeyHDD].ValueBlock,
+																  pKeysAndValuesHDD[currKeyHDD].ValueBlockLen);
+						}
+						else
+						{
+							//get positions
+							if (pKeysAndValuesHDD[currKeyHDD].Value == sourceFilePosition + sourceBuffPosition)
+							{
+								bool isFormatCorrupted = false;
+
+								pDocumentsBlock->readBlocksFromFile(pDocFile,
+																	pSourceBuffer,
+																	sourceFilePosition,
+																	sourceBuffPosition,
+																	sourceBuffLength,
+																	MAX_SIZE_BUFFER,
+																	minDocID,
+																	maxDocID,
+																	isFormatCorrupted);
+
+								if (isFormatCorrupted)
+								{
+									logError("Read corrupted.");
+
+									goto destroy2;
+								}
+							}
+							else
+							{
+								logError("Read corrupted.");
+
+								goto destroy2;
+							}
+						}
+
+						pDocumentsBlock->clear();
+
+						currKeyHDD++;
+					}
+				}
+
+			destroy2:
+				HArrayTextFilePair::DeleteArray(pKeysAndValuesHDD);
+			}
+
+
+
+			Info.CountWordsRAM = 0;
+		}
+
+		isStarted = true;
+	}
+	else
+	{
+		logError("Bad version.");
+	}
+}
+
 void FTSInstance::updateIndex()
 {
 	if (!checkStartedInstance(true))
@@ -270,7 +644,7 @@ void FTSInstance::updateIndex()
 	HArrayTextFile haWordsHDDTemp;
 	uchar8* pSourceBuffer = 0;
 	HArrayFixPair* pKeysAndValuesRAM = 0;
-	HArrayFixPair* pKeysAndValuesHDD = 0;
+	HArrayTextFilePair* pKeysAndValuesHDD = 0;
 
 	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
 	pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
@@ -345,7 +719,7 @@ void FTSInstance::updateIndex()
 	{
 		for(uint32 i=0; i < count - 1; i++)
 		{
-			if(pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i+1], countKeySegments) != -1)
+			if(pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i+1].Key, countKeySegments) != -1)
 			{
 				logError("createIndex.haWordsRAM. Array is not sorted.");
 				goto destroy;
@@ -365,7 +739,7 @@ void FTSInstance::updateIndex()
 	//}
 
 	//get data by portions from HDD
-	pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
+	pKeysAndValuesHDD = HArrayTextFilePair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 
 	uint32 currKeyRAM = 0;
 
@@ -412,9 +786,9 @@ void FTSInstance::updateIndex()
 		//bool isBufferNotEnough = false;
 
 		uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
-															  MAX_SIZE_BUFFER, 
-															  blockNumber,
-															  wordInBlock);
+																MAX_SIZE_BUFFER, 
+																blockNumber,
+																wordInBlock);
 
 		/*if(isBufferNotEnough)
 		{
@@ -427,7 +801,7 @@ void FTSInstance::updateIndex()
 		{
 			for(uint32 i=0; i < countHDD - 1; i++)
 			{
-				if(pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i+1], countKeySegments) != -1)
+				if(pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i+1].Key, countKeySegments) != -1)
 				{
 					logError("createIndex.haWordsHDD. Array is not sorted.");
 					goto destroy;
@@ -454,7 +828,7 @@ void FTSInstance::updateIndex()
 			
 			if(currKeyRAM < Info.CountWordsRAM && currKeyHDD < countHDD)
 			{
-				compareResult = pKeysAndValuesRAM[currKeyRAM].compareKeys(pKeysAndValuesHDD[currKeyHDD], countKeySegments);
+				compareResult = pKeysAndValuesRAM[currKeyRAM].compareKeys(pKeysAndValuesHDD[currKeyHDD].Key, countKeySegments);
 			}
 			else if(currKeyRAM < Info.CountWordsRAM && countHDD == 0)
 			{
@@ -507,34 +881,37 @@ void FTSInstance::updateIndex()
 				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
 		
 				//insert or update
-				haWordsHDDTemp.insertValue(pKeysAndValuesRAM[currKeyRAM].Key, docTempPosition);
-				
-				//check errors ===========================================
-				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
+				if (!haWordsHDDTemp.insert(pKeysAndValuesRAM[currKeyRAM].Key,
+											docTempPosition,
+											pDocumentsBlock))
 				{
-					newControlValue += pKeysAndValuesRAM[currKeyRAM].Key[i];
+					//check errors ===========================================
+					for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
+					{
+						newControlValue += pKeysAndValuesRAM[currKeyRAM].Key[i];
+					}
+
+					newControlValue += docTempPosition;
+					//========================================================
+
+					uint32 lastDocNumber = 0;
+
+					//Save blocks from RAM
+					pDocumentsBlock->writeBlocksToFile(pDocFileTemp,
+														pDestBuffer,
+														MAX_SIZE_BUFFER,
+														destBuffPosition,
+														0,
+														lastDocNumber);
+
+					pDestBuffer[destBuffPosition++] = 0; //null terminated
+
+					/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
+					{
+						pDocumentsBlock->clear();
+						pDocumentsBlockPool->releaseObject(pDocumentsBlock);
+					}*/
 				}
-
-				newControlValue += docTempPosition;
-				//========================================================
-				
-				uint32 lastDocNumber = 0;
-
-				//Save blocks from RAM
-				pDocumentsBlock->writeBlocksToFile(pDocFileTemp, 
-												   pDestBuffer, 
-												   MAX_SIZE_BUFFER, 
-												   destBuffPosition,
-												   0,
-												   lastDocNumber); 
-		
-				pDestBuffer[destBuffPosition++] = 0; //null terminated
-		
-				/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
-				{
-					pDocumentsBlock->clear();
-					pDocumentsBlockPool->releaseObject(pDocumentsBlock);
-				}*/
 
 				Info.CountWordsHDD++;
 				
@@ -792,7 +1169,7 @@ destroy:
 
 	if(pKeysAndValuesHDD)
 	{
-		HArrayFixPair::DeleteArray(pKeysAndValuesHDD);
+		HArrayTextFilePair::DeleteArray(pKeysAndValuesHDD);
 	}
 
 	if(pSourceBuffer)
@@ -834,8 +1211,8 @@ void FTSInstance::importIndex(const char* importPath)
 	uchar8* pSourceBuffer = 0;
 	uchar8* pSourceBufferImport = 0;
 
-	HArrayFixPair* pKeysAndValuesHDDImport = 0;
-	HArrayFixPair* pKeysAndValuesHDD = 0;
+	HArrayTextFilePair* pKeysAndValuesHDDImport = 0;
+	HArrayTextFilePair* pKeysAndValuesHDD = 0;
 
 	char documentPath[1024];
 	//char documentNamePath[1024];
@@ -941,10 +1318,10 @@ void FTSInstance::importIndex(const char* importPath)
 	//get data by portions from HDD
 	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
 
-	pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
+	pKeysAndValuesHDD = HArrayTextFilePair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 
 	//get data from import hdd
-	pKeysAndValuesHDDImport = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
+	pKeysAndValuesHDDImport = HArrayTextFilePair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 	
 	uint32 currKeyHDD = MAX_INT;
 	uint32 currKeyHDDImport = MAX_INT;
@@ -1025,7 +1402,7 @@ void FTSInstance::importIndex(const char* importPath)
 			{
 				for (uint32 i = 0; i < countHDD - 1; i++)
 				{
-					if (pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i + 1], countKeySegments) != -1)
+					if (pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i + 1].Key, countKeySegments) != -1)
 					{
 						logError("importIndex.haWordsHDD. Array is not sorted.");
 						goto destroy;
@@ -1064,7 +1441,7 @@ void FTSInstance::importIndex(const char* importPath)
 			
 		if(currKeyHDD < countHDD && currKeyHDDImport < countHDDImport)
 		{
-			compareResult = pKeysAndValuesHDDImport[currKeyHDDImport].compareKeys(pKeysAndValuesHDD[currKeyHDD], countKeySegments);
+			compareResult = pKeysAndValuesHDDImport[currKeyHDDImport].compareKeys(pKeysAndValuesHDD[currKeyHDD].Key, countKeySegments);
 		}
 		else if(currKeyHDD < countHDD)
 		{
@@ -1386,12 +1763,12 @@ destroy:
 
 	if(pKeysAndValuesHDD)
 	{
-		HArrayFixPair::DeleteArray(pKeysAndValuesHDD);
+		HArrayTextFilePair::DeleteArray(pKeysAndValuesHDD);
 	}
 
 	if(pKeysAndValuesHDDImport)
 	{
-		HArrayFixPair::DeleteArray(pKeysAndValuesHDDImport);
+		HArrayTextFilePair::DeleteArray(pKeysAndValuesHDDImport);
 	}
 
 	if(pSourceBuffer)
@@ -1454,361 +1831,6 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 		closeDocIndex();
 
 		//closeDocNameIndex();
-	}
-}
-
-void FTSInstance::openIndex(bool onlyCheckIndex)
-{
-	if (!checkStartedInstance(false))
-		return;
-
-	char documentPath[1024];
-	//char documentNamePath[1024];
-
-	Configuration.getDocumentPath(documentPath);
-	//Configuration.getDocumentNamePath(documentNamePath);
-
-	pDocFile = new BinaryFile(documentPath, false, false);
-	//pDocNameFile = new BinaryFile(documentNamePath, false, false);
-
-	if(!pDocFile->open())
-	{
-		logError("File %s is not open.", documentPath);
-		
-		delete pDocFile;
-		
-		//delete pDocNameFile;
-
-		return;
-	}
-		
-	//if(!documentsName.open(UINT_MAX))
-	//{
-	//	logError("File %s is not open.", documentsName.FullPath);
-	//	
-	//	pDocFile->close();
-	//	delete pDocFile;
-
-	//	//delete pDocNameFile;
-
-	//	return;
-	//}
-
-	//read repository version
-	uint32 uniqueIdentifier1;
-	pDocFile->readInt(&uniqueIdentifier1);
-
-	uint32 codeVersion1;
-	pDocFile->readInt(&codeVersion1);
-
-	//uint32 uniqueIdentifier2;
-	//pDocNameFile->readInt(&uniqueIdentifier2);
-
-	//uint32 codeVersion2;
-	//pDocNameFile->readInt(&codeVersion2);
-
-	if(uniqueIdentifier1 == UNIQUE_IDENTIFIER 
-	   && codeVersion1 == CODE_VERSION)
-	   //&& uniqueIdentifier2 == UNIQUE_IDENTIFIER 
-	   //&& codeVersion2 == CODE_VERSION)
-	{
-		pDocFile->read(&Info, sizeof(Info));
-		
-		Info.LastErrorMessage = LastErrorMessage;
-		//documentsName.FilePosition = (Info.LastNameID - INDEX_FILE_HEADER_SIZE) * Info.DocumentNameSize + INDEX_FILE_HEADER_SIZE;
-
-		Configuration.WordsHeaderBase = Info.WordsHeaderBase;
-
-		uint32 minDocID = getDocHeaderSize();
-		uint32 maxDocID = Info.LastNameIDRAM;
-		
-		//haWordsRAM
-		//reinit haWordsRAM
-		if(Configuration.MemoryMode == IN_MEMORY_MODE)
-		{
-			//load data to ram from hdd pages
-			haWordsHDD.close();
-
-			haWordsRAM.load();
-
-			Info.CountWordsRAM = Info.CountWordsHDD;
-			
-			haWordsHDD.open();
-			
-			//load documents
-			uchar8* pSourceBuffer = pBuffer;
-			
-			ulong64 sourceFilePosition = pDocFile->getPosition(); //version + unique identifier + info
-			uint32 sourceBuffPosition = 0;
-			uint32 sourceBuffLength = 0;
-
-			uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
-						
-			HArrayFixPair* pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
-
-			uint32 count = haWordsRAM.getKeysAndValuesByRange(pKeysAndValuesRAM,
-															Info.CountWordsRAM, 
-															0, 
-															0);
-			
-			if(count != Info.CountWordsRAM)
-			{
-				logError("Count != Info.CountWordsRAM");
-				
-				goto destroy1;
-			}
-
-			for(uint32 i=0; i < count - 1; i++)
-			{
-				if(pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i+1], countKeySegments) != -1)
-				{
-					logError("openIndex.haWordsRAM. Array is not sorted.");
-				}
-			}
-
-			bool isFormatCorrupted = false;
-
-			uint32 id;
-
-			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
-
-			for(uint32 i=0; i < Info.CountWordsRAM; i++)
-			{
-				//check errors ================
-				//checkKeyAndValue("readIndex.haWordsRAM", prevKey, key, value, MAX_INT);
-				//prevKey = key;
-				//=============================
-
-				/*if(key == getCode("базист", 6))
-				{
-					key = key;
-				}*/
-
-				if(pKeysAndValuesRAM[i].Value == sourceFilePosition + sourceBuffPosition)
-				{
-					pDocumentsBlock->readBlocksFromFile(pDocFile,
-														pSourceBuffer,
-														sourceFilePosition,
-														sourceBuffPosition,
-														sourceBuffLength,
-														MAX_SIZE_BUFFER,
-														minDocID,
-														maxDocID,
-														isFormatCorrupted);
-
-					if(isFormatCorrupted)
-					{
-						logError("Format corrupted.");
-						
-						goto destroy1;
-					}
-				}
-				else
-				{
-					logError("Read corrupted.");
-
-					goto destroy1;
-				}
-
-				if(!onlyCheckIndex)
-				{
-					haWordsRAM.insert(pKeysAndValuesRAM[i].Key, id);
-				}
-				else
-				{
-					//FOR TESTING !!! =====================================
-					pDocumentsBlock->clear();
-					//pDocumentsBlockPool->releaseObject(pDocumentsBlock);
-				}
-
-				//pKeysAndValuesRAM[i].Value = pDocumentsBlock->CountDocuments;
-				//=====================================================
-
-				if(getUsedMemory() >= Configuration.LimitUsedMemory)
-				{
-					logError("Configuration.LimitUsedMemory is exceed.");
-
-					goto destroy1;
-				}
-
-				if(Info.HasError)
-				{
-					goto destroy1;
-				}
-			}
-
-			documentsName.loadIntoRAM();
-
-			//move doc name file to memory
-			//sourceFilePosition = pDocNameFile->getPosition(); //version + unique identifier
-			//moveDocNameFileBlocksToRAM(pDocNameFile,
-			//							&documentsName,
-			//							sourceFilePosition,
-			//							pSourceBuffer,
-			//							MAX_SIZE_BUFFER);
-			
-			////get top words
-			//for(uint32 i = 0; i < Info.CountWordsRAM; i++)
-			//{
-			//	printf("\r%u", i);
-
-			//	for(uint32 j = i + 1; j < Info.CountWordsRAM; j++)
-			//	{
-			//		if(pKeysAndValuesRAM[i].Value < pKeysAndValuesRAM[j].Value)
-			//		{
-			//			HArrayFixPair tempPair = pKeysAndValuesRAM[j];
-			//			pKeysAndValuesRAM[j] = pKeysAndValuesRAM[i];
-			//			pKeysAndValuesRAM[i] = tempPair;
-			//		}
-			//	}
-			//}
-
-			//BinaryFile bf("c:\\fts\\top.txt", true, true);
-			//bf.open();
-
-			//for(uint32 i = 0; i < Info.CountWordsRAM; i++)
-			//{
-			//	char word[10];
-			//	pKeysAndValuesRAM[i].getWord(word);
-
-			//	char buff[256];
-			//	sprintf(buff, "%s\t%u\n", word,  pKeysAndValuesRAM[i].Value);
-
-			//	bf.write(buff, strlen(buff));
-			//}
-
-			//bf.close();
-
-			destroy1:
-
-			memset(pBuffer, 0, MAX_SIZE_BUFFER);
-						
-			HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
-
-			//documentsName.FilePosition = 0;
-		}
-		else
-		{
-			/*HArrayFixHDD haWordsHDD2;
-
-			haWordsHDD2.init("c:\\fts\\instance1", "", 12, 4, 24);
-
-			haWordsHDD2.open();*/
-			
-			if (onlyCheckIndex)
-			{
-				uchar8* pSourceBuffer = (uchar8*)pBuffer;
-
-				ulong64 sourceFilePosition = getDocHeaderSize(); //version + unique identifier + info
-				uint32 sourceBuffPosition = 0;
-				uint32 sourceBuffLength = 0;
-
-
-				//get data by portions from HDD
-				uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
-				HArrayFixPair* pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
-
-				uint32 currKeyRAM = 0;
-
-				ulong64 blockNumber = 0;
-				uint32 wordInBlock = 0;
-
-				uint32 id;
-
-				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
-
-				//uint32 startHeader = 0;
-
-				while (true)
-				{
-					//get data
-					bool isBufferNotEnough = false;
-
-					uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
-																			MAX_SIZE_BUFFER,
-																			blockNumber,
-																			wordInBlock);
-
-					/*if (isBufferNotEnough)
-					{
-						logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
-						goto destroy2;
-					}*/
-
-					//check errors ===========================================
-					if (countHDD)
-					{
-						for (uint32 i = 0; i < countHDD - 1; i++)
-						{
-							if (pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i + 1], countKeySegments) != -1)
-							{
-								logError("createIndex.haWordsHDD. Array is not sorted.");
-								goto destroy2;
-							}
-						}
-					}
-
-					//========================================================
-
-					if (countHDD == 0)
-					{
-						//exit
-						break;
-					}
-
-					uint32 currKeyHDD = 0;
-
-					while (currKeyHDD < countHDD)
-					{
-						//get positions
-						if (pKeysAndValuesHDD[currKeyHDD].Value == sourceFilePosition + sourceBuffPosition)
-						{
-							bool isFormatCorrupted = false;
-
-							pDocumentsBlock->readBlocksFromFile(pDocFile,
-																pSourceBuffer,
-																sourceFilePosition,
-																sourceBuffPosition,
-																sourceBuffLength,
-																MAX_SIZE_BUFFER,
-																minDocID,
-																maxDocID,
-																isFormatCorrupted);
-
-							if (isFormatCorrupted)
-							{
-								logError("Read corrupted.");
-
-								goto destroy2;
-							}
-						}
-						else
-						{
-							logError("Read corrupted.");
-
-							goto destroy2;
-						}
-
-						pDocumentsBlock->clear();
-
-						currKeyHDD++;
-					}
-				}
-
-			destroy2:
-				HArrayFixPair::DeleteArray(pKeysAndValuesHDD);
-			}
-
-		
-
-			Info.CountWordsRAM = 0;
-		}
-
-		isStarted = true;
-	}
-	else
-	{
-		logError("Bad version.");
 	}
 }
 

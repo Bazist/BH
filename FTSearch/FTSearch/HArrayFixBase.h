@@ -126,24 +126,24 @@ public:
 		{
 			if (isAsc)
 			{
-				while (pKeysAndValues[i].compareKeys(*p, countKeySegments) < 0)
+				while (pKeysAndValues[i].compareKeys(p->Key, countKeySegments) < 0)
 				{
 					i++;
 				}
 
-				while (pKeysAndValues[j].compareKeys(*p, countKeySegments) > 0)
+				while (pKeysAndValues[j].compareKeys(p->Key, countKeySegments) > 0)
 				{
 					j--;
 				}
 			}
 			else
 			{
-				while (pKeysAndValues[i].compareKeys(*p, countKeySegments) > 0)
+				while (pKeysAndValues[i].compareKeys(p->Key, countKeySegments) > 0)
 				{
 					i++;
 				}
 
-				while (pKeysAndValues[j].compareKeys(*p, countKeySegments) < 0)
+				while (pKeysAndValues[j].compareKeys(p->Key, countKeySegments) < 0)
 				{
 					j--;
 				}
@@ -179,14 +179,14 @@ public:
 	ulong64 Value;
 	
 	//1 segment = 4 bytes
-	int compareKeys(HArrayFixPair& pair, uint32 countKeySegments)
+	int compareKeys(uint32* key, uint32 countKeySegments)
 	{
 		for(uint32 i=0; i < countKeySegments; i++)
 		{
-			if(Key[i] < pair.Key[i])
+			if(Key[i] < key[i])
 				return -1;
 			
-			if(Key[i] > pair.Key[i])
+			if(Key[i] > key[i])
 				return 1;
 		}
 

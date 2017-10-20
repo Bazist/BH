@@ -11,6 +11,70 @@ const uint32 HARRAY_TEXT_FILE_BLOCK_SIZE = 4096;
 const uint32 HARRAY_TEXT_FILE_MAX_WORD_LEN = 64;
 const uint32 HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN = 15;
 
+struct HArrayTextFilePair
+{
+private:
+	HArrayTextFilePair()
+	{
+	}
+
+public:
+	
+	uint32* Key; //use additional memory
+	ulong64 Value;
+
+	char ValueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+	uchar8 ValueBlockLen;
+
+	static uint32 calcArrayMemory(uint32 count, uint32 countKeySegments)
+	{
+		return (sizeof(HArrayTextFilePair) + (countKeySegments << 2)) * count;
+	}
+
+	static HArrayTextFilePair* CreateArray(uint32 count, uint32 countKeySegments)
+	{
+		char* pArray = new char[calcArrayMemory(count, countKeySegments)];
+
+		HArrayTextFilePair* pCurrentPair = (HArrayTextFilePair*)pArray;
+		uint32* pCurrentKey = (uint32*)(pArray + sizeof(HArrayTextFilePair) * count);
+
+		for (uint32 i = 0; i < count; i++,
+			pCurrentPair++,
+			pCurrentKey += countKeySegments)
+		{
+			pCurrentPair->Key = pCurrentKey;
+			pCurrentPair->Value = 0;
+		}
+
+		return (HArrayTextFilePair*)pArray;
+	}
+
+	static void DeleteArray(HArrayTextFilePair* pArray)
+	{
+		delete[](char*)pArray;
+	}
+
+	//1 segment = 4 bytes
+	int compareKeys(uint32* key, uint32 countKeySegments)
+	{
+		for (uint32 i = 0; i < countKeySegments; i++)
+		{
+			if (Key[i] < key[i])
+				return -1;
+
+			if (Key[i] > key[i])
+				return 1;
+		}
+
+		return 0;
+	}
+
+	~HArrayTextFilePair()
+	{
+	}
+};
+
+
 class HArrayTextFile
 {
 private:
@@ -474,16 +538,11 @@ public:
 					{
 						if (valueBlockLen)
 						{
-							while (data[i]) //skip block
-							{
-								i++;
-							}
-
-							i++; //skip null terminated
+							i += valueBlockLen; //skip block
 						}
 						else
 						{
-							i += getValue(data + i, value); //skip value						
+							i += 5; //skip value						
 						}
 					}
 				}
@@ -491,17 +550,10 @@ public:
 				{
 					if (valueBlockLen)
 					{
-						while (data[i]) //block
+						for(uint32 j = 0; j < valueBlockLen; i++, j++)  //block
 						{
-							valueBlock[valueBlockLen] = data[i];
-
-							valueBlockLen++;
-							i++;
+							valueBlock[j] = data[i];							
 						}
-
-						//null terminated
-						valueBlockLen++;
-						i++; 
 					}
 					else
 					{
@@ -587,7 +639,7 @@ public:
 		}
 	}
 
-	uint32 getKeysAndValuesByPortions(HArrayFixPair* pairs,
+	uint32 getKeysAndValuesByPortions(HArrayTextFilePair* pairs,
 									  uint32 size,
 									  ulong64& blockNumber,
 									  uint32& wordInBlock)
@@ -613,10 +665,14 @@ public:
 			for (uint32 i = 0; i < len; currWordInBlock++)
 			{
 				//heaer
-				uchar8 header = data[i];
-
-				uchar8 startPos = header >> 4;
-				uchar8 wordLen = startPos + (header & 0xF);
+				ushort16 header = *(ushort16*)&data[i];
+				uchar8 startPos;
+				uchar8 wordLen;
+				
+				unpackHeader(header,
+							 startPos,
+							 wordLen,
+							 pairs[count].ValueBlockLen);
 
 				if (wordLen)
 				{
@@ -645,7 +701,17 @@ public:
 													pairs[count].Key,
 													maxKeySegments * 4);
 
-						i += getValue(data + i, pairs[count].Value);
+						if (pairs[count].ValueBlockLen)
+						{
+							for (uint32 j = 0; j < pairs[count].ValueBlockLen; i++, j++)  //block
+							{
+								pairs[count].ValueBlock[j] = data[i];
+							}
+						}
+						else
+						{
+							i += getValue(data + i, pairs[count].Value);
+						}
 
 						/*if (pairs[count].Value == 2147507280)
 							i = i;*/
@@ -663,9 +729,14 @@ public:
 					}
 					else
 					{
-						ulong64 value;
-
-						i += getValue(data + i, value);
+						if (pairs[count].ValueBlockLen)
+						{
+							i += pairs[count].ValueBlockLen; //skip block
+						}
+						else
+						{
+							i += 5; //skip value						
+						}
 					}
 
 					bFirst = false;
@@ -792,35 +863,35 @@ public:
 	}
 };
 
-class InsertToTextFileVisitor : public HArrayVisitor
-{
-
-private:
-	HArrayTextFile* pTextFile;
-
-public:
-	InsertToTextFileVisitor(HArrayTextFile* pTextFile)
-	{
-		this->pTextFile = pTextFile;
-	}
-
-	virtual void onStartScan()
-	{
-	}
-
-	virtual bool onVisit(uint32* key, ulong64 value)
-	{
-		this->pTextFile->insertValue(key, value);
-
-		return true;
-	}
-
-	virtual void onEndScan()
-	{
-	}
-
-	~InsertToTextFileVisitor()
-	{
-	}
-};
+//class InsertToTextFileVisitor : public HArrayVisitor
+//{
+//
+//private:
+//	HArrayTextFile* pTextFile;
+//
+//public:
+//	InsertToTextFileVisitor(HArrayTextFile* pTextFile)
+//	{
+//		this->pTextFile = pTextFile;
+//	}
+//
+//	virtual void onStartScan()
+//	{
+//	}
+//
+//	virtual bool onVisit(uint32* key, ulong64 value)
+//	{
+//		this->pTextFile->insertValue(key, value);
+//
+//		return true;
+//	}
+//
+//	virtual void onEndScan()
+//	{
+//	}
+//
+//	~InsertToTextFileVisitor()
+//	{
+//	}
+//};
 

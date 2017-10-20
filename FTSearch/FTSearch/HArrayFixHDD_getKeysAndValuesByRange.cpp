@@ -13,10 +13,10 @@ void HArrayFixHDD::sortItems(HArrayFixPair* pairs,
     
 	while (i <= j)
 	{
-		while (pairs[i].compareKeys(pivot, KeyLen) == -1)
+		while (pairs[i].compareKeys(pivot.Key, KeyLen) == -1)
 			i++;
             
-		while (pairs[j].compareKeys(pivot, KeyLen) == 1)
+		while (pairs[j].compareKeys(pivot.Key, KeyLen) == 1)
             j--;
             
 		if (i <= j)

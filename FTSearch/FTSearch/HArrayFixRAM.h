@@ -268,6 +268,7 @@ public:
 		}
 	}*/
 
+	/*
 	void load()
 	{
 		destroy();
@@ -336,6 +337,8 @@ public:
 
 		return true;
 	}
+
+	*/
 
 	/*
 	void load()
