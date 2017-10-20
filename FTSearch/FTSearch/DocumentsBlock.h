@@ -342,11 +342,6 @@ public:
 				break;
 			}
 		}
-
-		if (writedLen < bufferSize)
-		{
-			pBuffer[writedLen++] = 0; //null terminated
-		}
 	}
 
 	void writeBlocksToFile(BinaryFile* pFile, uint32& writedLen)
@@ -382,7 +377,8 @@ public:
 		writedLen++;
 	}
 
-	void readBlocksFromBuffer(char* buffer)
+	void readBlocksFromBuffer(char* buffer,
+							  uint32 bufferLen)
 	{
 		uint32 bufferPosition = 0;
 
@@ -427,9 +423,8 @@ public:
 				docNumber--;
 			}
 
-			if (buffer[bufferPosition]) //is last
+			if (bufferPosition >= bufferLen) //is last
 			{
-				bufferPosition++; //with null terminated
 				return;
 			}
 		}

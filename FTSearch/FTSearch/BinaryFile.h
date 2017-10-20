@@ -61,10 +61,14 @@ public:
 	bool readInt(uint32* pValue, ulong64 position);
 	bool readInt(uint32* pValue);
 	
+	bool readShort(ushort16* pValue);
+
 	bool readLong(ulong64* pValue, ulong64 position);
 	bool readLong(ulong64* pValue);
 
 	bool readInts(uint32* pValues, uint32 length);
+
+	void writeShort(const ushort16* pValue);
 
 	void writeInt(const uint32* pValue);
 	void writeInt(const uint32* pValue, const ulong64 position);

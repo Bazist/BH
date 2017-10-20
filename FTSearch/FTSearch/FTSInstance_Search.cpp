@@ -136,14 +136,12 @@ void FTSInstance::markMatchDocuments(const char* word,
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
-		bool isBlockValue;
 		char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
-		uint32 valueBlockLen;
+		uchar8 valueBlockLen;
 
 		ulong64 sourceFilePosition;
 		
 		if(haWordsHDD.getValueByKey(tempKey,
-									isBlockValue,
 									sourceFilePosition,
 									valueBlock,
 									valueBlockLen))
@@ -152,9 +150,9 @@ void FTSInstance::markMatchDocuments(const char* word,
 			uint32 id;
 			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-			if (isBlockValue)
+			if (valueBlockLen)
 			{
-				pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+				pDocumentsBlock->readBlocksFromBuffer(valueBlock, valueBlockLen);
 			}
 			else
 			{
@@ -523,14 +521,12 @@ void FTSInstance::calculateTrend(const char* phrase,
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
-		bool isBlockValue;
 		char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
-		uint32 valueBlockLen;
+		uchar8 valueBlockLen;
 
 		ulong64 sourceFilePosition;
 
 		if(haWordsHDD.getValueByKey(tempKey,
-									isBlockValue,
 									sourceFilePosition,
 									valueBlock,
 									valueBlockLen))
@@ -538,9 +534,9 @@ void FTSInstance::calculateTrend(const char* phrase,
 			//read docs
 			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-			if (isBlockValue)
+			if (valueBlockLen)
 			{
-				pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+				pDocumentsBlock->readBlocksFromBuffer(valueBlock, valueBlockLen);
 			}
 			else
 			{
@@ -619,23 +615,21 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 		if(Configuration.MemoryMode != IN_MEMORY_MODE
 			&& Info.CountWordsHDD)
 		{
-			bool isBlockValue;
 			char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
-			uint32 valueBlockLen;
+			uchar8 valueBlockLen;
 
 			ulong64 sourceFilePosition;
 
 			if(haWordsHDD.getValueByKey(tempKey,
-										isBlockValue,
 										sourceFilePosition,
 										valueBlock,
 										valueBlockLen))
 			{
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 				
-				if (isBlockValue)
+				if (valueBlockLen)
 				{
-					pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+					pDocumentsBlock->readBlocksFromBuffer(valueBlock, valueBlockLen);
 				}
 				else
 				{
@@ -745,14 +739,12 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 		if(Configuration.MemoryMode != IN_MEMORY_MODE
 			&& Info.CountWordsHDD)
 		{
-			bool isBlockValue;
 			char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
-			uint32 valueBlockLen;
+			uchar8 valueBlockLen;
 
 			ulong64 sourceFilePosition;
 
 			if(haWordsHDD.getValueByKey(tempKey,
-										isBlockValue,
 										sourceFilePosition,
 										valueBlock,
 										valueBlockLen))
@@ -760,9 +752,9 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 				//read docs
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-				if (isBlockValue)
+				if (valueBlockLen)
 				{
-					pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+					pDocumentsBlock->readBlocksFromBuffer(valueBlock, valueBlockLen);
 				}
 				else
 				{
@@ -1008,14 +1000,12 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 					if(Configuration.MemoryMode != IN_MEMORY_MODE
 						&& Info.CountWordsHDD)
 					{
-						bool isBlockValue;
 						char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
-						uint32 valueBlockLen;
+						uchar8 valueBlockLen;
 
 						ulong64 sourceFilePosition;
 
 						if (haWordsHDD.getValueByKey(tempKey,
-													isBlockValue,
 													sourceFilePosition,
 													valueBlock,
 													valueBlockLen))
@@ -1024,9 +1014,9 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 							uint32 id;
 							DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
 
-							if (isBlockValue)
+							if (valueBlockLen)
 							{
-								pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+								pDocumentsBlock->readBlocksFromBuffer(valueBlock, valueBlockLen);
 							}
 							else
 							{
@@ -1598,14 +1588,12 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 			if(Configuration.MemoryMode != IN_MEMORY_MODE
 				&& Info.CountWordsHDD)
 			{
-				bool isBlockValue;
 				char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
-				uint32 valueBlockLen;
+				uchar8 valueBlockLen;
 
 				ulong64 sourceFilePosition;
 
 				if (haWordsHDD.getValueByKey(tempKey,
-											isBlockValue,
 											sourceFilePosition,
 											valueBlock,
 											valueBlockLen))
@@ -1613,9 +1601,9 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 					//read docs
 					DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getTempObject();
 
-					if (isBlockValue)
+					if (valueBlockLen)
 					{
-						pDocumentsBlock->readBlocksFromBuffer(valueBlock);
+						pDocumentsBlock->readBlocksFromBuffer(valueBlock, valueBlockLen);
 					}
 					else
 					{

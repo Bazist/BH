@@ -465,6 +465,13 @@ bool BinaryFile::readInt(uint32* pValue)
 	return (n > 0);
 }
 
+bool BinaryFile::readShort(ushort16* pValue)
+{
+	size_t n = fread(pValue, 2, 1, m_file);
+
+	return (n > 0);
+}
+
 bool BinaryFile::readLong(ulong64* pValue)
 {
 	size_t n = fread (pValue, 8, 1, m_file);
@@ -483,6 +490,11 @@ bool BinaryFile::readInts(uint32* pValues,
 void BinaryFile::writeInt(const uint32* pValue)
 {
 	fwrite (pValue, 4, 1, m_file);
+}
+
+void BinaryFile::writeShort(const ushort16* pValue)
+{
+	fwrite(pValue, 2, 1, m_file);
 }
 
 void BinaryFile::writeByte(const uchar8* pValue)

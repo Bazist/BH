@@ -8,8 +8,8 @@
 #include "stdafx.h"
 
 const uint32 HARRAY_TEXT_FILE_BLOCK_SIZE = 4096;
-const uint32 HARRAY_TEXT_FILE_MAX_WORD_LEN = 16;
-const uint32 HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN = 16;
+const uint32 HARRAY_TEXT_FILE_MAX_WORD_LEN = 64;
+const uint32 HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN = 15;
 
 class HArrayTextFile
 {
@@ -189,10 +189,12 @@ public:
 		//}
 
 		//1. Write header
-		//4 bits for position of prefix + 4 bits for rest of word
-		uchar8 header = (startPos << 4) | currLen;
+		ushort16 header;
+		uchar8 blockLen = 0; //flag value 5 bytes
 
-		pFile->writeByte(&header);
+		packHeader(header, startPos, currLen, blockLen);
+
+		pFile->writeShort(&header);
 
 		//write word
 		pFile->write(word + startPos, currLen);
@@ -273,10 +275,11 @@ public:
 		//}
 
 		//1. Write header
-		//format [1bit: 1-document block, 0-offset][3bit: skip symbols by template][4bit: len of word]
-		uchar8 header = 0x10 | (startPos << 3) | currLen;
+		ushort16 header;
 		
-		pFile->writeByte(&header);
+		packHeader(header, startPos, currLen, valueBlockLen);
+
+		pFile->writeShort(&header);
 
 		//write word
 		pFile->write(word + startPos, currLen);
@@ -289,10 +292,9 @@ public:
 	}
 
 	bool getValueByKey(const uint32* key,
-					   bool& isBlockValue,
 					   ulong64& value,
 					   char* valueBlock,
-					   uint32& valueBlockLen)
+					   uchar8& valueBlockLen)
 	{
 		//HArrayVisitor::getWord(templateWord, key, maxKeySegments * 4);
 
@@ -301,58 +303,87 @@ public:
 		return getValueByKey(key,
 							 0,
 							 endPos,
-							 isBlockValue,
 							 value,
 							 valueBlock,
 							 valueBlockLen);
 	}
 
+	void packHeader(ushort16& header,
+					uchar8 prefixLen,
+					uchar8 wordLen,
+					uchar8 blockLen)
+	{
+		//format: [6bits: Prefix Len][6bits: Word Len][4bits: Block Len, If Block Len = 0 then Position 5 bytes, otherwise len of block]
+		header = (prefixLen << 10) | (wordLen << 4) | blockLen;
+	}
+
+	void unpackHeader(ushort16 header,
+					  uchar8& prefixLen,
+					  uchar8& wordLen,
+					  uchar8& blockLen)
+	{
+		//format: [6bits: Prefix Len][6bits: Word Len][4bits: Block Len, If Block Len = 0 then Position 5 bytes, otherwise len of block]
+		prefixLen = header >> 10;
+		wordLen = header << 6 >> 10;
+		blockLen = header & 0xF;
+	}
+
 	uint32 getValue(char* bytes, ulong64& value)
 	{
-		uchar8 val = (uchar8)bytes[0];
+		ulong64 val1 = bytes[0];
+		ulong64 val2 = *(uint32*)&bytes[1];
 
-		if (val >> 7) //5 bytes
-		{
-			value = (((ulong64)(uchar8)bytes[0] & 0x7F) << 32 ) | //reset first byte
-					((ulong64)(uchar8)bytes[1] << 24) |
-					((ulong64)(uchar8)bytes[2] << 16) |
-					((ulong64)(uchar8)bytes[3] << 8) |
-					((ulong64)(uchar8)bytes[4]);
+		value = (val1 << 32 | val2);
 
-			return 5;
-		}
-		else //4 bytes
-		{
-			value = ((ulong64)(uchar8)bytes[0] << 24) |
-					((ulong64)(uchar8)bytes[1] << 16) |
-					((ulong64)(uchar8)bytes[2] << 8) |
-					((ulong64)(uchar8)bytes[3]);
+		return 5;
 
-			return 4;
-		}
+		//if (val >> 7) //5 bytes
+		//{
+		//	value = (((ulong64)(uchar8)bytes[0] & 0x7F) << 32 ) | //reset first byte
+		//			((ulong64)(uchar8)bytes[1] << 24) |
+		//			((ulong64)(uchar8)bytes[2] << 16) |
+		//			((ulong64)(uchar8)bytes[3] << 8) |
+		//			((ulong64)(uchar8)bytes[4]);
+
+		//	return 5;
+		//}
+		//else //4 bytes
+		//{
+		//	value = ((ulong64)(uchar8)bytes[0] << 24) |
+		//			((ulong64)(uchar8)bytes[1] << 16) |
+		//			((ulong64)(uchar8)bytes[2] << 8) |
+		//			((ulong64)(uchar8)bytes[3]);
+
+		//	return 4;
+		//}
 	}
 
 	uint32 setValue(ulong64 value, char* bytes)
 	{
-		if (value >> 31) //5 bytes
-		{
-			bytes[0] = value << 24 >> 56 | 0x80; //set first bit
-			bytes[1] = value << 32 >> 56;
-			bytes[2] = value << 40 >> 56;
-			bytes[3] = value << 48 >> 56;
-			bytes[4] = value << 56 >> 56;
+		bytes[0] = value >> 32;
+		*(uint32*)&bytes[1] = (value & 0xFFFFFFFF);
 
-			return 5;
-		}
-		else //4 bytes
-		{
-			bytes[0] = value << 32 >> 56;
-			bytes[1] = value << 40 >> 56;
-			bytes[2] = value << 48 >> 56;
-			bytes[3] = value << 56 >> 56;
+		return 5;
 
-			return 4;
-		}
+		//if (value >> 31) //5 bytes
+		//{
+		//	bytes[0] = value << 24 >> 56 | 0x80; //set first bit
+		//	bytes[1] = value << 32 >> 56;
+		//	bytes[2] = value << 40 >> 56;
+		//	bytes[3] = value << 48 >> 56;
+		//	bytes[4] = value << 56 >> 56;
+
+		//	return 5;
+		//}
+		//else //4 bytes
+		//{
+		//	bytes[0] = value << 32 >> 56;
+		//	bytes[1] = value << 40 >> 56;
+		//	bytes[2] = value << 48 >> 56;
+		//	bytes[3] = value << 56 >> 56;
+
+		//	return 4;
+		//}
 	}
 
 	int compareKeys(const uint32* key1,
@@ -376,12 +407,10 @@ public:
 
 	int readBlock(ulong64 pos,
 				  const uint32* findKey,
-				  bool& isBlockValue,
 				  ulong64& value,
 				  char* valueBlock,
-				  uint32& valueBlockLen)
+				  uchar8& valueBlockLen)
 	{
-		isBlockValue = false;
 		valueBlockLen = 0;
 
 		char currWord[256];
@@ -395,13 +424,12 @@ public:
 		for (uint32 i = 0; i < len;)
 		{
 			//heaer
-			uchar8 header = data[i];
-
-			isBlockValue = header >> 7;
-
-			uchar8 startPos = header << 1 >> 5;
-			uchar8 wordLen = startPos + (header & 0xF);
-
+			ushort16 header = *(ushort16*)&data[i];
+			uchar8 startPos;
+			uchar8 wordLen;
+			
+			unpackHeader(header, startPos, wordLen, valueBlockLen);
+			
 			if (bFirst && startPos)
 			{
 				printf("corrupted data");
@@ -444,7 +472,7 @@ public:
 					}
 					else //if(res > 0) 
 					{
-						if (isBlockValue)
+						if (valueBlockLen)
 						{
 							while (data[i]) //skip block
 							{
@@ -461,7 +489,7 @@ public:
 				}
 				else //found !
 				{
-					if (isBlockValue)
+					if (valueBlockLen)
 					{
 						while (data[i]) //block
 						{
@@ -495,10 +523,9 @@ public:
 	bool getValueByKey(const uint32* key,
 					    ulong64 startPos,
 						ulong64 endPos,
-						bool& isBlock,
 						ulong64& value,
 						char* valueBlock,
-						uint32& valueBlockLen)
+						uchar8& valueBlockLen)
 	{
 		if (endPos - startPos > HARRAY_TEXT_FILE_BLOCK_SIZE)
 		{
@@ -508,7 +535,6 @@ public:
 
 			int res = readBlock(midPos,
 								key,
-								isBlock,
 								value,
 								valueBlock,
 								valueBlockLen);
@@ -521,7 +547,6 @@ public:
 					return getValueByKey(key,
 										 startPos,
 										 midPos,
-										 isBlock,
 										 value,
 										 valueBlock,
 										 valueBlockLen);
@@ -533,7 +558,6 @@ public:
 					return getValueByKey(key,
 										 midPos,
 										 endPos,
-										 isBlock,
 										 value,
 										 valueBlock,
 										 valueBlockLen);
@@ -548,7 +572,6 @@ public:
 		{
 			int res = readBlock(startPos,
 								key,
-								isBlock,
 								value,
 								valueBlock,
 								valueBlockLen);
