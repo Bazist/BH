@@ -612,6 +612,7 @@ private:
 	inline void indexWord(char* word,
 		uint32& len,
 		uint32 docID);
+
 	void rebuildIndex();
 
 	void moveDocFileBlocks(BinaryFile* pSourceDocFile,
@@ -641,24 +642,30 @@ private:
 			//1. Read data from file to buffer
 			if (sourceBuffLength == 0 || sourceBuffPosition + 128 >= MAX_SIZE_BUFFER)
 			{
-				//read new data from file
-				sourceFilePosition += sourceBuffPosition;
-				sourceBuffLength = pSourceDocFile->read(pSourceBuffer, sourceFilePosition, MAX_SIZE_BUFFER);
-
-				sourceBuffPosition = 0;
-
-				if (!sourceBuffLength)
+				if (pSourceDocFile)
 				{
-					return;
+					//read new data from file
+					sourceFilePosition += sourceBuffPosition;
+					sourceBuffLength = pSourceDocFile->read(pSourceBuffer, sourceFilePosition, MAX_SIZE_BUFFER);
+
+					sourceBuffPosition = 0;
+
+					if (!sourceBuffLength)
+					{
+						return;
+					}
 				}
 			}
 
 			//2. Write data to file from buffer
 			if (destBuffPosition + 128 >= destBuffLength)
 			{
-				pDestDocFile->write(pDestBuffer, destBuffPosition);
+				if (pDestDocFile)
+				{
+					pDestDocFile->write(pDestBuffer, destBuffPosition);
 
-				destBuffPosition = 0;
+					destBuffPosition = 0;
+				}
 			}
 
 			//3. Create header
@@ -758,7 +765,8 @@ private:
 				return;
 			}
 
-			if (!pSourceBuffer[sourceBuffPosition]) //is last
+			if (!pSourceBuffer[sourceBuffPosition] ||
+				sourceBuffPosition >= sourceBuffLength) //is last
 			{
 				//pDestBuffer[destBuffPosition++] = 0;
 				sourceBuffPosition++; //with null terminated
@@ -769,11 +777,74 @@ private:
 		return;
 	}
 
+	void mergeDocMemBlocks(uchar8* pSourceBuffer,
+						   uint32 sourceBuffLength,
+						   uchar8* pDestBuffer,
+						   uint32& destBuffPosition,
+						   uint32 baseDocNumber,
+						   uint32& lastDocNumber,
+						   uint32 maxLastNameID)
+	{
+		//insert or update
+		BinaryFile* pSourceDocFile = 0;
+		ulong64 sourceFilePosition = 0;
+		uint32 sourceBuffPosition = 0;
+		
+		BinaryFile* pDestDocFile = 0;
+		uint32 destBuffLength = HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN;
+
+		moveDocFileBlocks(pSourceDocFile,
+						pDestDocFile,
+						pSourceBuffer,
+						pDestBuffer,
+						sourceFilePosition,
+						sourceBuffPosition,
+						sourceBuffLength,
+						destBuffPosition,
+						destBuffLength,
+						HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN,
+						0,
+						lastDocNumber,
+						Info.LastNameIDRAM);
+	}
+
+	void moveDocMemBlocksToFile(BinaryFile* pDestDocFile,
+								uchar8* pSourceBuffer,
+								uint32 sourceBuffLength,
+		
+								uchar8* pDestBuffer,
+								uint32& destBuffPosition,
+								uint32 destBuffLength,
+
+								uint32 baseDocNumber,
+								uint32& lastDocNumber,
+								uint32 maxLastNameID)
+	{
+		//insert or update
+		BinaryFile* pSourceDocFile = 0;
+		ulong64 sourceFilePosition = 0;
+		uint32 sourceBuffPosition = 0;
+
+		moveDocFileBlocks(0,
+						  pDestDocFile,
+						  pSourceBuffer,
+						  pDestBuffer,
+						  sourceFilePosition,
+						  sourceBuffPosition,
+						  sourceBuffLength,
+						  destBuffPosition,
+						  destBuffLength,
+						  MAX_SIZE_BUFFER,
+						  0,
+						  lastDocNumber,
+						  Info.LastNameIDRAM);
+	}
+
 	void moveDocNameFileBlocks(BinaryFile* pSourceDocNameFile,
-		BinaryFile* pDestDocNameFile,
-		ulong64& sourceFilePosition,
-		uchar8* pBuffer,
-		uint32 maxSizeBuffer)
+								BinaryFile* pDestDocNameFile,
+								ulong64& sourceFilePosition,
+								uchar8* pBuffer,
+								uint32 maxSizeBuffer)
 	{
 		while (true)
 		{
@@ -794,6 +865,32 @@ private:
 		return;
 	}
 
+	void calcControlValue(HArrayTextFilePair* pKeysAndValuesHDD,
+						  uint32 currKeyHDD,
+						  uint32 docTempPosition,
+						  uint32& controlValue)
+	{
+		for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
+		{
+			controlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
+		}
+
+		controlValue += docTempPosition;
+	}
+
+	void calcControlValue(HArrayFixPair* pKeysAndValuesRAM,
+						  uint32 currKeyRAM,
+						  uint32 docTempPosition,
+						  uint32& controlValue)
+	{
+		for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
+		{
+			controlValue += pKeysAndValuesRAM[currKeyRAM].Key[i];
+		}
+
+		controlValue += docTempPosition;
+	}
+	
 	/*
 	void moveDocNameFileBlocksToRAM(BinaryFile* pSourceDocNameFile,
 		DocumentsName* pDocumentsName,

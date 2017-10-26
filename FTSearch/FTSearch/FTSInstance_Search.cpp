@@ -136,7 +136,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
-		char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+		uchar8 valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
 		uchar8 valueBlockLen;
 
 		ulong64 sourceFilePosition;
@@ -521,7 +521,7 @@ void FTSInstance::calculateTrend(const char* phrase,
 	if(Configuration.MemoryMode != IN_MEMORY_MODE
 		&& Info.CountWordsHDD)
 	{
-		char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+		uchar8 valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
 		uchar8 valueBlockLen;
 
 		ulong64 sourceFilePosition;
@@ -615,7 +615,7 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 		if(Configuration.MemoryMode != IN_MEMORY_MODE
 			&& Info.CountWordsHDD)
 		{
-			char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+			uchar8 valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
 			uchar8 valueBlockLen;
 
 			ulong64 sourceFilePosition;
@@ -739,7 +739,7 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 		if(Configuration.MemoryMode != IN_MEMORY_MODE
 			&& Info.CountWordsHDD)
 		{
-			char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+			uchar8 valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
 			uchar8 valueBlockLen;
 
 			ulong64 sourceFilePosition;
@@ -1000,7 +1000,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 					if(Configuration.MemoryMode != IN_MEMORY_MODE
 						&& Info.CountWordsHDD)
 					{
-						char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+						uchar8 valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
 						uchar8 valueBlockLen;
 
 						ulong64 sourceFilePosition;
@@ -1588,7 +1588,7 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 			if(Configuration.MemoryMode != IN_MEMORY_MODE
 				&& Info.CountWordsHDD)
 			{
-				char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+				uchar8 valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
 				uchar8 valueBlockLen;
 
 				ulong64 sourceFilePosition;

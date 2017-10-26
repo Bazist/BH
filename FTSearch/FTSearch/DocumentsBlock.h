@@ -313,7 +313,7 @@ public:
 		//pBinaryFile->write(pBuffer, length);
 	}
 
-	void writeBlocksToBuffer(char* pBuffer,
+	void writeBlocksToBuffer(uchar8* pBuffer,
 							 uint32 bufferSize,
 							 uint32& writedLen)
 	{
@@ -377,7 +377,7 @@ public:
 		writedLen++;
 	}
 
-	void readBlocksFromBuffer(char* buffer,
+	void readBlocksFromBuffer(uchar8* buffer,
 							  uint32 bufferLen)
 	{
 		uint32 bufferPosition = 0;

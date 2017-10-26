@@ -878,21 +878,14 @@ void FTSInstance::updateIndex()
 					docPosition = docPosition;
 				}*/
 
-				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
+				ulong64 docTempPosition = pDocFileTemp->getFileSize() + destBuffPosition;
 		
 				//insert or update
 				if (!haWordsHDDTemp.insert(pKeysAndValuesRAM[currKeyRAM].Key,
 											docTempPosition,
 											pDocumentsBlock))
 				{
-					//check errors ===========================================
-					for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
-					{
-						newControlValue += pKeysAndValuesRAM[currKeyRAM].Key[i];
-					}
-
-					newControlValue += docTempPosition;
-					//========================================================
+					calcControlValue(pKeysAndValuesRAM, currKeyRAM, docTempPosition, newControlValue);
 
 					uint32 lastDocNumber = 0;
 
@@ -919,127 +912,293 @@ void FTSInstance::updateIndex()
 			}
 			else if(compareResult == 0) //KEY IS EXISTS ON RAM AND HDD ===================================================
 			{
+				
 				//get positions
 				uint32 id = pKeysAndValuesRAM[currKeyRAM].Value;
 
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(id);
-		
-				ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
-
-				/*if(isWord("базист", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
-				{
-					docPosition = docPosition;
-				}*/
-
-				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
-		
-				//update
-				haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 				
-				//check errors ===========================================
-				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
+				uchar8 valueBlockRAM[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+				uint32 valueBlockLenRAM = 0;
+
+				pDocumentsBlock->writeBlocksToBuffer(valueBlockRAM,
+													 HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN,
+													 valueBlockLenRAM);
+		
+				//CASE 1: RAM block less than 16 and HDD block less than 16 =======================================================
+				if (valueBlockLenRAM < HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN &&
+					pKeysAndValuesHDD[currKeyHDD].ValueBlockLen > 0 &&
+					pKeysAndValuesHDD[currKeyHDD].ValueBlockLen < HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN)
 				{
-					newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
-				}
+					//CASE 2: RAM block + HDD block < 16, inject block =======================================================
+					if (valueBlockLenRAM + pKeysAndValuesHDD[currKeyHDD].ValueBlockLen < HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN)
+					{
+						//Merge valueBlockHDD + valueBlockRAM into one mem block
+						uchar8 destBuffer[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN + 1];
+						uint32 destBuffPosition = 0;
 
-				newControlValue += docTempPosition;
-				//========================================================
+						uint32 lastDocNumber = 0;
+						
+						//Move first mem block =======================================================
+						mergeDocMemBlocks(pKeysAndValuesHDD[currKeyHDD].ValueBlock,
+										  pKeysAndValuesHDD[currKeyHDD].ValueBlockLen,
+										  destBuffer,
+										  destBuffPosition,
+										  0,
+										  lastDocNumber,
+										  Info.LastNameIDRAM);
+						
+						//Move second mem block =======================================================
+						mergeDocMemBlocks(valueBlockRAM,
+										  valueBlockLenRAM,
+										  destBuffer,
+										  destBuffPosition,
+										  lastDocNumber,
+										  lastDocNumber,
+										  Info.LastNameIDRAM);
 
-				//insert or update
-				uint32 lastDocNumber = 0;
+						//Insert merged block into dictionary =======================================================
+						haWordsHDDTemp.insertBlock(pKeysAndValuesHDD[currKeyHDD].Key,
+												   destBuffer,
+												   destBuffPosition);
+					}
+					//CASE 3: RAM block + HDD block > 16, inject position =======================================================
+					else
+					{
+						ulong64 docTempPosition = pDocFileTemp->getFileSize() + destBuffPosition;
 
-				//A. Read and save blocks from HDD
-				if(docPosition == sourceFilePosition + sourceBuffPosition)
-				{
-					moveDocFileBlocks(pDocFile, 
-									  pDocFileTemp, 
-									  pSourceBuffer, 
-									  pDestBuffer, 
-									  sourceFilePosition, 
-									  sourceBuffPosition, 
-									  sourceBuffLength, 
-									  destBuffPosition, 
-									  destBuffLength,
-									  MAX_SIZE_BUFFER,
-									  0,
-									  lastDocNumber,
-									  Info.LastNameIDRAM);
+						uint32 lastDocNumber = 0;
+
+						//Move mem block to doc file  =======================================================
+						moveDocMemBlocksToFile(pDocFileTemp,
+											   pKeysAndValuesHDD[currKeyHDD].ValueBlock,
+											   pKeysAndValuesHDD[currKeyHDD].ValueBlockLen,
+											   pDestBuffer,
+											   destBuffPosition,
+											   destBuffLength,
+											   0,
+											   lastDocNumber,
+											   Info.LastNameIDRAM);
+
+						//Move mem block to doc file =======================================================
+						moveDocMemBlocksToFile(pDocFileTemp,
+											   valueBlockRAM,
+											   valueBlockLenRAM,
+											   pDestBuffer,
+											   destBuffPosition,
+											   destBuffLength,
+											   lastDocNumber,
+											   lastDocNumber,
+											   Info.LastNameIDRAM);
+
+						//Insert position block into dictionary =======================================================
+						haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key,
+												   docTempPosition);
+					}
 				}
 				else
 				{
-					logError("Read corrupted.");
-					goto destroy;
+					//CASE 4: RAM block less than 16 and HDD block more than 16  =======================================================
+					if (valueBlockLenRAM < HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN)
+					{
+						ulong64 docTempPosition = pDocFileTemp->getFileSize() + destBuffPosition;
+
+						uint32 lastDocNumber = 0;
+
+						//Save file block HDD ==================================================
+						ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
+
+						calcControlValue(pKeysAndValuesHDD, currKeyHDD, docTempPosition, newControlValue);
+
+						//Read and save blocks from HDD  ==========================================
+						if (docPosition == sourceFilePosition + sourceBuffPosition)
+						{
+							moveDocFileBlocks(pDocFile,
+											pDocFileTemp,
+											pSourceBuffer,
+											pDestBuffer,
+											sourceFilePosition,
+											sourceBuffPosition,
+											sourceBuffLength,
+											destBuffPosition,
+											destBuffLength,
+											MAX_SIZE_BUFFER,
+											0,
+											lastDocNumber,
+											Info.LastNameIDRAM);
+						}
+						else
+						{
+							logError("Read corrupted.");
+							goto destroy;
+						}
+						
+						//Save mem block RAM ==========================================
+						moveDocMemBlocksToFile(pDocFileTemp,
+											valueBlockRAM,
+											valueBlockLenRAM,
+											pDestBuffer,
+											destBuffPosition,
+											destBuffLength,
+											lastDocNumber,
+											lastDocNumber,
+											Info.LastNameIDRAM);
+
+						//Save position in dictionary  ==========================================
+						haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key,
+												   docTempPosition);
+					}
+					//CASE 5: RAM block more than 16 and HDD block less than 16
+					else if (pKeysAndValuesHDD[currKeyHDD].ValueBlockLen < HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN)
+					{
+						ulong64 docTempPosition = pDocFileTemp->getFileSize() + destBuffPosition;
+
+						uint32 lastDocNumber = 0;
+
+						//Save mem block RAM ===================================================
+						moveDocMemBlocksToFile(pDocFileTemp,
+												pKeysAndValuesHDD[currKeyHDD].ValueBlock,
+												pKeysAndValuesHDD[currKeyHDD].ValueBlockLen,
+												pDestBuffer,
+												destBuffPosition,
+												destBuffLength,
+												0,
+												lastDocNumber,
+												Info.LastNameIDRAM);
+
+						//Save file block HDD ==================================================
+						ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
+
+						calcControlValue(pKeysAndValuesHDD, currKeyHDD, docTempPosition, newControlValue);
+
+						//A. Read and save blocks from HDD
+						if (docPosition == sourceFilePosition + sourceBuffPosition)
+						{
+							moveDocFileBlocks(pDocFile,
+											pDocFileTemp,
+											pSourceBuffer,
+											pDestBuffer,
+											sourceFilePosition,
+											sourceBuffPosition,
+											sourceBuffLength,
+											destBuffPosition,
+											destBuffLength,
+											MAX_SIZE_BUFFER,
+											lastDocNumber,
+											lastDocNumber,
+											Info.LastNameIDRAM);
+						}
+						else
+						{
+							logError("Read corrupted.");
+							goto destroy;
+						}
+
+						//Save position in dictionary  ==========================================
+						haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key,
+													docTempPosition);
+					}
+					//CASE 6: RAM block more than 16 and HDD block more than 16 ===========================================
+					else
+					{
+						ulong64 docTempPosition = pDocFileTemp->getFileSize() + destBuffPosition;
+						
+						uint32 lastDocNumber = 0;
+
+						ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
+
+						calcControlValue(pKeysAndValuesHDD, currKeyHDD, docTempPosition, newControlValue);
+
+						//Read and save blocks from HDD  =======================================================
+						if (docPosition == sourceFilePosition + sourceBuffPosition)
+						{
+							moveDocFileBlocks(pDocFile,
+												pDocFileTemp,
+												pSourceBuffer,
+												pDestBuffer,
+												sourceFilePosition,
+												sourceBuffPosition,
+												sourceBuffLength,
+												destBuffPosition,
+												destBuffLength,
+												MAX_SIZE_BUFFER,
+												0,
+												lastDocNumber,
+												Info.LastNameIDRAM);
+						}
+						else
+						{
+							logError("Read corrupted.");
+							goto destroy;
+						}
+
+						//Save blocks from RAM =======================================================
+						pDocumentsBlock->writeBlocksToFile(pDocFileTemp,
+															pDestBuffer,
+															MAX_SIZE_BUFFER,
+															destBuffPosition,
+															0,
+															lastDocNumber);
+
+						pDestBuffer[destBuffPosition++] = 0; //null terminated
+
+						//Save position in dictionary  ===============================================
+						haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key,
+												   docTempPosition);
+					}
 				}
 				
-				//B. Save blocks from RAM
-				pDocumentsBlock->writeBlocksToFile(pDocFileTemp, 
-												   pDestBuffer, 
-												   MAX_SIZE_BUFFER, 
-												   destBuffPosition,
-												   0,
-												   lastDocNumber); 
-		
-				pDestBuffer[destBuffPosition++] = 0; //null terminated
-		
-				/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
-				{
-					pDocumentsBlock->clear();
-					pDocumentsBlockPool->releaseObject(pDocumentsBlock);
-				}*/
-
 				currKeyRAM++;
 				currKeyHDD++;
 			}
 			else //KEY IS EXISTS ONLY ON HDD ===================================================
 			{
-				//get positions
-				ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
-
-				/*if(isWord("базист", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
+				if (pKeysAndValuesHDD[currKeyHDD].ValueBlockLen) //block
 				{
-					docPosition = docPosition;
-				}*/
-
-				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
-		
-				//update
-				haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
-
-				//check errors ===========================================
-				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
-				{
-					newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
+					haWordsHDDTemp.insertBlock(pKeysAndValuesHDD[currKeyHDD].Key,
+											   pKeysAndValuesHDD[currKeyHDD].ValueBlock,
+											   pKeysAndValuesHDD[currKeyHDD].ValueBlockLen);
 				}
-
-				newControlValue += docTempPosition;
-				//========================================================
-
-				uint32 lastDocNumber = 0;
-
-				//Read and save blocks from HDD
-				if(docPosition == sourceFilePosition + sourceBuffPosition)
+				else //value
 				{
-					moveDocFileBlocks(pDocFile, 
-									  pDocFileTemp, 
-									  pSourceBuffer, 
-									  pDestBuffer, 
-									  sourceFilePosition, 
-									  sourceBuffPosition, 
-									  sourceBuffLength, 
-									  destBuffPosition, 
-									  destBuffLength,
-									  MAX_SIZE_BUFFER,
-									  0,
-									  lastDocNumber,
-									  Info.LastNameIDRAM);
+					//get positions
+					ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
+
+					ulong64 docTempPosition = pDocFileTemp->getFileSize() + destBuffPosition;
+
+					//update
+					haWordsHDDTemp.insertValue(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
+
+					calcControlValue(pKeysAndValuesHDD, currKeyHDD, docTempPosition, newControlValue);
+					//========================================================
+
+					uint32 lastDocNumber = 0;
+
+					//Read and save blocks from HDD
+					if (docPosition == sourceFilePosition + sourceBuffPosition)
+					{
+						moveDocFileBlocks(pDocFile,
+							pDocFileTemp,
+							pSourceBuffer,
+							pDestBuffer,
+							sourceFilePosition,
+							sourceBuffPosition,
+							sourceBuffLength,
+							destBuffPosition,
+							destBuffLength,
+							MAX_SIZE_BUFFER,
+							0,
+							lastDocNumber,
+							Info.LastNameIDRAM);
+					}
+					else
+					{
+						logError("Read corrupted.");
+						goto destroy;
+					}
+
+					pDestBuffer[destBuffPosition++] = 0; //null terminated
 				}
-				else
-				{
-					logError("Read corrupted.");
-					goto destroy;
-				}
-				
-				pDestBuffer[destBuffPosition++] = 0; //null terminated
 		
 				currKeyHDD++;
 			}

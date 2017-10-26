@@ -23,7 +23,7 @@ public:
 	uint32* Key; //use additional memory
 	ulong64 Value;
 
-	char ValueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+	uchar8 ValueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
 	uchar8 ValueBlockLen;
 
 	static uint32 calcArrayMemory(uint32 count, uint32 countKeySegments)
@@ -162,7 +162,7 @@ public:
 	{
 		if (pDocumentsBlock)
 		{
-			char valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
+			uchar8 valueBlock[HARRAY_TEXT_FILE_MAX_VALUE_BLOCK_LEN];
 
 			uint32 valueBlockLen = 0;
 
@@ -275,7 +275,7 @@ public:
 	}
 
 	void insertBlock(const uint32* key,
-					 char* valueBlock,
+					 uchar8* valueBlock,
 					 uint32 valueBlockLen)
 	{
 		char word[HARRAY_TEXT_FILE_MAX_WORD_LEN];
@@ -357,7 +357,7 @@ public:
 
 	bool getValueByKey(const uint32* key,
 					   ulong64& value,
-					   char* valueBlock,
+					   uchar8* valueBlock,
 					   uchar8& valueBlockLen)
 	{
 		//HArrayVisitor::getWord(templateWord, key, maxKeySegments * 4);
@@ -472,7 +472,7 @@ public:
 	int readBlock(ulong64 pos,
 				  const uint32* findKey,
 				  ulong64& value,
-				  char* valueBlock,
+				  uchar8* valueBlock,
 				  uchar8& valueBlockLen)
 	{
 		valueBlockLen = 0;
@@ -576,7 +576,7 @@ public:
 					    ulong64 startPos,
 						ulong64 endPos,
 						ulong64& value,
-						char* valueBlock,
+						uchar8* valueBlock,
 						uchar8& valueBlockLen)
 	{
 		if (endPos - startPos > HARRAY_TEXT_FILE_BLOCK_SIZE)
