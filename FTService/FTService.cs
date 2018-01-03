@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -221,51 +222,94 @@ namespace FTServiceWCF
         }
 
         [OperationContract]
-        public List<FTSearch.Result> SearchPhrase(string phrase, string templateName, int skip, int take)
+        public List<FTSearch.Result> SearchPhrase(string phrase,
+                                                  string templateName,
+                                                  int skip,
+                                                  int take)
         {
             return TryCatch<List<FTSearch.Result>>(() =>
              {
                  if (!IsStarted())
                      throw new Exception("Service is not started.");
 
-                 var result = new List<FTSearch.Result>();
-
-                 foreach (var fts in Instances)
-                 {
-                     var sr = fts.SearchPhrase(phrase, templateName, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
-
-                     if (skip > sr.FullCountMatches) //skip all results
-                      {
-                         skip -= Convert.ToInt32(sr.FullCountMatches);
-                     }
-                     else
-                     {
-                         if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
-                          {
-                             result.AddRange(sr.Results.Take(take - result.Count));
-
-                             break;
-                         }
-                         else //go to next instance
-                          {
-                             if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
-                              {
-                                 result.AddRange(sr.Results);
-
-                                 skip = 0;
-                             }
-                             else //take part results from current instance, exit
-                              {
-                                 result.AddRange(sr.Results.Take(take - result.Count));
-
-                                 break;
-                             }
-                         }
-                     }
-                 }
-
-                 return result;
+                 return GetPortion(ref skip,
+                                   take,
+                                   fts => fts.SearchPhrase(phrase,
+                                                           templateName,
+                                                           int.MinValue,
+                                                           int.MaxValue,
+                                                           skip));
              });
+        }
+        
+        private List<FTSearch.Result> GetPortion(ref int skip,
+                                                 int take,
+                                                 Func<FTSearch, FTSearch.SearchResult> searchFunc)
+        {
+            var result = new List<FTSearch.Result>();
+
+            foreach (var fts in Instances)
+            {
+                //fts.SearchQuery()
+                var sr = searchFunc(fts); 
+
+                if (skip > sr.FullCountMatches) //skip all results
+                {
+                    skip -= Convert.ToInt32(sr.FullCountMatches);
+                }
+                else
+                {
+                    if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
+                    {
+                        result.AddRange(sr.Results.Take(take - result.Count));
+
+                        break;
+                    }
+                    else //go to next instance
+                    {
+                        if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
+                        {
+                            result.AddRange(sr.Results);
+
+                            skip = 0;
+                        }
+                        else //take part results from current instance, exit
+                        {
+                            result.AddRange(sr.Results.Take(take - result.Count));
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        [OperationContract]
+        public List<FTSearch.Result> SearchQuery(List<FTSearch.Selector> selectors,
+                                                 int minPage,
+                                                 int maxPage,
+                                                 int skip,
+                                                 bool agregateBySubject)
+        {
+            return TryCatch<List<FTSearch.Result>>(() =>
+            {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
+
+                //TODO merge logic on instance with logic on shards
+                int shardSkip = 0;
+                int shardTake = int.MaxValue;
+
+                return GetPortion(ref shardSkip,
+                                  shardTake,
+                                  fts => fts.SearchQuery(selectors,
+                                                         minPage,
+                                                         maxPage,
+                                                         skip,
+                                                         agregateBySubject));
+            });
         }
 
         [OperationContract]
@@ -639,6 +683,12 @@ namespace FTServiceWCF
                 var basicHttpBinding = new BasicHttpBinding();
                 basicHttpBinding.MaxReceivedMessageSize = int.MaxValue;
                 basicHttpBinding.MaxBufferSize = int.MaxValue;
+
+                var smb = new ServiceMetadataBehavior();
+                smb.HttpGetEnabled = true;
+                smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
+
+                _host.Description.Behaviors.Add(smb);
 
                 _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
                 _host.Open();

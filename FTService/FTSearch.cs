@@ -720,9 +720,9 @@ namespace FTServiceWCF
 
         public unsafe SearchResult SearchPhrase(string phrase,
                                                 string templateName,
-                                                uint minPage,
-                                                uint maxPage,
-                                                uint skip)
+                                                int minPage,
+                                                int maxPage,
+                                                int skip)
         {
             SearchResult sr = new SearchResult();
             
@@ -731,12 +731,12 @@ namespace FTServiceWCF
             {
                 IntPtr pRelevantResult = searchPhraseDLL(InstanceNumber,
                                                          pPhrase,
-                                                         (System.UInt32)phrase.Length,
+                                                         Convert.ToUInt32(phrase.Length),
                                                          pTemplateName,
-                                                         (System.UInt32)templateName.Length,
-                                                         minPage,
-                                                         maxPage,
-                                                         skip);
+                                                         Convert.ToUInt32(templateName.Length),
+                                                         Convert.ToUInt32(minPage),
+                                                         Convert.ToUInt32(maxPage),
+                                                         Convert.ToUInt32(skip));
 
                 RelevantResultDLL relevantResultDLL = (RelevantResultDLL)Marshal.PtrToStructure(pRelevantResult, typeof(RelevantResultDLL));
 
@@ -865,10 +865,10 @@ namespace FTServiceWCF
             return relevantResult;
         }
 
-        public unsafe List<string> SearchQuery(List<Selector> selectors,
-                                               uint minPage,
-                                               uint maxPage,
-                                               uint skip,
+        public unsafe SearchResult SearchQuery(List<Selector> selectors,
+                                               int minPage,
+                                               int maxPage,
+                                               int skip,
                                                bool agregateBySubject)
         {
             IntPtr[] ptrs = new IntPtr[selectors.Count];
@@ -881,12 +881,18 @@ namespace FTServiceWCF
             }
 
             //query
-            IntPtr pQueryResult = searchQueryDLL(InstanceNumber, ptrs, (uint)selectors.Count, minPage, maxPage, skip, agregateBySubject);
+            IntPtr pQueryResult = searchQueryDLL(InstanceNumber,
+                                                 ptrs,
+                                                 Convert.ToUInt32(selectors.Count),
+                                                 Convert.ToUInt32(minPage),
+                                                 Convert.ToUInt32(maxPage),
+                                                 Convert.ToUInt32(skip),
+                                                 agregateBySubject);
 
             //Console.WriteLine(pQueryResult);
 
             //get results
-            List<string> queryResult = new List<string>();
+            SearchResult sr = new SearchResult();
 
             QueryResultDLL queryResultDLL = (QueryResultDLL)Marshal.PtrToStructure(pQueryResult, typeof(QueryResultDLL));
             int rowSize = Marshal.SizeOf(typeof(QueryRowDLL));
@@ -904,7 +910,7 @@ namespace FTServiceWCF
 
                     string text = docName + ";" + Encoding.GetString(queryRowDLL.Text).Replace("\0", "");
 
-                    queryResult.Add(text);
+                    sr.Results.Add(new Result { Name = text });
                 }
             }
 
@@ -917,7 +923,7 @@ namespace FTServiceWCF
             //releaseQueryResult
             releaseQueryResultDLL(InstanceNumber, pQueryResult);
 
-            return queryResult;
+            return sr;
         }
 
         public unsafe string CalculateTrend(string phrase, uint count, uint minPage, uint maxPage)
