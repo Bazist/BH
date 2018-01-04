@@ -47,6 +47,10 @@
     <Compile Include="FTSearch.cs" />
     <Compile Include="FTService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stemmer\Among.cs" />
+    <Compile Include="Stemmer\EnglishStemmer.cs" />
+    <Compile Include="Stemmer\RussianStemmer.cs" />
+    <Compile Include="Stemmer\StemmerOperations.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

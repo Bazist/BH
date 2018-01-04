@@ -78,12 +78,6 @@ namespace FTServiceWCF
             public ResultPosition[] Positions;
         }
 
-        public class RelevantResult
-        {
-            public string MatchWords;
-            public List<string> Results = new List<string>();
-        }
-
         public class Selector
         {
             public string Name;
@@ -286,7 +280,7 @@ namespace FTServiceWCF
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] MaxBound = new byte[128];
 
-            public System.UInt32 pDictionary;
+            IntPtr pDictionary;
 
             public System.UInt32 AutoStemmingOn;
             public System.Byte RangeType;      //0 - no range, 1 - range of numbers
@@ -715,6 +709,7 @@ namespace FTServiceWCF
         public class SearchResult
         {
             public List<Result> Results = new List<Result>();
+            public string MatchWords;
             public uint FullCountMatches = 0;
         }
 
@@ -802,28 +797,32 @@ namespace FTServiceWCF
             }
         }
 
-        public unsafe RelevantResult SearchPhraseRel(string phrase,
-                                                     uint minPage,
-                                                     uint maxPage)
+        public unsafe SearchResult SearchPhraseRel(string phrase,
+                                                   int minPage,
+                                                   int maxPage)
         {
-            RelevantResult relevantResult = new RelevantResult();
+            SearchResult result = new SearchResult();
 
             //byte[] nameBytes = new byte[256];
 
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase))
             {
-                IntPtr pRelevantResult = searchPhraseRelDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, minPage, maxPage);
+                IntPtr pRelevantResult = searchPhraseRelDLL(InstanceNumber,
+                                                            pPhrase,
+                                                            Convert.ToUInt32(phrase.Length),
+                                                            Convert.ToUInt32(minPage),
+                                                            Convert.ToUInt32(maxPage));
 
                 RelevantResultDLL relevantResultDLL = (RelevantResultDLL)Marshal.PtrToStructure(pRelevantResult, typeof(RelevantResultDLL));
 
-                relevantResult.MatchWords = relevantResultDLL.MatchWords;
+                result.MatchWords = relevantResultDLL.MatchWords;
 
                 for (uint i = 0; i < relevantResultDLL.CountMatches; i++)
                 {
                     //get name of document
                     //getDocumentNameByIDDLL(InstanceNumber, relevantResultDLL.Matches[i], pName, DOC_NAME_LENGTH);
 
-                    relevantResult.Results.Add(relevantResultDLL.Matches[i].Name);
+                    result.Results.Add(new Result { Name = relevantResultDLL.Matches[i].Name });
                 }
 
                 releaseRelevantResultDLL(InstanceNumber, pRelevantResult);
@@ -831,14 +830,14 @@ namespace FTServiceWCF
                 //Marshal.Release(pRelevantResult);
             }
 
-            return relevantResult;
+            return result;
         }
 
-        public unsafe RelevantResult SearchNewMems(DateTime startDate1,
-                                                   DateTime startDate2,
-                                                   DateTime endDate2)
+        public unsafe SearchResult SearchNewMems(DateTime startDate1,
+                                                 DateTime startDate2,
+                                                 DateTime endDate2)
         {
-            RelevantResult relevantResult = new RelevantResult();
+            var result = new SearchResult();
 
             IntPtr pRelevantResult = searchNewMemsDLL(InstanceNumber,
                                                       (uint)startDate1.Year,
@@ -854,7 +853,7 @@ namespace FTServiceWCF
             {
                 RelevantResultDLL relevantResultDLL = (RelevantResultDLL)Marshal.PtrToStructure(pRelevantResult, typeof(RelevantResultDLL));
 
-                relevantResult.MatchWords = relevantResultDLL.MatchWords;
+                result.MatchWords = relevantResultDLL.MatchWords;
 
                 releaseRelevantResultDLL(InstanceNumber, pRelevantResult);
             }
@@ -862,7 +861,7 @@ namespace FTServiceWCF
             //Marshal.Release(pRelevantResult);
 
 
-            return relevantResult;
+            return result;
         }
 
         public unsafe SearchResult SearchQuery(List<Selector> selectors,
@@ -926,17 +925,21 @@ namespace FTServiceWCF
             return sr;
         }
 
-        public unsafe string CalculateTrend(string phrase, uint count, uint minPage, uint maxPage)
+        public unsafe string CalculateTrend(string phrase, int count, int minPage, int maxPage)
         {
             StringBuilder sb = new StringBuilder();
-
-            RelevantResult relevantResult = new RelevantResult();
 
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase))
             {
                 fixed (uint* points = new uint[count])
                 {
-                    calculateTrendDLL(InstanceNumber, pPhrase, (System.UInt32)phrase.Length, points, count, minPage, maxPage);
+                    calculateTrendDLL(InstanceNumber,
+                                      pPhrase,
+                                      Convert.ToUInt32(phrase.Length),
+                                      points,
+                                      Convert.ToUInt32(count),
+                                      Convert.ToUInt32(minPage),
+                                      Convert.ToUInt32(maxPage));
 
                     for (int i = 0; i < count; i++)
                     {
@@ -948,9 +951,9 @@ namespace FTServiceWCF
             return sb.ToString();
         }
 
-        public unsafe RelevantResult SearchHtmlSeldomWords(string text)
+        public unsafe SearchResult SearchHtmlSeldomWords(string text)
         {
-            RelevantResult relevantResult = new RelevantResult();
+            SearchResult sr = new SearchResult();
 
             fixed (Byte* pText = Encoding.GetBytes(text))
             {
@@ -965,7 +968,7 @@ namespace FTServiceWCF
                 ////Marshal.Release(pRelevantResult);
             }
 
-            return relevantResult;
+            return sr;
         }
 
         public FTSInstanceInfo GetInfo()

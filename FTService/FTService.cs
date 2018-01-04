@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FTSearchWCF.Stemmers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -222,12 +223,12 @@ namespace FTServiceWCF
         }
 
         [OperationContract]
-        public List<FTSearch.Result> SearchPhrase(string phrase,
+        public FTSearch.SearchResult SearchPhrase(string phrase,
                                                   string templateName,
                                                   int skip,
                                                   int take)
         {
-            return TryCatch<List<FTSearch.Result>>(() =>
+            return TryCatch(() =>
              {
                  if (!IsStarted())
                      throw new Exception("Service is not started.");
@@ -242,11 +243,11 @@ namespace FTServiceWCF
              });
         }
         
-        private List<FTSearch.Result> GetPortion(ref int skip,
+        private FTSearch.SearchResult GetPortion(ref int skip,
                                                  int take,
                                                  Func<FTSearch, FTSearch.SearchResult> searchFunc)
         {
-            var result = new List<FTSearch.Result>();
+            FTSearch.SearchResult result = new FTSearch.SearchResult();
 
             foreach (var fts in Instances)
             {
@@ -261,21 +262,24 @@ namespace FTServiceWCF
                 {
                     if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
                     {
-                        result.AddRange(sr.Results.Take(take - result.Count));
+                        result.MatchWords += sr.MatchWords;
+                        result.Results.AddRange(sr.Results.Take(take - result.Results.Count));
 
                         break;
                     }
                     else //go to next instance
                     {
-                        if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
+                        if (result.Results.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
                         {
-                            result.AddRange(sr.Results);
+                            result.MatchWords += sr.MatchWords;
+                            result.Results.AddRange(sr.Results);
 
                             skip = 0;
                         }
                         else //take part results from current instance, exit
                         {
-                            result.AddRange(sr.Results.Take(take - result.Count));
+                            result.MatchWords += sr.MatchWords;
+                            result.Results.AddRange(sr.Results.Take(take - result.Results.Count));
 
                             break;
                         }
@@ -287,13 +291,13 @@ namespace FTServiceWCF
         }
 
         [OperationContract]
-        public List<FTSearch.Result> SearchQuery(List<FTSearch.Selector> selectors,
+        public FTSearch.SearchResult SearchQuery(List<FTSearch.Selector> selectors,
                                                  int minPage,
                                                  int maxPage,
                                                  int skip,
                                                  bool agregateBySubject)
         {
-            return TryCatch<List<FTSearch.Result>>(() =>
+            return TryCatch(() =>
             {
                 if (!IsStarted())
                     throw new Exception("Service is not started.");
@@ -309,6 +313,43 @@ namespace FTServiceWCF
                                                          maxPage,
                                                          skip,
                                                          agregateBySubject));
+            });
+        }
+
+        [OperationContract]
+        public FTSearch.SearchResult SearchPhraseRel(string phrase, int minPage, int maxPage, int skip, int take)
+        {
+            return TryCatch(() =>
+            {
+                return GetPortion(ref skip,
+                                      take,
+                                      fts => fts.SearchPhraseRel(phrase,
+                                                                 minPage,
+                                                                 maxPage));
+            });
+        }
+
+        private static RussianStemmer _rusStemmer = new RussianStemmer();
+        private static EnglishStemmer _engStemmer = new EnglishStemmer();
+
+        [OperationContract]
+        public string StemContent(string contentText)
+        {
+            contentText = _rusStemmer.StemContent(contentText);
+            contentText = _engStemmer.StemContent(contentText);
+            
+            return contentText.ToLower();
+        }
+
+        [OperationContract]
+        public string CalculateTrend(string phrase, int count, int minPage, int maxPage)
+        {
+            return TryCatch(() =>
+            {
+                return ActiveInstance.CalculateTrend(phrase,
+                                                     count,
+                                                     minPage,
+                                                     maxPage);
             });
         }
 

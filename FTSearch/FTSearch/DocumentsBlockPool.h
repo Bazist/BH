@@ -31,25 +31,8 @@ public:
 		uint32 page = Count>>16;
 		uint32 index = Count&0xFFFF;
 
-		if(Count >= Size)
-		{
-			if(page >= MAX_POOL_PAGES)
-			{
-				sprintf(pLastErrorMessage, "DocumentsBlockPool is full.");
-				return 0;
-			}
-
-			DocumentsBlock* pDocumentsBlocks = new DocumentsBlock[MAX_SHORT];
-			pDocumentsBlockLists[page] = pDocumentsBlocks;
-
-			for(uint32 i=0; i<MAX_SHORT; i++)
-			{
-				pDocumentsBlockLists[page][i].pBlockMemoryPool = pBlockMemoryPool;
-				pDocumentsBlockLists[page][i].pPostSelectorPool = pPostSelectorPool;
-			}
-			
-			Size += MAX_SHORT;
-		}
+		if (!checkSize(page))
+			return 0;
 		
 		DocumentsBlock* pDocumentsBlock = &pDocumentsBlockLists[page][index];
 		
@@ -58,9 +41,38 @@ public:
 		return pDocumentsBlock;
 	}
 
+	bool checkSize(int page)
+	{
+		if (Count >= Size)
+		{
+			if (page >= MAX_POOL_PAGES)
+			{
+				sprintf(pLastErrorMessage, "DocumentsBlockPool is full.");
+
+				return false;
+			}
+
+			DocumentsBlock* pDocumentsBlocks = new DocumentsBlock[MAX_SHORT];
+			pDocumentsBlockLists[page] = pDocumentsBlocks;
+
+			for (uint32 i = 0; i<MAX_SHORT; i++)
+			{
+				pDocumentsBlockLists[page][i].pBlockMemoryPool = pBlockMemoryPool;
+				pDocumentsBlockLists[page][i].pPostSelectorPool = pPostSelectorPool;
+			}
+
+			Size += MAX_SHORT;
+		}
+
+		return true;
+	}
+
 	DocumentsBlock* getTempObject()
 	{
 		//pDocumentsBlockLists[0][0].clear();
+
+		if (!checkSize(0))
+			return 0;
 
 		return &pDocumentsBlockLists[0][0];
 	}

@@ -3,7 +3,7 @@
 
 void FTSInstance::createIndex()
 {
-	if (!checkStartedInstance(false))
+	if (!checkStartedInstance(true))
 		return;
 
 	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
@@ -240,8 +240,6 @@ void FTSInstance::createIndex()
 	memset(pBuffer, 0, MAX_SIZE_BUFFER);
 
 	HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
-
-	isStarted = true;
 }
 
 void FTSInstance::updateIndex()
@@ -1791,8 +1789,6 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 			Info.CountWordsRAM = 0;
 		}
-
-		isStarted = true;
 	}
 	else
 	{

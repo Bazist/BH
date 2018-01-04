@@ -107,6 +107,8 @@ public:
 		init();
 
 		openOrCreateIndex(onlyCheckIndex);
+
+		isStarted = true;
 	}
 
 	uint32 getSearchPoolsMemory();

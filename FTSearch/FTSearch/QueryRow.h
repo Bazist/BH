@@ -17,7 +17,7 @@ public:
 
 	uint32 DocNumber;
 
-	char DocName[64];
+	char DocName[256];
 	char Text[128];
 
 	uint32 CountFilterSelectors;
