@@ -39,8 +39,8 @@ namespace FTWinService
 
         private static FTService _fts = new FTService();
         private static string _indexedArchives = string.Empty;
-        private static long _readBytes = 0;
-        private static int _amountDocuments = 0;
+        //private static long _readBytes = 0;
+        //private static int _amountDocuments = 0;
         private static Thread _job;
 
         public void TestStart()
@@ -83,7 +83,8 @@ namespace FTWinService
 
                 _fts.Start();
 
-                FTService.StartWebservice(ConfigurationManager.AppSettings["URL"],
+                FTService.StartWebservice(_fts,
+                                          ConfigurationManager.AppSettings["URL"],
                                           ex => {
                                               WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
                                           });
@@ -111,8 +112,8 @@ namespace FTWinService
                     try
                     {
                         IndexService indexService = new IndexService(_fts,
-                                                                             x => WriteLog(x, EventLogEntryType.Error),
-                                                                             x => Debug.WriteLine(x));
+                                                                     x => WriteLog(x, EventLogEntryType.Error),
+                                                                     x => Debug.WriteLine(x));
 
                         var jobType = ConfigurationManager.AppSettings["JobType"];
 

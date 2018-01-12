@@ -710,16 +710,15 @@ namespace FTServiceWCF
             }
         }
 
-        public static void StartWebservice(string url, Action<Exception> errorHandler = null)
+        public static void StartWebservice(FTService service, string url, Action<Exception> errorHandler = null)
         {
             _errorHandler = errorHandler;
 
             TryCatch(() =>
             {
-                Type serviceType = typeof(FTService);
                 Uri serviceUri = new Uri(url);
 
-                _host = new ServiceHost(serviceType, serviceUri);
+                _host = new ServiceHost(service, serviceUri);
 
                 var basicHttpBinding = new BasicHttpBinding();
                 basicHttpBinding.MaxReceivedMessageSize = int.MaxValue;
@@ -731,6 +730,7 @@ namespace FTServiceWCF
 
                 _host.Description.Behaviors.Add(smb);
 
+                Type serviceType = typeof(FTService);
                 _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
                 _host.Open();
             });
