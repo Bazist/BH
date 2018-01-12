@@ -875,8 +875,11 @@ namespace FTServiceWCF
             //allocate structures
             for (int i = 0; i < selectors.Count; i++)
             {
-                ptrs[i] = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(SelectorDLL)));
-                Marshal.StructureToPtr(selectors[i].ConvertToSelectorDLL(), ptrs[i], true);
+                var size = Marshal.SizeOf(typeof(SelectorDLL));
+
+                ptrs[i] = Marshal.AllocHGlobal(size);
+
+                Marshal.StructureToPtr(selectors[i].ConvertToSelectorDLL(), ptrs[i], false);
             }
 
             //query

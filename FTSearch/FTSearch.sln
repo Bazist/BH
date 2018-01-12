@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FTSearch", "FTSearch\FTSearch.vcxproj", "{69A1675E-C3BB-4E6A-9E40-094F383A5D26}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTServiceWCF", "..\FTService\FTServiceWCF.csproj", "{34F64742-DB2E-434A-BA1C-1C9474E501BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTWinService", "..\FTWinService\FTWinService.csproj", "{1176C0DB-BA37-47D6-94FA-21849E5F6937}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTRobot", "..\FTRobot\FTRobot.csproj", "{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,18 @@ Global
 		{1176C0DB-BA37-47D6-94FA-21849E5F6937}.Release|Win32.Build.0 = Release|Any CPU
 		{1176C0DB-BA37-47D6-94FA-21849E5F6937}.Release|x64.ActiveCfg = Release|Any CPU
 		{1176C0DB-BA37-47D6-94FA-21849E5F6937}.Release|x64.Build.0 = Release|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Debug|Win32.Build.0 = Debug|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Debug|x64.Build.0 = Debug|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Release|Win32.ActiveCfg = Release|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Release|Win32.Build.0 = Release|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Release|x64.ActiveCfg = Release|Any CPU
+		{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

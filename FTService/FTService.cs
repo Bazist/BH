@@ -132,7 +132,7 @@ namespace FTServiceWCF
                 conf.IndexPath = indexPath;
 
                 conf.MemoryMode = (uint)FTSearch.MemoryMode.HDD;
-                conf.AutoStemmingOn = 12;
+                conf.AutoStemmingOn = 8;
                 conf.MinLenWord = 3;
                 conf.MaxLenWord = 64;
                 conf.DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
