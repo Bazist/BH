@@ -7,8 +7,8 @@
     <ProjectGuid>{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FTRobot</RootNamespace>
-    <AssemblyName>FTRobot</AssemblyName>
+    <RootNamespace>FTBoobenRobot</RootNamespace>
+    <AssemblyName>FTBoobenRobot</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

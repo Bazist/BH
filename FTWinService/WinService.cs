@@ -11,7 +11,7 @@ using System.Threading;
 using FTServiceWCF;
 using System.IO;
 using System.Configuration;
-using FTRobot;
+using FTBoobenRobot;
 
 namespace FTWinService
 {

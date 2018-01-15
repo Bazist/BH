@@ -13,7 +13,7 @@ using System.IO.Compression;
 using System.Collections.Concurrent;
 using FTServiceWCF;
 
-namespace FTRobot
+namespace FTBoobenRobot
 {
     public partial class IndexService
     {
@@ -27,26 +27,26 @@ namespace FTRobot
             _logError = logError;
             _logInfo = logInfo;
 
-            FTRobot.Site.Sites = new List<Site>();
+            FTBoobenRobot.Site.Sites = new List<Site>();
 
-            FTRobot.Site.Sites.Add(new PravdaSite(service));
+            FTBoobenRobot.Site.Sites.Add(new PravdaSite(service));
 
-            FTRobot.Site.Sites.Add(new KhafSite(service));
+            FTBoobenRobot.Site.Sites.Add(new KhafSite(service));
 
-            FTRobot.Site.Sites.Add(new SearchengineSite(service));
-            FTRobot.Site.Sites.Add(new DouSite(service));
-            FTRobot.Site.Sites.Add(new GamedevSite(service));
-            FTRobot.Site.Sites.Add(new HabrSite(service));
-            FTRobot.Site.Sites.Add(new GotaiSite(service));
-            FTRobot.Site.Sites.Add(new SqlSite(service));
-            FTRobot.Site.Sites.Add(new SevasSite(service));
-            FTRobot.Site.Sites.Add(new SkcSite(service));
-            FTRobot.Site.Sites.Add(new VeloSite(service));
-            FTRobot.Site.Sites.Add(new IxbtSite(service));
-            FTRobot.Site.Sites.Add(new AutouaSite(service));
-            FTRobot.Site.Sites.Add(new FinSite(service));
-            FTRobot.Site.Sites.Add(new GratisSite(service));
-            FTRobot.Site.Sites.Add(new CyberSite(service));
+            FTBoobenRobot.Site.Sites.Add(new SearchengineSite(service));
+            FTBoobenRobot.Site.Sites.Add(new DouSite(service));
+            FTBoobenRobot.Site.Sites.Add(new GamedevSite(service));
+            FTBoobenRobot.Site.Sites.Add(new HabrSite(service));
+            FTBoobenRobot.Site.Sites.Add(new GotaiSite(service));
+            FTBoobenRobot.Site.Sites.Add(new SqlSite(service));
+            FTBoobenRobot.Site.Sites.Add(new SevasSite(service));
+            FTBoobenRobot.Site.Sites.Add(new SkcSite(service));
+            FTBoobenRobot.Site.Sites.Add(new VeloSite(service));
+            FTBoobenRobot.Site.Sites.Add(new IxbtSite(service));
+            FTBoobenRobot.Site.Sites.Add(new AutouaSite(service));
+            FTBoobenRobot.Site.Sites.Add(new FinSite(service));
+            FTBoobenRobot.Site.Sites.Add(new GratisSite(service));
+            FTBoobenRobot.Site.Sites.Add(new CyberSite(service));
         }
 
         private class IndexContent
@@ -70,7 +70,7 @@ namespace FTRobot
             //read file
             if (archive != null)
             {
-                string path = file.ToLower().Replace(@"c:\ftrobot\", string.Empty);
+                string path = file.ToLower().Replace(@"c:\FTBoobenRobot\", string.Empty);
                 ZipArchiveEntry zipEntry = archive.GetEntry(path);
 
                 if (zipEntry != null)
@@ -112,7 +112,7 @@ namespace FTRobot
             ic.ContentText = null;
 
             //read file
-            string path = file.ToLower().Replace(@"c:\ftrobot\", string.Empty);
+            string path = file.ToLower().Replace(@"c:\FTBoobenRobot\", string.Empty);
 
             if (zipEntry != null)
             {
@@ -174,7 +174,7 @@ namespace FTRobot
             if (info.LastNameIDRAM <= 80) //empty instance
             {
                 /*
-                string logPath = FTRobot.Site.FTROBOT_PATH + "Log.txt";
+                string logPath = FTBoobenRobot.Site.FTBoobenRobot_PATH + "Log.txt";
 
                 if (File.Exists(logPath))
                 {
@@ -219,7 +219,7 @@ namespace FTRobot
                         if (File.Exists(file))
                         {
                             string aliasName = Path.GetFileName(file).Replace(".txt", "");
-                            string contentText = File.ReadAllText(file, FTRobot.Site.ASC2Encoding);
+                            string contentText = File.ReadAllText(file, FTBoobenRobot.Site.ASC2Encoding);
 
                             //string[] parts = contentText.Split(new char[] { '.', '?', '!' });
                             //foreach (string part in parts)
@@ -272,11 +272,11 @@ namespace FTRobot
                         {
                             if (archiveIndex == 1)
                             {
-                                zipPath = @"C:\FTRobot\" + startDate.Year.ToString("0000") + startDate.Month.ToString("00") + ".zip";
+                                zipPath = @"C:\FTBoobenRobot\" + startDate.Year.ToString("0000") + startDate.Month.ToString("00") + ".zip";
                             }
                             else
                             {
-                                zipPath = @"C:\FTRobot\" + startDate.Year.ToString("0000") + startDate.Month.ToString("00") + "_" + archiveIndex.ToString() + ".zip";
+                                zipPath = @"C:\FTBoobenRobot\" + startDate.Year.ToString("0000") + startDate.Month.ToString("00") + "_" + archiveIndex.ToString() + ".zip";
                             }
 
                             if (File.Exists(zipPath))
@@ -336,7 +336,7 @@ namespace FTRobot
             {
                 string tbLogText = string.Empty;
 
-                foreach (Site site in FTRobot.Site.Sites)
+                foreach (Site site in FTBoobenRobot.Site.Sites)
                 {
                     tbLogText += "======== ONLINE SPIDER INFO FOR " + site.Code + "========;\r\n";
                     tbLogText += "TotalSizeHTML : " + site.TotalSize.ToString() + " bytes;\r\n";
@@ -381,7 +381,7 @@ namespace FTRobot
 
                 _logInfo(tbLogText);
 
-                File.WriteAllText(FTRobot.Site.FTROBOT_PATH + "stat.txt", tbLogText);
+                File.WriteAllText(FTBoobenRobot.Site.FTBoobenRobot_PATH + "stat.txt", tbLogText);
             }
             catch
             {
@@ -428,7 +428,7 @@ namespace FTRobot
                     year = ((DateTime)reader["OnDate"]).Year;
                     month = ((DateTime)reader["OnDate"]).Month;
 
-                    zipPath = @"C:\FTRobot\" + year.ToString("0000") + month.ToString("00");
+                    zipPath = @"C:\FTBoobenRobot\" + year.ToString("0000") + month.ToString("00");
 
                     if (File.Exists(zipPath))
                     {
@@ -472,7 +472,7 @@ namespace FTRobot
 
                     if (filePaths.Count >= portion)
                     {
-                        Archive.AddFiles(fullZipPath, @"C:\FTRobot\", filePaths.ToArray(), null, AddLog);
+                        Archive.AddFiles(fullZipPath, @"C:\FTBoobenRobot\", filePaths.ToArray(), null, AddLog);
 
                         filePaths.Clear();
 
@@ -481,13 +481,13 @@ namespace FTRobot
 
                     if (!reader.Read())
                     {
-                        Archive.AddFiles(fullZipPath, @"C:\FTRobot\", filePaths.ToArray(), null, AddLog);
+                        Archive.AddFiles(fullZipPath, @"C:\FTBoobenRobot\", filePaths.ToArray(), null, AddLog);
 
                         return;
                     }
                 }
 
-                Archive.AddFiles(fullZipPath, @"C:\FTRobot\", filePaths.ToArray(), null, AddLog);
+                Archive.AddFiles(fullZipPath, @"C:\FTBoobenRobot\", filePaths.ToArray(), null, AddLog);
             }
         }
 
@@ -527,7 +527,7 @@ namespace FTRobot
             try
             {
                 //run spiders
-                foreach (Site site in FTRobot.Site.Sites)
+                foreach (Site site in FTBoobenRobot.Site.Sites)
                 {
                     //site.LoadLabels();
 
@@ -565,11 +565,11 @@ namespace FTRobot
                     {
                         if (archiveIndex == 1)
                         {
-                            zipPath = @"C:\FTRobot\" + startDate.Year.ToString("0000") + startDate.Month.ToString("00") + ".zip";
+                            zipPath = @"C:\FTBoobenRobot\" + startDate.Year.ToString("0000") + startDate.Month.ToString("00") + ".zip";
                         }
                         else
                         {
-                            zipPath = @"C:\FTRobot\" + startDate.Year.ToString("0000") + startDate.Month.ToString("00") + "_" + archiveIndex.ToString() + ".zip";
+                            zipPath = @"C:\FTBoobenRobot\" + startDate.Year.ToString("0000") + startDate.Month.ToString("00") + "_" + archiveIndex.ToString() + ".zip";
                         }
 
                         if (File.Exists(zipPath))

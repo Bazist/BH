@@ -85,9 +85,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FTRobot\FTRobot.csproj">
+    <ProjectReference Include="..\FTBoobenRobot\FTBoobenRobot.csproj">
       <Project>{b2aef7ac-0e77-4ba7-8270-2ff637223ae1}</Project>
-      <Name>FTRobot</Name>
+      <Name>FTBoobenRobot</Name>
     </ProjectReference>
     <ProjectReference Include="..\FTService\FTServiceWCF.csproj">
       <Project>{34f64742-db2e-434a-ba1c-1c9474e501bf}</Project>

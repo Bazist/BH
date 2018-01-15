@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTServiceWCF", "..\FTServic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTWinService", "..\FTWinService\FTWinService.csproj", "{1176C0DB-BA37-47D6-94FA-21849E5F6937}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTRobot", "..\FTRobot\FTRobot.csproj", "{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTBoobenRobot", "..\FTBoobenRobot\FTBoobenRobot.csproj", "{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

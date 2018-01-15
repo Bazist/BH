@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
-namespace FTRobot
+namespace FTBoobenRobot
 {
     public class Archive
     {
@@ -42,13 +42,13 @@ namespace FTRobot
                             {
                                 string path = filePaths[i];
 
-                                if (path.Contains(@"FTRobot"))
+                                if (path.Contains(@"FTBoobenRobot"))
                                 {
                                     fileContent = File.ReadAllText(filePaths[i], Archive.Encoding);
                                 }
                                 else
                                 {
-                                    fileContent = File.ReadAllText(Path.Combine(@"C:\FTRobot", filePaths[i]), Archive.Encoding);
+                                    fileContent = File.ReadAllText(Path.Combine(@"C:\FTBoobenRobot", filePaths[i]), Archive.Encoding);
                                 }
                             }
 

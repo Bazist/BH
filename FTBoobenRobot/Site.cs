@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using FTServiceWCF;
 
-namespace FTRobot
+namespace FTBoobenRobot
 {
     public abstract class Site
     {
@@ -24,7 +24,7 @@ namespace FTRobot
             ErrorDelay = TimeSpan.FromMinutes(15);
         }
 
-        public const string FTROBOT_PATH = @"c:\FTRobot\";
+        public const string FTBoobenRobot_PATH = @"c:\FTBoobenRobot\";
 
         private FTService _service;
 
@@ -44,7 +44,7 @@ namespace FTRobot
 
         private string GetDirectoryPath(string docNumber)
         {
-            return FTROBOT_PATH + (int.Parse(docNumber) - int.Parse(docNumber) % 1000).ToString() + @"\";
+            return FTBoobenRobot_PATH + (int.Parse(docNumber) - int.Parse(docNumber) % 1000).ToString() + @"\";
         }
 
         protected abstract List<string> GetDocNumberByUrl(string url);
@@ -392,7 +392,7 @@ namespace FTRobot
         //    {
         //        string str = string.Format("[{0}] {1} -> {2}\r\n", DateTime.Now.ToString(), operation, text);
 
-        //        string logPath = @"d:\FTRobot\Log.txt";
+        //        string logPath = @"d:\FTBoobenRobot\Log.txt";
 
         //        File.AppendAllText(logPath, str);
         //    }
@@ -402,7 +402,7 @@ namespace FTRobot
         {
             //lock (FileLocker)
             //{
-            //    string logPath = @"d:\FTRobot\Log.txt";
+            //    string logPath = @"d:\FTBoobenRobot\Log.txt";
 
             //    File.AppendAllText(logPath, text + "\r\n");
             //}
@@ -900,7 +900,7 @@ namespace FTRobot
         //public void LoadLabels()
         //{
         //    //read labels
-        //    string path = FTRobot.Site.FTROBOT_PATH + "labels_" + this.Code + ".txt";
+        //    string path = FTBoobenRobot.Site.FTBoobenRobot_PATH + "labels_" + this.Code + ".txt";
 
         //    if (File.Exists(path))
         //    {
@@ -928,7 +928,7 @@ namespace FTRobot
         //        {
         //            var lbl = this.Labels.GetEnumerator();
 
-        //            StreamWriter sw = new StreamWriter(FTRobot.Site.FTROBOT_PATH + "labels_" + this.Code + ".txt");
+        //            StreamWriter sw = new StreamWriter(FTBoobenRobot.Site.FTBoobenRobot_PATH + "labels_" + this.Code + ".txt");
 
         //            while (lbl.MoveNext())
         //            {
