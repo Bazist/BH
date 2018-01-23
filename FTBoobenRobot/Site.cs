@@ -24,7 +24,7 @@ namespace FTBoobenRobot
             ErrorDelay = TimeSpan.FromMinutes(15);
         }
 
-        public const string FTBoobenRobot_PATH = @"c:\FTBoobenRobot\";
+        public const string FTRobot_PATH = @"C:\FTRobot\";
 
         private FTService _service;
 
@@ -44,7 +44,7 @@ namespace FTBoobenRobot
 
         private string GetDirectoryPath(string docNumber)
         {
-            return FTBoobenRobot_PATH + (int.Parse(docNumber) - int.Parse(docNumber) % 1000).ToString() + @"\";
+            return FTRobot_PATH + (int.Parse(docNumber) - int.Parse(docNumber) % 1000).ToString() + @"\";
         }
 
         protected abstract List<string> GetDocNumberByUrl(string url);
@@ -392,7 +392,7 @@ namespace FTBoobenRobot
         //    {
         //        string str = string.Format("[{0}] {1} -> {2}\r\n", DateTime.Now.ToString(), operation, text);
 
-        //        string logPath = @"d:\FTBoobenRobot\Log.txt";
+        //        string logPath = @"Site.FTRobot_PATH\Log.txt";
 
         //        File.AppendAllText(logPath, str);
         //    }

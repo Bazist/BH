@@ -42,13 +42,13 @@ namespace FTBoobenRobot
                             {
                                 string path = filePaths[i];
 
-                                if (path.Contains(@"FTBoobenRobot"))
+                                if (path.Contains(Site.FTRobot_PATH))
                                 {
                                     fileContent = File.ReadAllText(filePaths[i], Archive.Encoding);
                                 }
                                 else
                                 {
-                                    fileContent = File.ReadAllText(Path.Combine(@"C:\FTBoobenRobot", filePaths[i]), Archive.Encoding);
+                                    fileContent = File.ReadAllText(Path.Combine(Site.FTRobot_PATH, filePaths[i]), Archive.Encoding);
                                 }
                             }
 
