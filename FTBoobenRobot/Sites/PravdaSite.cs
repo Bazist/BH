@@ -51,8 +51,7 @@ namespace FTBoobenRobot
                 for (int i = nums.Count - 1; i >= 0; i--)
                 {
                     var ids = this.ExtractByRegexp(nums[i], "topic=(?<num>[0-9]+)");
-                    var ids2 = this.ExtractByRegexp(labels[i * 2], "(?<num>[0-9]+)");
-
+                    var ids2 = this.ExtractByRegexp(labels[i * 2], "(?<num>[0-9\\s]+)");
                     
                     string url = GetUrlByDocNumber(ids[0], 1, null);
                     CheckLabelAndAddPage(pages, url, ids2[0]);

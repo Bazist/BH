@@ -30,8 +30,6 @@ namespace FTBoobenRobot
                     {
                         for (; i < endIndex && i < filePaths.Length; i++)
                         {
-                            ZipArchiveEntry zipEntry = archive.CreateEntry(filePaths[i].ToLower().Replace(directoryPath.ToLower(), string.Empty));
-
                             string fileContent;
 
                             if (fileContents != null)
@@ -41,16 +39,18 @@ namespace FTBoobenRobot
                             else
                             {
                                 string path = filePaths[i];
-
-                                if (path.Contains(Site.FTRobot_PATH))
+                                
+                                if (File.Exists(path))
                                 {
                                     fileContent = File.ReadAllText(filePaths[i], Archive.Encoding);
                                 }
                                 else
                                 {
-                                    fileContent = File.ReadAllText(Path.Combine(Site.FTRobot_PATH, filePaths[i]), Archive.Encoding);
+                                    continue;
                                 }
                             }
+
+                            ZipArchiveEntry zipEntry = archive.CreateEntry(filePaths[i].ToLower().Replace(directoryPath.ToLower(), string.Empty));
 
                             using (StreamWriter writer = new StreamWriter(zipEntry.Open(), Archive.Encoding))
                             {

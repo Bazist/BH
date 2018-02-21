@@ -398,7 +398,7 @@ namespace FTBoobenRobot
         //    }
         //}
 
-        private void WriteLog(string text)
+        private void WriteLog(string filePath)
         {
             //lock (FileLocker)
             //{
@@ -407,7 +407,7 @@ namespace FTBoobenRobot
             //    File.AppendAllText(logPath, text + "\r\n");
             //}
 
-            DBHelpers.SavePage(this.Code, text);
+            DBHelpers.SavePage(this.Code, filePath.Replace(Site.FTRobot_PATH, string.Empty));
         }
 
         private void ProcessPage(Page firstPage, Page page)

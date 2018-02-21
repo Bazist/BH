@@ -60,7 +60,7 @@ namespace FTBoobenRobot
 
         private void IndexFile(ZipArchive archive, int curr, SqlDataReader reader)
         {
-            string file = (string)reader["URL"];
+            string file = Site.FTRobot_PATH + (string)reader["URL"];
 
             IndexContent ic = new IndexContent();
 
@@ -70,7 +70,8 @@ namespace FTBoobenRobot
             //read file
             if (archive != null)
             {
-                string path = Regex.Replace(file, Site.FTRobot_PATH, string.Empty, RegexOptions.IgnoreCase);
+                string path = file.ToLower().Replace(Site.FTRobot_PATH.ToLower(), string.Empty);
+
                 ZipArchiveEntry zipEntry = archive.GetEntry(path);
 
                 if (zipEntry != null)
@@ -86,6 +87,10 @@ namespace FTBoobenRobot
                 if (File.Exists(file))
                 {
                     ic.ContentText = File.ReadAllText(file, Archive.Encoding);
+                }
+                else
+                {
+                    ic.ContentText = null;
                 }
             }
 
@@ -104,7 +109,7 @@ namespace FTBoobenRobot
         private void IndexEntry(ZipArchiveEntry zipEntry, int curr)
         {
 
-            string file = zipEntry.FullName;
+            string file = Site.FTRobot_PATH + zipEntry.FullName;
 
             IndexContent ic = new IndexContent();
 
@@ -112,8 +117,6 @@ namespace FTBoobenRobot
             ic.ContentText = null;
 
             //read file
-            string path = Regex.Replace(file, Site.FTRobot_PATH, string.Empty, RegexOptions.IgnoreCase);
-
             if (zipEntry != null)
             {
                 using (StreamReader sr = new StreamReader(zipEntry.Open(), Archive.Encoding))
@@ -502,17 +505,30 @@ namespace FTBoobenRobot
             _logInfo(text);
         }
 
-        private void ArchivePrevMonth()
+        public void ArchivePrevMonth()
         {
-            DateTime dt = DateTime.Now.AddMonths(-1);
-            DateTime startDate = new DateTime(dt.Year, dt.Month, 1);
-            DateTime endDate = startDate.AddMonths(1).AddSeconds(-1);
+            var dt = DateTime.Now.AddMonths(-1);
 
-            DBHelpers.GetPages(ProcessPage, null, startDate, endDate);
+            DateTime startDate = new DateTime(dt.Year, dt.Month, 1);
+
+            while (startDate < DateTime.Now)
+            {
+                DateTime endDate = startDate.AddMonths(1).AddSeconds(-1);
+
+                DBHelpers.GetPages(ProcessPage, null, startDate, endDate);
+
+                startDate = startDate.AddMonths(1);
+
+                break;
+            }
         }
 
         public void Run()
         {
+            //IndexPrevMonth();
+            //ArchivePrevMonth();
+            //return;
+
             //index files
             //IndexFiles();
 
@@ -551,10 +567,8 @@ namespace FTBoobenRobot
 
         private void IndexPrevMonth()
         {
-            //new DateTime(2015, 1, 1);
-
             //index previous periods
-            DateTime baseDate = DateTime.Now.AddMonths(-1); //baseDate.AddMonths(16);
+            DateTime baseDate = new DateTime(2016, 11, 1); //DateTime.Now.AddMonths(-1); //baseDate.AddMonths(16);
 
             DateTime startDate = new DateTime(baseDate.Year, baseDate.Month, 1);
             DateTime endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); //startDate.AddMonths(1);
