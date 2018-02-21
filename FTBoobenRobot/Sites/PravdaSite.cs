@@ -22,9 +22,9 @@ namespace FTBoobenRobot
         {
             return new List<Page>
             {
-                new Page() {URL = "http://forum.pravda.com.ua/index.php?board=2.0"},
-                new Page() {URL = "http://forum.pravda.com.ua/index.php?board=2.50"},
-                new Page() {URL = "http://forum.pravda.com.ua/index.php?board=2.100"}
+                new Page() {URL = "https://forum.pravda.com.ua/index.php?board=2.0"},
+                new Page() {URL = "https://forum.pravda.com.ua/index.php?board=2.50"},
+                new Page() {URL = "https://forum.pravda.com.ua/index.php?board=2.100"}
             };
         }
 
@@ -35,7 +35,7 @@ namespace FTBoobenRobot
 
         protected override string GetUrlByDocNumber(string docNumber, int page, string dashboardID)
         {
-            return string.Format("http://forum.pravda.com.ua/index.php?topic={0}.{1}", docNumber, (page - 1) * 30);
+            return string.Format("https://forum.pravda.com.ua/index.php?topic={0}.{1}", docNumber, (page - 1) * 30);
         }
 
         protected override List<Page> OnDashboardLoaded(Page page)
@@ -67,8 +67,8 @@ namespace FTBoobenRobot
             page.FileContent = (" " + GetMessages("<div class=\"msg\">", "</div>", "div", page.HtmlContent));
 
             //check load next page
-            page.NeedLoadNextPage = (page.HtmlContent.IndexOf("Наступна</a>") >= 0) &&
-                                    (page.HtmlContent.IndexOf("<a href=\"\">Наступна</a>") == -1);
+            page.NeedLoadNextPage = page.HtmlContent.Contains("Наступна</span>") &&
+                                    !page.HtmlContent.Contains("<a href=\"\"><span class=\"hideonmobile\">Наступна</span>");
         }
     }
 }

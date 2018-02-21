@@ -82,7 +82,7 @@ namespace FTBoobenRobot
                     {
                         string filePath = GetFilePath(Code, dashboardID, docNumber[0], pageNumber + 1);
 
-                        if (!File.Exists(filePath))
+                        if (!File.Exists(filePath) || !DBHelpers.HasPage(url))
                         {
                             break;
                         }

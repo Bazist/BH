@@ -36,6 +36,28 @@ namespace FTBoobenRobot
             }
         }
 
+        public static bool HasPage(string url)
+        {
+            using (SqlConnection con = new SqlConnection(_connString))
+            {
+                //
+                // Open the SqlConnection.
+                //
+                con.Open();
+                //
+                // The following code uses an SqlCommand based on the SqlConnection.
+                //
+                using (SqlCommand command = new SqlCommand("HasPage", con))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.AddWithValue("@URL", url ?? Convert.DBNull);
+
+                    return (int)command.ExecuteScalar() == 1;
+                }
+            }
+        }
+
         public static void SaveLabel(string site,
                                      string url,
                                      string label)
