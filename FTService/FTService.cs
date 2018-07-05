@@ -1,10 +1,12 @@
-﻿using System;
+﻿using FTSearchWCF.Stemmers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -130,7 +132,7 @@ namespace FTServiceWCF
                 conf.IndexPath = indexPath;
 
                 conf.MemoryMode = (uint)FTSearch.MemoryMode.HDD;
-                conf.AutoStemmingOn = 12;
+                conf.AutoStemmingOn = 8;
                 conf.MinLenWord = 3;
                 conf.MaxLenWord = 64;
                 conf.DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
@@ -221,51 +223,134 @@ namespace FTServiceWCF
         }
 
         [OperationContract]
-        public List<FTSearch.Result> SearchPhrase(string phrase, string templateName, int skip, int take)
+        public FTSearch.SearchResult SearchPhrase(string phrase,
+                                                  string templateName,
+                                                  int skip,
+                                                  int take)
         {
-            return TryCatch<List<FTSearch.Result>>(() =>
+            return TryCatch(() =>
              {
                  if (!IsStarted())
                      throw new Exception("Service is not started.");
 
-                 var result = new List<FTSearch.Result>();
-
-                 foreach (var fts in Instances)
-                 {
-                     var sr = fts.SearchPhrase(phrase, templateName, uint.MinValue, uint.MaxValue, Convert.ToUInt32(skip));
-
-                     if (skip > sr.FullCountMatches) //skip all results
-                      {
-                         skip -= Convert.ToInt32(sr.FullCountMatches);
-                     }
-                     else
-                     {
-                         if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
-                          {
-                             result.AddRange(sr.Results.Take(take - result.Count));
-
-                             break;
-                         }
-                         else //go to next instance
-                          {
-                             if (result.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
-                              {
-                                 result.AddRange(sr.Results);
-
-                                 skip = 0;
-                             }
-                             else //take part results from current instance, exit
-                              {
-                                 result.AddRange(sr.Results.Take(take - result.Count));
-
-                                 break;
-                             }
-                         }
-                     }
-                 }
-
-                 return result;
+                 return GetPortion(ref skip,
+                                   take,
+                                   fts => fts.SearchPhrase(phrase,
+                                                           templateName,
+                                                           int.MinValue,
+                                                           int.MaxValue,
+                                                           skip));
              });
+        }
+        
+        private FTSearch.SearchResult GetPortion(ref int skip,
+                                                 int take,
+                                                 Func<FTSearch, FTSearch.SearchResult> searchFunc)
+        {
+            FTSearch.SearchResult result = new FTSearch.SearchResult();
+
+            foreach (var fts in Instances)
+            {
+                //fts.SearchQuery()
+                var sr = searchFunc(fts); 
+
+                if (skip > sr.FullCountMatches) //skip all results
+                {
+                    skip -= Convert.ToInt32(sr.FullCountMatches);
+                }
+                else
+                {
+                    if (skip + take <= sr.FullCountMatches) //all our data in current instance, get portion
+                    {
+                        result.MatchWords += sr.MatchWords;
+                        result.Results.AddRange(sr.Results.Take(take - result.Results.Count));
+
+                        break;
+                    }
+                    else //go to next instance
+                    {
+                        if (result.Results.Count + sr.Results.Count <= take) //take all results from current instance, goto next instance
+                        {
+                            result.MatchWords += sr.MatchWords;
+                            result.Results.AddRange(sr.Results);
+
+                            skip = 0;
+                        }
+                        else //take part results from current instance, exit
+                        {
+                            result.MatchWords += sr.MatchWords;
+                            result.Results.AddRange(sr.Results.Take(take - result.Results.Count));
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        [OperationContract]
+        public FTSearch.SearchResult SearchQuery(List<FTSearch.Selector> selectors,
+                                                 int minPage,
+                                                 int maxPage,
+                                                 int skip,
+                                                 bool agregateBySubject)
+        {
+            return TryCatch(() =>
+            {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
+
+                //TODO merge logic on instance with logic on shards
+                int shardSkip = 0;
+                int shardTake = int.MaxValue;
+
+                return GetPortion(ref shardSkip,
+                                  shardTake,
+                                  fts => fts.SearchQuery(selectors,
+                                                         minPage,
+                                                         maxPage,
+                                                         skip,
+                                                         agregateBySubject));
+            });
+        }
+
+        [OperationContract]
+        public FTSearch.SearchResult SearchPhraseRel(string phrase, int minPage, int maxPage, int skip, int take)
+        {
+            return TryCatch(() =>
+            {
+                return GetPortion(ref skip,
+                                      take,
+                                      fts => fts.SearchPhraseRel(phrase,
+                                                                 minPage,
+                                                                 maxPage));
+            });
+        }
+
+        private static RussianStemmer _rusStemmer = new RussianStemmer();
+        private static EnglishStemmer _engStemmer = new EnglishStemmer();
+
+        [OperationContract]
+        public string StemContent(string contentText)
+        {
+            contentText = _rusStemmer.StemContent(contentText);
+            contentText = _engStemmer.StemContent(contentText);
+            
+            return contentText.ToLower();
+        }
+
+        [OperationContract]
+        public string CalculateTrend(string phrase, int count, int minPage, int maxPage)
+        {
+            return TryCatch(() =>
+            {
+                return ActiveInstance.CalculateTrend(phrase,
+                                                     count,
+                                                     minPage,
+                                                     maxPage);
+            });
         }
 
         [OperationContract]
@@ -625,21 +710,27 @@ namespace FTServiceWCF
             }
         }
 
-        public static void StartWebservice(string url, Action<Exception> errorHandler = null)
+        public static void StartWebservice(FTService service, string url, Action<Exception> errorHandler = null)
         {
             _errorHandler = errorHandler;
 
             TryCatch(() =>
             {
-                Type serviceType = typeof(FTService);
                 Uri serviceUri = new Uri(url);
 
-                _host = new ServiceHost(serviceType, serviceUri);
+                _host = new ServiceHost(service, serviceUri);
 
                 var basicHttpBinding = new BasicHttpBinding();
                 basicHttpBinding.MaxReceivedMessageSize = int.MaxValue;
                 basicHttpBinding.MaxBufferSize = int.MaxValue;
 
+                var smb = new ServiceMetadataBehavior();
+                smb.HttpGetEnabled = true;
+                smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
+
+                _host.Description.Behaviors.Add(smb);
+
+                Type serviceType = typeof(FTService);
                 _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
                 _host.Open();
             });

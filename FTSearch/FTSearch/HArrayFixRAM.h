@@ -270,8 +270,6 @@ public:
 
 	void load()
 	{
-		destroy();
-
 		HArrayTextFile file;
 
 		file.init(Path, TableName, KeyLen);

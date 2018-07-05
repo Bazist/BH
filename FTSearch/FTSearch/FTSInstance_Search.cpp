@@ -351,7 +351,7 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 
 	memset(pSourceBuffer, 0, MAX_SIZE_BUFFER);
 
-	ulong64 sourceFilePosition = 80;
+	ulong64 sourceFilePosition = getDocHeaderSize();
 	uint32 sourceBuffPosition = 0;
 	uint32 sourceBuffLength = 0;
 

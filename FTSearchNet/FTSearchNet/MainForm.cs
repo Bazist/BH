@@ -618,7 +618,7 @@ namespace FTSearchTest
 
             fts.SetConfiguration(FTService.GetDefaultConfiguration());
 
-            FTService.StartWebservice("http://localhost:8080");
+            FTService.StartWebservice(fts, "http://localhost:8080");
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -648,15 +648,15 @@ namespace FTSearchTest
 
             this.UpdateInstanceInfo(fts);
 
-            var results = fts.SearchPhrase(tbSearchText.Text, string.Empty, 0, 25);
+            var result = fts.SearchPhrase(tbSearchText.Text, string.Empty, 0, 25);
 
             rtbLog.Clear();
 
             StringBuilder sb = new StringBuilder();
 
-            foreach (var result in results)
+            foreach (var res in result.Results)
             {
-                sb.Append(result.Name).Append("\r\n");
+                sb.Append(res.Name).Append("\r\n");
             }
 
             rtbLog.Text = sb.ToString();

@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{34F64742-DB2E-434A-BA1C-1C9474E501BF}</ProjectGuid>
+    <ProjectGuid>{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FTServiceWCF</RootNamespace>
-    <AssemblyName>FTServiceWCF</AssemblyName>
+    <RootNamespace>FTBoobenRobot</RootNamespace>
+    <AssemblyName>FTBoobenRobot</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -17,11 +17,10 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Bin\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,12 +29,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,20 +42,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FTSearch.cs" />
-    <Compile Include="FTService.cs" />
+    <Compile Include="Archive.cs" />
+    <Compile Include="DBHelpers.cs" />
+    <Compile Include="IndexService.cs" />
+    <Compile Include="Page.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Stemmer\Among.cs" />
-    <Compile Include="Stemmer\EnglishStemmer.cs" />
-    <Compile Include="Stemmer\RussianStemmer.cs" />
-    <Compile Include="Stemmer\StemmerOperations.cs" />
+    <Compile Include="Site.cs" />
+    <Compile Include="Sites\AutouaSite.cs" />
+    <Compile Include="Sites\CyberSite.cs" />
+    <Compile Include="Sites\DouSite.cs" />
+    <Compile Include="Sites\FinSite.cs" />
+    <Compile Include="Sites\GamedevSite.cs" />
+    <Compile Include="Sites\GotaiSite.cs" />
+    <Compile Include="Sites\GratisSite.cs" />
+    <Compile Include="Sites\HabrSite.cs" />
+    <Compile Include="Sites\IxbtSite.cs" />
+    <Compile Include="Sites\KhafSite.cs" />
+    <Compile Include="Sites\PravdaSite.cs" />
+    <Compile Include="Sites\SearchengineSite.cs" />
+    <Compile Include="Sites\SevasSite.cs" />
+    <Compile Include="Sites\SkcSite.cs" />
+    <Compile Include="Sites\SqlSite.cs" />
+    <Compile Include="Sites\VeloSite.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FTService\FTServiceWCF.csproj">
+      <Project>{34f64742-db2e-434a-ba1c-1c9474e501bf}</Project>
+      <Name>FTServiceWCF</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
