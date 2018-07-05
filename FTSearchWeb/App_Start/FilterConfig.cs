@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 
-namespace FTSearchWeb
+namespace BH.Web
 {
     public class FilterConfig
     {

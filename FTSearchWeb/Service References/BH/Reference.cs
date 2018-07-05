@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FTSearchWeb.BH {
+namespace BH {
     using System.Runtime.Serialization;
     using System;
     
@@ -359,7 +359,7 @@ namespace FTSearchWeb.BH {
         private string NameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private FTSearchWeb.BH.FTSearchResultPosition[] PositionsField;
+        private BH.FTSearchResultPosition[] PositionsField;
         
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -384,7 +384,7 @@ namespace FTSearchWeb.BH {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public FTSearchWeb.BH.FTSearchResultPosition[] Positions {
+        public BH.FTSearchResultPosition[] Positions {
             get {
                 return this.PositionsField;
             }
@@ -745,22 +745,22 @@ namespace FTSearchWeb.BH {
         System.Threading.Tasks.Task<bool> IsStartedAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetConfiguration", ReplyAction="http://tempuri.org/FTService/GetConfigurationResponse")]
-        FTSearchWeb.BH.FTSearchConfigurationDLL GetConfiguration();
+        BH.FTSearchConfigurationDLL GetConfiguration();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetConfiguration", ReplyAction="http://tempuri.org/FTService/GetConfigurationResponse")]
-        System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchConfigurationDLL> GetConfigurationAsync();
+        System.Threading.Tasks.Task<BH.FTSearchConfigurationDLL> GetConfigurationAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetDefaultConfiguration", ReplyAction="http://tempuri.org/FTService/GetDefaultConfigurationResponse")]
-        FTSearchWeb.BH.FTSearchConfigurationDLL GetDefaultConfiguration();
+        BH.FTSearchConfigurationDLL GetDefaultConfiguration();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetDefaultConfiguration", ReplyAction="http://tempuri.org/FTService/GetDefaultConfigurationResponse")]
-        System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchConfigurationDLL> GetDefaultConfigurationAsync();
+        System.Threading.Tasks.Task<BH.FTSearchConfigurationDLL> GetDefaultConfigurationAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SetConfiguration", ReplyAction="http://tempuri.org/FTService/SetConfigurationResponse")]
-        void SetConfiguration(FTSearchWeb.BH.FTSearchConfigurationDLL configuration);
+        void SetConfiguration(BH.FTSearchConfigurationDLL configuration);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SetConfiguration", ReplyAction="http://tempuri.org/FTService/SetConfigurationResponse")]
-        System.Threading.Tasks.Task SetConfigurationAsync(FTSearchWeb.BH.FTSearchConfigurationDLL configuration);
+        System.Threading.Tasks.Task SetConfigurationAsync(BH.FTSearchConfigurationDLL configuration);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/Start", ReplyAction="http://tempuri.org/FTService/StartResponse")]
         void Start(int instanceNumber);
@@ -769,16 +769,16 @@ namespace FTSearchWeb.BH {
         System.Threading.Tasks.Task StartAsync(int instanceNumber);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhrase", ReplyAction="http://tempuri.org/FTService/SearchPhraseResponse")]
-        FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase, string templateName, int skip, int take);
+        BH.FTSearchResult[] SearchPhrase(string phrase, string templateName, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhrase", ReplyAction="http://tempuri.org/FTService/SearchPhraseResponse")]
-        System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase, string templateName, int skip, int take);
+        System.Threading.Tasks.Task<BH.FTSearchResult[]> SearchPhraseAsync(string phrase, string templateName, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetInfo", ReplyAction="http://tempuri.org/FTService/GetInfoResponse")]
-        FTSearchWeb.BH.FTServiceInfo GetInfo();
+        BH.FTServiceInfo GetInfo();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetInfo", ReplyAction="http://tempuri.org/FTService/GetInfoResponse")]
-        System.Threading.Tasks.Task<FTSearchWeb.BH.FTServiceInfo> GetInfoAsync();
+        System.Threading.Tasks.Task<BH.FTServiceInfo> GetInfoAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/IndexText", ReplyAction="http://tempuri.org/FTService/IndexTextResponse")]
         bool IndexText(string aliasName, string contentText);
@@ -818,12 +818,12 @@ namespace FTSearchWeb.BH {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface FTServiceChannel : FTSearchWeb.BH.FTService, System.ServiceModel.IClientChannel {
+    public interface FTServiceChannel : BH.FTService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class FTServiceClient : System.ServiceModel.ClientBase<FTSearchWeb.BH.FTService>, FTSearchWeb.BH.FTService {
+    public partial class FTServiceClient : System.ServiceModel.ClientBase<BH.FTService>, BH.FTService {
         
         public FTServiceClient() {
         }
@@ -852,27 +852,27 @@ namespace FTSearchWeb.BH {
             return base.Channel.IsStartedAsync();
         }
         
-        public FTSearchWeb.BH.FTSearchConfigurationDLL GetConfiguration() {
+        public BH.FTSearchConfigurationDLL GetConfiguration() {
             return base.Channel.GetConfiguration();
         }
         
-        public System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchConfigurationDLL> GetConfigurationAsync() {
+        public System.Threading.Tasks.Task<BH.FTSearchConfigurationDLL> GetConfigurationAsync() {
             return base.Channel.GetConfigurationAsync();
         }
         
-        public FTSearchWeb.BH.FTSearchConfigurationDLL GetDefaultConfiguration() {
+        public BH.FTSearchConfigurationDLL GetDefaultConfiguration() {
             return base.Channel.GetDefaultConfiguration();
         }
         
-        public System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchConfigurationDLL> GetDefaultConfigurationAsync() {
+        public System.Threading.Tasks.Task<BH.FTSearchConfigurationDLL> GetDefaultConfigurationAsync() {
             return base.Channel.GetDefaultConfigurationAsync();
         }
         
-        public void SetConfiguration(FTSearchWeb.BH.FTSearchConfigurationDLL configuration) {
+        public void SetConfiguration(BH.FTSearchConfigurationDLL configuration) {
             base.Channel.SetConfiguration(configuration);
         }
         
-        public System.Threading.Tasks.Task SetConfigurationAsync(FTSearchWeb.BH.FTSearchConfigurationDLL configuration) {
+        public System.Threading.Tasks.Task SetConfigurationAsync(BH.FTSearchConfigurationDLL configuration) {
             return base.Channel.SetConfigurationAsync(configuration);
         }
         
@@ -884,19 +884,19 @@ namespace FTSearchWeb.BH {
             return base.Channel.StartAsync(instanceNumber);
         }
         
-        public FTSearchWeb.BH.FTSearchResult[] SearchPhrase(string phrase, string templateName, int skip, int take) {
+        public BH.FTSearchResult[] SearchPhrase(string phrase, string templateName, int skip, int take) {
             return base.Channel.SearchPhrase(phrase, templateName, skip, take);
         }
         
-        public System.Threading.Tasks.Task<FTSearchWeb.BH.FTSearchResult[]> SearchPhraseAsync(string phrase, string templateName, int skip, int take) {
+        public System.Threading.Tasks.Task<BH.FTSearchResult[]> SearchPhraseAsync(string phrase, string templateName, int skip, int take) {
             return base.Channel.SearchPhraseAsync(phrase, templateName, skip, take);
         }
         
-        public FTSearchWeb.BH.FTServiceInfo GetInfo() {
+        public BH.FTServiceInfo GetInfo() {
             return base.Channel.GetInfo();
         }
         
-        public System.Threading.Tasks.Task<FTSearchWeb.BH.FTServiceInfo> GetInfoAsync() {
+        public System.Threading.Tasks.Task<BH.FTServiceInfo> GetInfoAsync() {
             return base.Channel.GetInfoAsync();
         }
         

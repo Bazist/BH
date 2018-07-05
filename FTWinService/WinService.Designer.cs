@@ -1,4 +1,4 @@
-﻿namespace FTWinService
+﻿namespace BH.WinService
 {
     partial class WinService
     {

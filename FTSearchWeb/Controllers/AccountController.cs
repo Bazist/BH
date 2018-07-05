@@ -8,9 +8,9 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using FTSearchWeb.Models;
+using BH.Web.Models;
 
-namespace FTSearchWeb.Controllers
+namespace BH.Web.Controllers
 {
     [Authorize]
     public class AccountController : Controller

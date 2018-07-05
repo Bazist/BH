@@ -10,9 +10,9 @@ using System.IO;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Threading;
-using FTServiceWCF;
+using BH.WCF;
 
-namespace FTSearchTest
+namespace BH.Tests
 {
     public partial class MainForm : Form
     {

@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.IO.Compression;
 
-namespace FTBoobenRobot
+namespace BH.BoobenRobot
 {
     public class DBHelpers
     {

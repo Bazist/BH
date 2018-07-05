@@ -1,4 +1,4 @@
-﻿namespace FTSearchTest
+﻿namespace BH.Tests
 {
     partial class MainForm
     {

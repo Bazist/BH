@@ -8,12 +8,12 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using FTServiceWCF;
+using BH.WCF;
 using System.IO;
 using System.Configuration;
-using FTBoobenRobot;
+using BH.BoobenRobot;
 
-namespace FTWinService
+namespace BH.WinService
 {
     public partial class WinService : ServiceBase
     {

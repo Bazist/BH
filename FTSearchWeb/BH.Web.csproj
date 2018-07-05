@@ -13,8 +13,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FTSearchWeb</RootNamespace>
-    <AssemblyName>FTSearchWeb</AssemblyName>
+    <RootNamespace>BH.Web</RootNamespace>
+    <AssemblyName>BH.Web</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>false</UseIISExpress>
@@ -26,6 +26,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -241,13 +242,13 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Service References\BH\FTSearchWeb.BH.FTSearchConfigurationDLL.datasource">
+    <Content Include="Service References\BH\BH.Web.BH.FTSearchConfigurationDLL.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
-    <Content Include="Service References\BH\FTSearchWeb.BH.FTSearchResult.datasource">
+    <Content Include="Service References\BH\BH.Web.BH.FTSearchResult.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
-    <Content Include="Service References\BH\FTSearchWeb.BH.FTServiceInfo.datasource">
+    <Content Include="Service References\BH\BH.Web.BH.FTServiceInfo.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
     <None Include="Service References\BH\FTService.wsdl" />

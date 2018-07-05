@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace FTSearchWeb.Model
+namespace BH.Web.Model
 {
     public class PhraseAttribute : ValidationAttribute
     {

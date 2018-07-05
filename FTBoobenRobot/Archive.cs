@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
-namespace FTBoobenRobot
+namespace BH.BoobenRobot
 {
     public class Archive
     {

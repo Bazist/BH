@@ -5,9 +5,9 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
-using FTSearchWeb.Models;
+using BH.Web.Models;
 
-namespace FTSearchWeb
+namespace BH.Web
 {
     public partial class Startup
     {

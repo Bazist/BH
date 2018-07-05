@@ -8,8 +8,8 @@
     <ProjectGuid>{0CAEF305-E916-423F-A67A-8EAF9780D1FC}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FTSearchTest</RootNamespace>
-    <AssemblyName>FTSearchTest</AssemblyName>
+    <RootNamespace>BH.Tests</RootNamespace>
+    <AssemblyName>BH.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -127,9 +127,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\FTService\FTServiceWCF.csproj">
+    <ProjectReference Include="..\..\FTService\BH.WCF.csproj">
       <Project>{34f64742-db2e-434a-ba1c-1c9474e501bf}</Project>
-      <Name>FTServiceWCF</Name>
+      <Name>BH.WCF</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

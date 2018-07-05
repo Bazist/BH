@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Configuration;
 using System.Reflection;
 
-namespace FTWinService
+namespace BH.WinService
 {
     static class Program
     {

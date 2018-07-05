@@ -7,7 +7,7 @@ using System.IO;
 using System.Net;
 using System.ServiceModel;
 
-namespace FTServiceWCF
+namespace BH.WCF
 {
     public class FTSearch
     {

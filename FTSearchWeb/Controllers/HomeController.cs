@@ -1,4 +1,4 @@
-﻿using FTSearchWeb.Model;
+﻿using BH.Web.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 
-namespace FTSearchWeb.Controllers
+namespace BH.Web.Controllers
 {
     public class HomeController : Controller
     {

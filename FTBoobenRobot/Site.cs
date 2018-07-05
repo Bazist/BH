@@ -7,9 +7,9 @@ using System.IO;
 using System.Threading;
 using System.Text.RegularExpressions;
 using System.Xml;
-using FTServiceWCF;
+using BH.WCF;
 
-namespace FTBoobenRobot
+namespace BH.BoobenRobot
 {
     public abstract class Site
     {
@@ -402,7 +402,7 @@ namespace FTBoobenRobot
         {
             //lock (FileLocker)
             //{
-            //    string logPath = @"d:\FTBoobenRobot\Log.txt";
+            //    string logPath = @"d:\BH.BoobenRobot\Log.txt";
 
             //    File.AppendAllText(logPath, text + "\r\n");
             //}
@@ -900,7 +900,7 @@ namespace FTBoobenRobot
         //public void LoadLabels()
         //{
         //    //read labels
-        //    string path = FTBoobenRobot.Site.FTBoobenRobot_PATH + "labels_" + this.Code + ".txt";
+        //    string path = BH.BoobenRobot.Site.BH.BoobenRobot_PATH + "labels_" + this.Code + ".txt";
 
         //    if (File.Exists(path))
         //    {
@@ -928,7 +928,7 @@ namespace FTBoobenRobot
         //        {
         //            var lbl = this.Labels.GetEnumerator();
 
-        //            StreamWriter sw = new StreamWriter(FTBoobenRobot.Site.FTBoobenRobot_PATH + "labels_" + this.Code + ".txt");
+        //            StreamWriter sw = new StreamWriter(BH.BoobenRobot.Site.BH.BoobenRobot_PATH + "labels_" + this.Code + ".txt");
 
         //            while (lbl.MoveNext())
         //            {

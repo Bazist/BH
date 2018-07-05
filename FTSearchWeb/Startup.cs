@@ -1,8 +1,8 @@
 ﻿using Microsoft.Owin;
 using Owin;
 
-[assembly: OwinStartupAttribute(typeof(FTSearchWeb.Startup))]
-namespace FTSearchWeb
+[assembly: OwinStartupAttribute(typeof(BH.Web.Startup))]
+namespace BH.Web
 {
     public partial class Startup
     {

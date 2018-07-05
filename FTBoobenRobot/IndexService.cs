@@ -11,9 +11,9 @@ using System.Text.RegularExpressions;
 using System.Data.SqlClient;
 using System.IO.Compression;
 using System.Collections.Concurrent;
-using FTServiceWCF;
+using BH.WCF;
 
-namespace FTBoobenRobot
+namespace BH.BoobenRobot
 {
     public partial class IndexService
     {
@@ -27,26 +27,26 @@ namespace FTBoobenRobot
             _logError = logError;
             _logInfo = logInfo;
 
-            FTBoobenRobot.Site.Sites = new List<Site>();
+            BH.BoobenRobot.Site.Sites = new List<Site>();
 
-            FTBoobenRobot.Site.Sites.Add(new PravdaSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new PravdaSite(service));
 
-            FTBoobenRobot.Site.Sites.Add(new KhafSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new KhafSite(service));
 
-            FTBoobenRobot.Site.Sites.Add(new SearchengineSite(service));
-            FTBoobenRobot.Site.Sites.Add(new DouSite(service));
-            FTBoobenRobot.Site.Sites.Add(new GamedevSite(service));
-            FTBoobenRobot.Site.Sites.Add(new HabrSite(service));
-            FTBoobenRobot.Site.Sites.Add(new GotaiSite(service));
-            FTBoobenRobot.Site.Sites.Add(new SqlSite(service));
-            FTBoobenRobot.Site.Sites.Add(new SevasSite(service));
-            FTBoobenRobot.Site.Sites.Add(new SkcSite(service));
-            FTBoobenRobot.Site.Sites.Add(new VeloSite(service));
-            FTBoobenRobot.Site.Sites.Add(new IxbtSite(service));
-            FTBoobenRobot.Site.Sites.Add(new AutouaSite(service));
-            FTBoobenRobot.Site.Sites.Add(new FinSite(service));
-            FTBoobenRobot.Site.Sites.Add(new GratisSite(service));
-            FTBoobenRobot.Site.Sites.Add(new CyberSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new SearchengineSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new DouSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new GamedevSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new HabrSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new GotaiSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new SqlSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new SevasSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new SkcSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new VeloSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new IxbtSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new AutouaSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new FinSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new GratisSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new CyberSite(service));
         }
 
         private class IndexContent
@@ -181,7 +181,7 @@ namespace FTBoobenRobot
             if (info.LastNameIDRAM <= 80) //empty instance
             {
                 /*
-                string logPath = FTBoobenRobot.Site.FTRobot_PATH + "Log.txt";
+                string logPath = BH.BoobenRobot.Site.FTRobot_PATH + "Log.txt";
 
                 if (File.Exists(logPath))
                 {
@@ -226,7 +226,7 @@ namespace FTBoobenRobot
                         if (File.Exists(file))
                         {
                             string aliasName = Path.GetFileName(file).Replace(".txt", "");
-                            string contentText = File.ReadAllText(file, FTBoobenRobot.Site.ASC2Encoding);
+                            string contentText = File.ReadAllText(file, BH.BoobenRobot.Site.ASC2Encoding);
 
                             //string[] parts = contentText.Split(new char[] { '.', '?', '!' });
                             //foreach (string part in parts)
@@ -343,7 +343,7 @@ namespace FTBoobenRobot
             {
                 string tbLogText = string.Empty;
 
-                foreach (Site site in FTBoobenRobot.Site.Sites)
+                foreach (Site site in BH.BoobenRobot.Site.Sites)
                 {
                     tbLogText += "======== ONLINE SPIDER INFO FOR " + site.Code + "========;\r\n";
                     tbLogText += "TotalSizeHTML : " + site.TotalSize.ToString() + " bytes;\r\n";
@@ -547,7 +547,7 @@ namespace FTBoobenRobot
             try
             {
                 //run spiders
-                foreach (Site site in FTBoobenRobot.Site.Sites)
+                foreach (Site site in BH.BoobenRobot.Site.Sites)
                 {
                     //site.LoadLabels();
 

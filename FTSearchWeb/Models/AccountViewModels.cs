@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace FTSearchWeb.Models
+namespace BH.Web.Models
 {
     public class ExternalLoginConfirmationViewModel
     {

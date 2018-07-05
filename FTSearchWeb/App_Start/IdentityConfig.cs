@@ -10,9 +10,9 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using FTSearchWeb.Models;
+using BH.Web.Models;
 
-namespace FTSearchWeb
+namespace BH.Web
 {
     public class EmailService : IIdentityMessageService
     {

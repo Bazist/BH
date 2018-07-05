@@ -1,10 +1,10 @@
-﻿using FTServiceWCF;
+﻿using BH.WCF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FTBoobenRobot
+namespace BH.BoobenRobot
 {
     public class AutouaSite : Site
     {

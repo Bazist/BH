@@ -1,4 +1,4 @@
-﻿namespace FTWinService
+﻿namespace BH.WinService
 {
     partial class ProjectInstaller
     {
@@ -42,7 +42,7 @@
             // 
             this.serviceInstaller1.Description = "BH - Full Text Search Service";
             this.serviceInstaller1.DisplayName = "BH\\FTSearch";
-            this.serviceInstaller1.ServiceName = "FTWinService";
+            this.serviceInstaller1.ServiceName = "BH.WinService";
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             this.serviceInstaller1.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.serviceInstaller1_AfterInstall);
             // 

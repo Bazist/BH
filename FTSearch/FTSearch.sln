@@ -5,15 +5,15 @@ VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FTSearch", "FTSearch\FTSearch.vcxproj", "{69A1675E-C3BB-4E6A-9E40-094F383A5D26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTSearchTest", "..\FTSearchNet\FTSearchNet\FTSearchTest.csproj", "{0CAEF305-E916-423F-A67A-8EAF9780D1FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.Tests", "..\FTSearchNet\FTSearchNet\BH.Tests.csproj", "{0CAEF305-E916-423F-A67A-8EAF9780D1FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTSearchWeb", "..\FTSearchWeb\FTSearchWeb.csproj", "{C8AFBC48-850A-44B7-BF10-94D5425516D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.Web", "..\FTSearchWeb\BH.Web.csproj", "{C8AFBC48-850A-44B7-BF10-94D5425516D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTServiceWCF", "..\FTService\FTServiceWCF.csproj", "{34F64742-DB2E-434A-BA1C-1C9474E501BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.WCF", "..\FTService\BH.WCF.csproj", "{34F64742-DB2E-434A-BA1C-1C9474E501BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTWinService", "..\FTWinService\FTWinService.csproj", "{1176C0DB-BA37-47D6-94FA-21849E5F6937}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.WinService", "..\FTWinService\BH.WinService.csproj", "{1176C0DB-BA37-47D6-94FA-21849E5F6937}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTBoobenRobot", "..\FTBoobenRobot\FTBoobenRobot.csproj", "{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.BoobenRobot", "..\FTBoobenRobot\BH.BoobenRobot.csproj", "{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,5 +96,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F2871A96-AF83-4D65-9400-7DF142827C36}
 	EndGlobalSection
 EndGlobal

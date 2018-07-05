@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Optimization;
 
-namespace FTSearchWeb
+namespace BH.Web
 {
     public class BundleConfig
     {
