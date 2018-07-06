@@ -66,7 +66,11 @@
     <Compile Include="Sites\VeloSite.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FTService\BH.WCF.csproj">
+    <ProjectReference Include="..\BH.BaseRobot\BH.BaseRobot.csproj">
+      <Project>{a996adc9-2a42-48b9-aa74-532b2866c8c0}</Project>
+      <Name>BH.BaseRobot</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BH.WCF\BH.WCF.csproj">
       <Project>{34f64742-db2e-434a-ba1c-1c9474e501bf}</Project>
       <Name>BH.WCF</Name>
     </ProjectReference>
