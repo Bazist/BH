@@ -13,7 +13,12 @@ namespace BH.BaseRobot
     //3. Append new directories
     //4. Html/Text
 
-    public class BaseRobot
+    public interface IBaseRobot
+    {
+        void Run();
+    }
+
+    public class BaseRobot : IBaseRobot
     {
         #region Event Methods
 
@@ -72,6 +77,11 @@ namespace BH.BaseRobot
         #endregion
         
         #region Manage Methods
+
+        public void Run()
+        {
+
+        }
 
         #endregion
     }

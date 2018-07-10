@@ -28,7 +28,7 @@ namespace BH.Tests
         private Stopwatch indexedTime = new Stopwatch();
         private Stopwatch totalTime = new Stopwatch();
 
-        private FTService fts = new FTService();
+        private FTService fts = null;// new FTService();
 
         private void UpdateScanSpeed()
         {
@@ -616,9 +616,9 @@ namespace BH.Tests
             //               }
             //           });
 
-            fts.SetConfiguration(FTService.GetDefaultConfiguration());
+            //fts.SetConfiguration(FTService.GetDefaultConfiguration());
 
-            FTService.StartWebservice(fts, "http://localhost:8080");
+            //FTService.StartWebservice(fts, "http://localhost:8080");
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -744,9 +744,18 @@ namespace BH.Tests
 
         private void button3_Click(object sender, EventArgs e)
         {
-            fts.Start();
+            //fts.Start();
 
-            fts.ClearInstance();
+            //fts.ClearInstance();
+
+            var xx = BaseRobot.RobotFactory.CreateFactory();
+
+            var xxx = xx.CreateRobots();
+
+            foreach(var x in xxx)
+            {
+                var str = x.ToString();
+            }
         }
     }
 }

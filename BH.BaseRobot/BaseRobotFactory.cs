@@ -8,7 +8,7 @@ namespace BH.BaseRobot
 {
     public interface IRobotFactory
     {
-        IEnumerable<BaseRobot> CreateRobots();
+        IEnumerable<IBaseRobot> CreateRobots();
     }
 
     public class RobotFactory : IRobotFactory
@@ -19,10 +19,10 @@ namespace BH.BaseRobot
 
         private static IEnumerable<T> GetAssemblies<T>()
         {
-            var path = Path.GetFullPath(Assembly.GetEntryAssembly().Location);
+            var path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             var files = System.IO.Directory.GetFiles(path, "*.dll", System.IO.SearchOption.AllDirectories)
-                                           .Except(new[] { Assembly.GetEntryAssembly().Location });
+                                           .Except(new[] { Assembly.GetExecutingAssembly().Location });
 
 
             foreach (var file in files)
@@ -32,7 +32,8 @@ namespace BH.BaseRobot
                 if (assembly != null)
                 {
                     var types = assembly.GetTypes()
-                                        .Where(t => t.IsAssignableFrom(typeof(T)));
+                                        .Where(t => t.IsAssignableFrom(typeof(T)) ||
+                                                    t.IsSubclassOf(typeof(T)));
 
                     foreach (var type in types)
                     {
@@ -52,7 +53,7 @@ namespace BH.BaseRobot
                 return new RobotFactory();
         }
 
-        public IEnumerable<BaseRobot> CreateRobots()
+        public IEnumerable<IBaseRobot> CreateRobots()
         {
             return GetAssemblies<BaseRobot>();
         }
