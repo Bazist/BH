@@ -8,35 +8,22 @@ namespace BH.BaseRobot
 {
     public class File
     {
-        private File()
+        public File(Directory directory,
+                    string name,
+                    string content = null)
         {
-        }
-
-        public static File CreateFile(Directory directory,
-                                      string name,
-                                      string content = null)
-        {
-            return new File
-            {
-                Directory = directory,
-                Name = name,
-                Content = content
-            };
+            Directory = directory;
+            Name = name;
+            Content = content;
         }
 
         public Directory Directory { get; private set; }
 
-        public string FullPath
-        {
-            get
-            {
-                return $"{Directory.FullPath}\\{Name}";
-            }
-        }
+        public string Name { get; }
 
-        public string Name { get; private set; }
+        public string Content { get; }
 
-        public string Content { get; private set; }
+        public string FullPath => $"{Directory.FullPath}\\{Name}";
 
         public string Version { get; set; }
 

@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace BH.BaseRobot
 {
+    public enum ErrorCode
+    {
+        General = 1
+    }
+
     public class Error
     {
-        public enum Code
-        {
-            General = 1
-        }
-
-        public string Message { get; set; }
-        public string CallStack { get; set; }
+        public ErrorCode Code { get; }
+        public string Message { get; }
+        public string CallStack { get; }
     }
 }

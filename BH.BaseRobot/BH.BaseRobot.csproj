@@ -51,6 +51,10 @@
     <Compile Include="Scheduler.cs" />
     <Compile Include="Statistic.cs" />
     <Compile Include="Storage.cs" />
+    <Compile Include="TimeTable\RunEveryDayTimeTable.cs" />
+    <Compile Include="TimeTable\RunOnceTimeTable.cs" />
+    <Compile Include="TimeTable\TimeTable.cs" />
+    <Compile Include="TimeTable\WaitPeriodTimeTable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
