@@ -16,5 +16,10 @@ namespace BH.BaseRobot
             else
                 return nowDate.AddDays(1).Add(Date.Value.TimeOfDay).Subtract(nowDate);
         }
+
+        public override string ToString()
+        {
+            return $"Run every day at {Date.Value.TimeOfDay}";
+        }
     }
 }

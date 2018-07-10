@@ -16,5 +16,10 @@ namespace BH.BaseRobot
             else
                 return Period.Value;
         }
+
+        public override string ToString()
+        {
+            return $"Start from {Date} and run every {Period} time span";
+        }
     }
 }

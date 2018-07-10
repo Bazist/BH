@@ -16,5 +16,10 @@ namespace BH.BaseRobot
             else
                 return null;
         }
+
+        public override string ToString()
+        {
+            return $"Run once at {Date}";
+        }
     }
 }
