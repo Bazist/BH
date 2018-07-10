@@ -63,7 +63,7 @@ namespace BH.BaseRobot
 
         public Configuration Configuration { get; } = Configuration.Default;
 
-        public Scheduler Scheduler { get; } = new Scheduler();
+        public Scheduler Scheduler { get; }
 
         public Storage Storage { get; } = new Storage();
 

@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseRobot.cs" />
+    <Compile Include="BaseRobotFactory.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Directory.cs" />
     <Compile Include="Error.cs" />
