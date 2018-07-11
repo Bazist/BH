@@ -1,41 +1,76 @@
-﻿using System;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BH.BaseRobot
 {
     public class QueueIndexing
     {
-        protected void AddDirectory(Directory dir)
+        public QueueIndexing()
         {
-
+            _directories = new ConcurrentQueue<Directory>();
+            _files = new ConcurrentQueue<File>();
+            _filesWithContent = new ConcurrentQueue<File>();
         }
 
-        protected void RemoveDirectory(Directory dir)
-        {
+        private ConcurrentQueue<Directory> _directories;
+        private ConcurrentQueue<File> _files;
+        private ConcurrentQueue<File> _filesWithContent;
 
+        public void EnqueDirectory(Directory directory)
+        {
+            _directories.Enqueue(directory);
         }
 
-        protected void AddDirectories(IEnumerable<Directory> dirs)
+        public void EnqueDirectories(IEnumerable<Directory> directories)
         {
-
+            foreach (var directory in directories)
+                EnqueDirectory(directory);
         }
 
-        protected void AddFile(File file)
+        public Directory DequeDirectory()
         {
+            Directory directory;
 
+            if (_directories.TryDequeue(out directory))
+                return directory;
+            else
+                return null;
         }
 
-        protected void RemoveFile(File file)
+        public void EnqueFile(File file)
         {
-
+            _files.Enqueue(file);
         }
 
-        protected void AddFiles(IEnumerable<File> files)
+        public void EnqueFiles(IEnumerable<File> files)
         {
+            foreach (var file in files)
+                EnqueFile(file);
+        }
 
+        public File DequeFile()
+        {
+            File file;
+
+            if (_files.TryDequeue(out file))
+                return file;
+            else
+                return null;
+        }
+
+        public void EnqueFileWithContent(File file)
+        {
+            _filesWithContent.Enqueue(file);
+        }
+
+        public File DequeFileWithContent()
+        {
+            File file;
+
+            if (_filesWithContent.TryDequeue(out file))
+                return file;
+            else
+                return null;
         }
     }
 }

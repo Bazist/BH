@@ -21,7 +21,9 @@ namespace BH.BaseRobot
 
         public string Name { get; }
 
-        public string Content { get; }
+        public string Content { get; set; }
+
+        public bool HasContent => !string.IsNullOrEmpty(Content);
 
         public string FullPath => $"{Directory.FullPath}\\{Name}";
 

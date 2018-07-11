@@ -17,7 +17,7 @@ namespace BH.BaseRobot
         {
         }
 
-        private static IEnumerable<T> GetAssemblies<T>()
+        private static IEnumerable<T> FindTypes<T>()
         {
             var path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
@@ -45,7 +45,7 @@ namespace BH.BaseRobot
 
         public static IRobotFactory CreateFactory()
         {
-            var factories = GetAssemblies<IRobotFactory>();
+            var factories = FindTypes<IRobotFactory>();
 
             if (factories.Any())
                 return factories.First();
@@ -55,7 +55,7 @@ namespace BH.BaseRobot
 
         public IEnumerable<IBaseRobot> CreateRobots()
         {
-            return GetAssemblies<BaseRobot>();
+            return FindTypes<BaseRobot>();
         }
     }
 }
