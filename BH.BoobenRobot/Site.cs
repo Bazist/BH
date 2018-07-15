@@ -505,7 +505,7 @@ namespace BH.BoobenRobot
 
                 try
                 {
-                    _service.IndexText(docCode, page.FileContent);
+                    _service.IndexText(docCode, null, page.FileContent);
                 }
                 catch
                 {

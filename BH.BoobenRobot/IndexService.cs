@@ -159,7 +159,7 @@ namespace BH.BoobenRobot
                     ic.ContentText = ic.ContentText.Substring(0, 65000);
                 }
 
-                _service.IndexText(ic.AliasName, ic.ContentText);
+                _service.IndexText(ic.AliasName, null, ic.ContentText);
 
                 if (_curr % 100 == 0)
                 {
