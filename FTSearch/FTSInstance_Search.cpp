@@ -42,7 +42,7 @@ void FTSInstance::calcMatchDocuments(const char* word,
 		}
 	}
 
-	uint32 minDocID = getDocHeaderSize();
+	uint32 minDocID = 1;
 	uint32 maxDocID = Info.LastNameIDRAM;
 
 	//Read from HDD
@@ -129,7 +129,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 		}
 	}
 
-	uint32 minDocID = getDocHeaderSize();
+	uint32 minDocID = 1;
 	uint32 maxDocID = Info.LastNameIDRAM;
 
 	//Read from HDD
@@ -501,7 +501,7 @@ void FTSInstance::calculateTrend(const char* phrase,
 		}
 	}
 
-	uint32 minDocID = getDocHeaderSize();
+	uint32 minDocID = 1;
 	uint32 maxDocID = Info.LastNameIDRAM;
 
 	//Read from HDD
@@ -582,7 +582,7 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 			}
 		}
 
-		uint32 minDocID = getDocHeaderSize();
+		uint32 minDocID = 1;
 		uint32 maxDocID = Info.LastNameIDRAM;
 
 		//Read from HDD
@@ -693,7 +693,7 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 			}
 		}
 
-		uint32 minDocID = getDocHeaderSize();
+		uint32 minDocID = 1;
 		uint32 maxDocID = Info.LastNameIDRAM;
 
 		//Read from HDD
@@ -823,7 +823,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 	uchar8 c = 0;
 
-	uint32 minDocID = getDocHeaderSize();
+	uint32 minDocID = 1;
 	uint32 maxDocID = Info.LastNameIDRAM;
 
 	for(uint32 i = 0; i <= phraseLen; i++)
@@ -1503,7 +1503,7 @@ QueryResult* FTSInstance::searchQuery(Selector** selectors,
 			haWordsRAM.scanByVisitor(pSelector);
 		}
 
-		uint32 minDocID = getDocHeaderSize();
+		uint32 minDocID = 1;
 		uint32 maxDocID = Info.LastNameIDRAM;
 
 		for(uint32 j=0; j < pSelector->pDictionary->Count; j++)

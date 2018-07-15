@@ -47,8 +47,6 @@ class FTSInstanceInfo
 public:
 	uint32 Version;
 
-	uint32 FirstNameID;
-
 	uint32 LastNameIDRAM;
 	uint32 LastNameIDHDD;
 	
@@ -117,10 +115,8 @@ public:
 		CountWordsRAM = 0;
 		CountWordsHDD = 0;
 
-		FirstNameID = sizeof(UNIQUE_IDENTIFIER) + sizeof(Version) + sizeof(FTSInstanceInfo);
-		
-		LastNameIDRAM = FirstNameID;
-		LastNameIDHDD = FirstNameID;
+		LastNameIDRAM = 1;
+		LastNameIDHDD = 1;
 
 		LastErrorMessage[0] = 0;
 		HasError = false;

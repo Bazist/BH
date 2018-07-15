@@ -1103,7 +1103,7 @@ void FTSInstance::importIndex(const char* importPath)
 			//Read and save blocks from HDD
 			if(docPosition == sourceFilePositionImport + sourceBuffPositionImport)
 			{
-				uint32 baseDocNumber = Info.LastNameIDHDD - docHeaderSize;
+				uint32 baseDocNumber = Info.LastNameIDHDD - 1;
 
 				moveDocFileBlocks(pDocFileImport, 
 								  pDocFileTemp, 
@@ -1117,7 +1117,7 @@ void FTSInstance::importIndex(const char* importPath)
 								  MAX_SIZE_BUFFER,
 								  baseDocNumber,
 								  lastDocNumber,
-								  Info.LastNameIDHDD + infoImport.LastNameIDHDD - docHeaderSize);
+								  Info.LastNameIDHDD + infoImport.LastNameIDHDD - 1);
 			}
 			else
 			{
@@ -1182,7 +1182,7 @@ void FTSInstance::importIndex(const char* importPath)
 
 			if(docPositionImport == sourceFilePositionImport + sourceBuffPositionImport)
 			{
-				uint32 baseDocNumber = Info.LastNameIDHDD - docHeaderSize;
+				uint32 baseDocNumber = Info.LastNameIDHDD - 1;
 
 				moveDocFileBlocks(pDocFileImport,
 								  pDocFileTemp, 
@@ -1196,7 +1196,7 @@ void FTSInstance::importIndex(const char* importPath)
 								  MAX_SIZE_BUFFER,
 								  baseDocNumber,
 								  lastDocNumber,
-								  Info.LastNameIDHDD + infoImport.LastNameIDHDD - docHeaderSize);
+								  Info.LastNameIDHDD + infoImport.LastNameIDHDD - 1);
 			}
 			else
 			{
@@ -1311,8 +1311,8 @@ void FTSInstance::importIndex(const char* importPath)
 	}
 
 	//save header
-	Info.LastNameIDHDD += infoImport.LastNameIDHDD - docHeaderSize;
-	Info.LastNameIDRAM += infoImport.LastNameIDRAM - docHeaderSize; //new ids from here
+	Info.LastNameIDHDD += infoImport.LastNameIDHDD - 1;
+	Info.LastNameIDRAM += infoImport.LastNameIDRAM - 1; //new ids from here
 
 	pDocFileTemp->setPosition(0);
 	pDocFileTemp->writeInt(&UNIQUE_IDENTIFIER);
@@ -1507,7 +1507,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 		Configuration.WordsHeaderBase = Info.WordsHeaderBase;
 
-		uint32 minDocID = getDocHeaderSize();
+		uint32 minDocID = 1;
 		uint32 maxDocID = Info.LastNameIDRAM;
 		
 		//haWordsRAM

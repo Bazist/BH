@@ -282,7 +282,7 @@ public:
 				else
 				{
 					//document on hdd
-					uint32 offset = (id - docHeaderSize) * Info.DocumentNameSize + DOC_NAME_HEADER_SIZE;
+					uint32 offset = (id - 1) * Info.DocumentNameSize + DOC_NAME_HEADER_SIZE;
 					pDocNameFile->read(name, offset, sizeName);
 				}
 			}
