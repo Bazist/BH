@@ -53,9 +53,16 @@
     <Compile Include="Statistic.cs" />
     <Compile Include="Storage.cs" />
     <Compile Include="TimeTable\RunEveryDayTimeTable.cs" />
+    <Compile Include="TimeTable\RunNowTimeTable.cs" />
     <Compile Include="TimeTable\RunOnceTimeTable.cs" />
     <Compile Include="TimeTable\TimeTable.cs" />
     <Compile Include="TimeTable\WaitPeriodTimeTable.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BH.WCF\BH.WCF.csproj">
+      <Project>{34F64742-DB2E-434A-BA1C-1C9474E501BF}</Project>
+      <Name>BH.WCF</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

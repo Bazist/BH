@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BH.WCF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,9 +47,9 @@ namespace BH.BaseRobot
 
         #region Virtual Methods
 
-        protected virtual Configuration GetConfiguration(Configuration config)
+        protected virtual Scheduler GetScheduler()
         {
-            return config;
+            return new Scheduler(new RunNowTimeTable(), Run);
         }
 
         protected virtual IEnumerable<Directory> GetDirectories()
@@ -73,13 +74,11 @@ namespace BH.BaseRobot
 
         #region Members
 
-        public Configuration Configuration { get; } = Configuration.Default;
+        public Scheduler Scheduler { get; private set; }
 
-        public Scheduler Scheduler { get; }
+        public Storage Storage { get; private set; }
 
-        public Storage Storage { get; } = new Storage();
-
-        public QueueIndexing QueueIndexing { get; } = new QueueIndexing();
+        public QueueIndexing QueueIndexing { get; private set; }
 
         public bool IsRunning => IsScanRunning || IsIndexRunning;
 
@@ -90,6 +89,13 @@ namespace BH.BaseRobot
         #endregion
 
         #region Run Methods
+
+        public void Init(FTService ftService)
+        {
+            Storage = new Storage(ftService);
+            QueueIndexing = new QueueIndexing();
+            Scheduler = GetScheduler();
+        }
 
         public void Run()
         {
@@ -132,11 +138,6 @@ namespace BH.BaseRobot
             }
 
             return;
-        }
-
-        private void ReadFileVersions(IEnumerable<File> files)
-        {
-
         }
 
         private bool ScanDirectory(Directory directory)

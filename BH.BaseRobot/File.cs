@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BH.WCF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,11 @@ namespace BH.BaseRobot
         public override string ToString()
         {
             return FullPath;
+        }
+
+        public FTService.DocumentName ToDocumentName()
+        {
+            return new FTService.DocumentName { Name = Name, Version = Version };
         }
     }
 }
