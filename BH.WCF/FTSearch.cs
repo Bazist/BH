@@ -239,7 +239,7 @@ namespace BH.WCF
         [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct RelevantResultNameDLL
         {
-            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 256)]
+            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = DOC_NAME_LENGTH)]
             public string Name;
         }
 
@@ -271,8 +271,8 @@ namespace BH.WCF
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] Name = new byte[128];
 
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-            public byte[] FilePath = new byte[256];
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = DOC_NAME_LENGTH)]
+            public byte[] FilePath = new byte[DOC_NAME_LENGTH];
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] MinBound = new byte[128];
@@ -637,6 +637,19 @@ namespace BH.WCF
             return File.ReadAllText(fullName, GetFileEncoding(fullName));
         }
 
+        //TODO make another method to load portion of names in one call
+        public unsafe string GetDocumentNameByID(uint id)
+        {
+            byte[] nameBytes = new byte[DOC_NAME_LENGTH];
+
+            fixed (Byte* pName = nameBytes)
+            {
+                getDocumentNameByIDDLL(InstanceNumber, id, pName, DOC_NAME_LENGTH);
+
+                return Encoding.GetString(nameBytes).Replace("\0", "");
+            }
+        }
+
         public unsafe List<Result> SearchPhraseWithOr(string phrase, uint minPage, uint maxPage)
         {
             string[] phrases = phrase.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
@@ -652,14 +665,14 @@ namespace BH.WCF
 
             List<Result> results = new List<Result>();
 
-            byte[] nameBytes = new byte[256];
+            byte[] nameBytes = new byte[DOC_NAME_LENGTH];
 
             fixed (Byte* pName = nameBytes)
             {
                 foreach (uint id in ids.Distinct())
                 {
                     //get name of document
-                    getDocumentNameByIDDLL(InstanceNumber, id, pName, 256);
+                    getDocumentNameByIDDLL(InstanceNumber, id, pName, DOC_NAME_LENGTH);
 
                     Result result = new Result();
 
@@ -675,7 +688,7 @@ namespace BH.WCF
         public unsafe List<uint> SearchIDByPhrase(string phrase, string templateName, uint minPage, uint maxPage)
         {
             List<uint> results = new List<uint>();
-            byte[] nameBytes = new byte[256];
+            byte[] nameBytes = new byte[DOC_NAME_LENGTH];
 
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase),
                          pTemplateName = Encoding.GetBytes(templateName),
@@ -764,7 +777,7 @@ namespace BH.WCF
                     //    result.Positions = new ResultPosition[matchPositions.Length];
                     //    for (int j = 0; j < result.Positions.Length; j++)
                     //    {
-                    //        result.Positions[j].StartPosition = int.Parse(nameAndPart[1]) * 65536 + matchPositions[j] * 256;
+                    //        result.Positions[j].StartPosition = int.Parse(nameAndPart[1]) * 65536 + matchPositions[j] * DOC_NAME_LENGTH;
                     //        result.Positions[j].Length = 512;
                     //    }
                     //}
@@ -803,7 +816,7 @@ namespace BH.WCF
         {
             SearchResult result = new SearchResult();
 
-            //byte[] nameBytes = new byte[256];
+            //byte[] nameBytes = new byte[DOC_NAME_LENGTH];
 
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase))
             {
@@ -899,7 +912,7 @@ namespace BH.WCF
             QueryResultDLL queryResultDLL = (QueryResultDLL)Marshal.PtrToStructure(pQueryResult, typeof(QueryResultDLL));
             int rowSize = Marshal.SizeOf(typeof(QueryRowDLL));
 
-            byte[] nameBytes = new byte[256];
+            byte[] nameBytes = new byte[DOC_NAME_LENGTH];
 
             fixed (Byte* pName = nameBytes)
             {

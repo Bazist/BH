@@ -134,6 +134,11 @@ namespace BH.BaseRobot
             return;
         }
 
+        private void ReadFileVersions(IEnumerable<File> files)
+        {
+
+        }
+
         private bool ScanDirectory(Directory directory)
         {
             try
@@ -144,6 +149,8 @@ namespace BH.BaseRobot
                 var files = GetFiles(directory);
 
                 QueueIndexing.EnqueFiles(files);
+
+                ReadFileVersions(files);
 
                 while (true)
                 {
@@ -188,9 +195,9 @@ namespace BH.BaseRobot
                         if(!string.IsNullOrEmpty(content))
                         {
                             file.Content = content;
+
+                            QueueIndexing.EnqueFileWithContent(file);
                         }
-    
-                        QueueIndexing.EnqueFileWithContent(file);
                     }
                     finally
                     {

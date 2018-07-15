@@ -243,6 +243,27 @@ namespace BH.WCF
              });
         }
         
+        [OperationContract]
+        public Dictionary<string, string> ReadDocumentVersions(List<string> documentNames)
+        {
+            var result = documentNames.ToDictionary(x => x, y => string.Empty);
+            var foundDocumentNames = 0;
+
+            foreach (var instance in Instances.Reverse<FTSearch>())
+            {
+                var info = instance.GetInfo();
+                for(uint docId = info.LastNameIDRAM; docId > 64; docId--)
+                {
+                    string[] nameAndVersion = instance.GetDocumentNameByID(docId).Split(';');
+
+
+
+                }
+            }
+
+            return result;
+        }
+
         private FTSearch.SearchResult GetPortion(ref int skip,
                                                  int take,
                                                  Func<FTSearch, FTSearch.SearchResult> searchFunc)
@@ -389,14 +410,14 @@ namespace BH.WCF
         }
 
         [OperationContract]
-        public bool IndexText(string aliasName, string contentText)
+        public bool IndexText(string documentName, string documentVersion, string contentText)
         {
             return TryCatch<bool>(() =>
             {
                 if (!IsStarted())
                     throw new Exception("Service is not started.");
 
-                return ActiveInstance.IndexContent(aliasName, contentText, FTSearch.ContentType.Text);
+                return ActiveInstance.IndexContent($"{documentName};{documentVersion}", contentText, FTSearch.ContentType.Text);
 
                 //{
                 //    foreach (var file in IndexedFilesInMemory)
@@ -529,146 +550,146 @@ namespace BH.WCF
             });
         }
 
-        static void Unpack(string archive, string file, string dest)
-        {
-            //7z e archive.zip - oc:\soft *.cpp - r
-            //extracts all *.cpp files from archive archive.zip to c:\soft folder.
+        //static void Unpack(string archive, string file, string dest)
+        //{
+        //    //7z e archive.zip - oc:\soft *.cpp - r
+        //    //extracts all *.cpp files from archive archive.zip to c:\soft folder.
 
-            var proc = new System.Diagnostics.Process();
-            proc.StartInfo = new System.Diagnostics.ProcessStartInfo();
-            proc.StartInfo.FileName = @"C:\Program Files\7-Zip\7z.exe";
-            proc.StartInfo.Arguments = " x \"" + archive + "\" -o\"" + dest + "\" \"" + file + "\" -r";
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        //    var proc = new System.Diagnostics.Process();
+        //    proc.StartInfo = new System.Diagnostics.ProcessStartInfo();
+        //    proc.StartInfo.FileName = @"C:\Program Files\7-Zip\7z.exe";
+        //    proc.StartInfo.Arguments = " x \"" + archive + "\" -o\"" + dest + "\" \"" + file + "\" -r";
+        //    proc.StartInfo.UseShellExecute = false;
+        //    proc.StartInfo.CreateNoWindow = true;
+        //    proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
-            //proc.StartInfo.Verb = "runas";
+        //    //proc.StartInfo.Verb = "runas";
 
-            proc.Start();
-            proc.WaitForExit();
+        //    proc.Start();
+        //    proc.WaitForExit();
 
-            //Console.WriteLine(proc.StandardError.ReadToEnd());
-            //Console.WriteLine(proc.StandardOutput.ReadToEnd());
-        }
+        //    //Console.WriteLine(proc.StandardError.ReadToEnd());
+        //    //Console.WriteLine(proc.StandardOutput.ReadToEnd());
+        //}
 
-        [OperationContract]
-        public string LoadContent(string name, string aroundPhrase)
-        {
-            return TryCatch<string>(() =>
-            {
-                name = name.Replace(@"C:\FTS\Logs\Unpacked\", string.Empty);
+        //[OperationContract]
+        //public string LoadContent(string name, string aroundPhrase)
+        //{
+        //    return TryCatch<string>(() =>
+        //    {
+        //        name = name.Replace(@"C:\FTS\Logs\Unpacked\", string.Empty);
 
-                var parts = name.Split('\\');
+        //        var parts = name.Split('\\');
 
-                var archiveName = parts[0];
+        //        var archiveName = parts[0];
 
-                var archive = Path.Combine(@"\\srv3\fs\Production-Logs", archiveName) + ".7z";
+        //        var archive = Path.Combine(@"\\Production-Logs", archiveName) + ".7z";
 
-                var file = name.Replace(archiveName + "\\", "");
+        //        var file = name.Replace(archiveName + "\\", "");
 
-                var dest = Path.Combine(@"C:\FTS\Logs\Cached", archiveName);
+        //        var dest = Path.Combine(@"C:\FTS\Logs\Cached", archiveName);
 
-                if (!Directory.Exists(dest))
-                {
-                    Directory.CreateDirectory(dest);
-                }
+        //        if (!Directory.Exists(dest))
+        //        {
+        //            Directory.CreateDirectory(dest);
+        //        }
 
-                var fullPath = Path.Combine(dest, file);
+        //        var fullPath = Path.Combine(dest, file);
 
-                if (!File.Exists(fullPath))
-                {
-                    Unpack(archive, file, dest);
-                }
+        //        if (!File.Exists(fullPath))
+        //        {
+        //            Unpack(archive, file, dest);
+        //        }
 
-                var content = new StringBuilder();
+        //        var content = new StringBuilder();
 
-                int startLine = -1;
-                int endLine = -1;
+        //        int startLine = -1;
+        //        int endLine = -1;
 
-                const int amountLines = 50;
+        //        const int amountLines = 50;
 
-                //need optimize !
-                Queue<string> lines = new Queue<string>();
+        //        //need optimize !
+        //        Queue<string> lines = new Queue<string>();
 
-                using (StreamReader sr = new StreamReader(fullPath))
-                {
-                    while (!sr.EndOfStream)
-                    {
-                        string line = sr.ReadLine();
+        //        using (StreamReader sr = new StreamReader(fullPath))
+        //        {
+        //            while (!sr.EndOfStream)
+        //            {
+        //                string line = sr.ReadLine();
 
-                        //Regex reg1 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "[^a-zA-Z0-9]+");
-                        //Regex reg2 = new Regex("^" + aroundPhrase + "[^a-zA-Z0-9]+");
-                        //Regex reg3 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "$");
+        //                //Regex reg1 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "[^a-zA-Z0-9]+");
+        //                //Regex reg2 = new Regex("^" + aroundPhrase + "[^a-zA-Z0-9]+");
+        //                //Regex reg3 = new Regex("[^a-zA-Z0-9]+" + aroundPhrase + "$");
 
-                        var words = aroundPhrase.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        //                var words = aroundPhrase.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                        if (words.Any(m => Regex.Match(line, "\\b" + m + "\\b", RegexOptions.IgnoreCase).Success))
-                        {
-                            if (startLine == -1)
-                            {
-                                if (lines.Count > amountLines)
-                                {
-                                    startLine = lines.Count - amountLines;
-                                }
-                                else
-                                {
-                                    startLine = 0;
-                                }
-                            }
+        //                if (words.Any(m => Regex.Match(line, "\\b" + m + "\\b", RegexOptions.IgnoreCase).Success))
+        //                {
+        //                    if (startLine == -1)
+        //                    {
+        //                        if (lines.Count > amountLines)
+        //                        {
+        //                            startLine = lines.Count - amountLines;
+        //                        }
+        //                        else
+        //                        {
+        //                            startLine = 0;
+        //                        }
+        //                    }
 
-                            endLine = lines.Count + amountLines;
-                        }
+        //                    endLine = lines.Count + amountLines;
+        //                }
 
-                        //make break
-                        if (startLine != -1 && lines.Count > endLine)
-                        {
-                            content.AppendLine("[BREAK]");
-                            content.AppendLine(lines.Aggregate((x, y) => x + "\n" + y));
+        //                //make break
+        //                if (startLine != -1 && lines.Count > endLine)
+        //                {
+        //                    content.AppendLine("[BREAK]");
+        //                    content.AppendLine(lines.Aggregate((x, y) => x + "\n" + y));
 
-                            if (content.Length > 1024 * 1024)
-                            {
-                                content.AppendLine("[TooManyMatches]");
+        //                    if (content.Length > 1024 * 1024)
+        //                    {
+        //                        content.AppendLine("[TooManyMatches]");
 
-                                return content.ToString();
-                            }
+        //                        return content.ToString();
+        //                    }
 
-                            startLine = -1;
-                            endLine = -1;
+        //                    startLine = -1;
+        //                    endLine = -1;
 
-                            //leave 50 rows
-                            for (int i = 0; i < lines.Count - amountLines; i++)
-                            {
-                                lines.Dequeue();
-                            }
-                        }
+        //                    //leave 50 rows
+        //                    for (int i = 0; i < lines.Count - amountLines; i++)
+        //                    {
+        //                        lines.Dequeue();
+        //                    }
+        //                }
 
-                        if (startLine == -1 &&
-                            endLine == -1 &&
-                            lines.Count > amountLines)
-                        {
-                            lines.Dequeue();
-                        }
+        //                if (startLine == -1 &&
+        //                    endLine == -1 &&
+        //                    lines.Count > amountLines)
+        //                {
+        //                    lines.Dequeue();
+        //                }
 
-                        lines.Enqueue(line);
-                    }
-                }
+        //                lines.Enqueue(line);
+        //            }
+        //        }
 
-                //end of file
-                if (startLine != -1)
-                {
-                    content.AppendLine("[BREAK]");
+        //        //end of file
+        //        if (startLine != -1)
+        //        {
+        //            content.AppendLine("[BREAK]");
 
-                    if (lines.Count > 0)
-                    {
-                        content.AppendLine(lines.Aggregate((x, y) => x + "\r\n" + y));
-                    }
-                }
+        //            if (lines.Count > 0)
+        //            {
+        //                content.AppendLine(lines.Aggregate((x, y) => x + "\r\n" + y));
+        //            }
+        //        }
 
-                //File.Delete(fullPath);
+        //        //File.Delete(fullPath);
 
-                return content.ToString();
-            });
-        }
+        //        return content.ToString();
+        //    });
+        //}
 
         private static T TryCatch<T>(Func<T> action)
         {
