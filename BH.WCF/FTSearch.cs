@@ -40,6 +40,8 @@ namespace BH.WCF
         {
             public uint Version;
 
+            public uint FirstNameID;
+
             public uint LastNameIDRAM;
             public uint LastNameIDHDD;
 
@@ -207,6 +209,8 @@ namespace BH.WCF
         public struct FTSInstanceInfoDLL
         {
             public System.UInt32 Version;
+
+            public System.UInt32 FirstNameID;
 
             public System.UInt32 LastNameIDRAM;
             public System.UInt32 LastNameIDHDD;
@@ -996,6 +1000,8 @@ namespace BH.WCF
             FTSInstanceInfo info = new FTSInstanceInfo();
 
             info.Version = dllInfo.Version;
+
+            info.FirstNameID = dllInfo.FirstNameID;
 
             info.LastNameIDRAM = dllInfo.LastNameIDRAM;
             info.LastNameIDHDD = dllInfo.LastNameIDHDD;

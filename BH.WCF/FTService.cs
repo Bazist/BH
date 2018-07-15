@@ -260,7 +260,7 @@ namespace BH.WCF
             {
                 var info = instance.GetInfo();
 
-                for(uint docId = info.LastNameIDRAM; docId > 64; docId--)
+                for(uint docId = info.LastNameIDRAM; docId >= info.FirstNameID; docId--)
                 {
                     string[] nameAndVersion = instance.GetDocumentNameByID(docId).Split(';');
 
@@ -417,6 +417,7 @@ namespace BH.WCF
                     result.LastNameIDRAM += current.LastNameIDRAM;
                     result.TotalMemory += current.TotalMemory;
                     result.UsedMemory += current.UsedMemory;
+                    result.FirstNameID = current.FirstNameID;
                     result.Version = current.Version;
                     result.WordsHeaderBase = current.WordsHeaderBase;
                 }
