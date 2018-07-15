@@ -48,6 +48,12 @@ namespace BH.WCF
             public uint RelevantLevel;
         }
 
+        public class DocumentName
+        {
+            public string Name;
+            public string Version;
+        }
+
         #endregion
 
         #region Members
@@ -244,24 +250,38 @@ namespace BH.WCF
         }
         
         [OperationContract]
-        public Dictionary<string, string> ReadDocumentVersions(List<string> documentNames)
+        public List<DocumentName> ReadDocumentVersions(List<DocumentName> documentNames)
         {
-            var result = documentNames.ToDictionary(x => x, y => string.Empty);
+            var dicDocumentNames = documentNames.ToDictionary(x => x.Name,
+                                                              x => x);
             var foundDocumentNames = 0;
 
             foreach (var instance in Instances.Reverse<FTSearch>())
             {
                 var info = instance.GetInfo();
+
                 for(uint docId = info.LastNameIDRAM; docId > 64; docId--)
                 {
                     string[] nameAndVersion = instance.GetDocumentNameByID(docId).Split(';');
 
+                    string name = nameAndVersion[0];
+                    string version = nameAndVersion[1];
 
+                    if (dicDocumentNames.ContainsKey(name))
+                    {
+                        dicDocumentNames[name].Version = version;
 
+                        foundDocumentNames++;
+
+                        if(foundDocumentNames >= dicDocumentNames.Count)
+                        {
+                            return documentNames;
+                        }
+                    }
                 }
             }
 
-            return result;
+            return documentNames;
         }
 
         private FTSearch.SearchResult GetPortion(ref int skip,
