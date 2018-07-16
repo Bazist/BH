@@ -11,7 +11,16 @@ namespace BH.BaseRobot
 
         public override TimeSpan? HowLongToWait(DateTime nowDate)
         {
-            return TimeSpan.FromSeconds(0);
+            if (Date == null)
+            {
+                Date = nowDate;
+
+                return TimeSpan.FromSeconds(0);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public override string ToString()

@@ -10,8 +10,8 @@ namespace BH.BaseRobot
             Period = period;
         }
 
-        public DateTime? Date { get; }
-        public TimeSpan? Period { get; }
+        public DateTime? Date { get; protected set; }
+        public TimeSpan? Period { get; protected set; }
 
         public abstract TimeSpan? HowLongToWait(DateTime nowDate);
     }
