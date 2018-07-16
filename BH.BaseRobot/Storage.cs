@@ -21,10 +21,14 @@ namespace BH.BaseRobot
             return _ftService.GetInfo();
         }
 
-        public IEnumerable<File> ReadFileVersions(IEnumerable<File> files)
+        public IDictionary<string, string> ReadFileVersions(IEnumerable<File> files)
         {
-            return _ftService.ReadDocumentVersions(files.Select(x => x.ToDocumentName())
-                                                        .ToList());
+            return _ftService.ReadDocumentVersions(files.Select(x => x.Name).ToList());
+        }
+
+        public void IndexFile(File file)
+        {
+            _ftService.IndexText(file.Name, file.Version, file.Content);
         }
 
         public bool IsFileExists(string name)

@@ -39,8 +39,6 @@ namespace BH.BaseRobot
         protected virtual bool OnBeforeFileIndexing(File file) => true;
         protected virtual bool OnAfterFileIndexing(File file) => true;
         
-        protected virtual void OnStatUpdated(Statistic stat) { }
-
         protected virtual bool OnError(Error error) => true;
 
         #endregion
@@ -59,7 +57,7 @@ namespace BH.BaseRobot
 
         protected virtual IEnumerable<File> GetFiles(Directory directory)
         {
-            return null;
+            return new File[] { };
         }
 
         protected virtual bool ShouldFileIndexed(File file, string oldVersion, string newVersion) => (newVersion == null ||
@@ -151,7 +149,7 @@ namespace BH.BaseRobot
 
                 QueueIndexing.EnqueFiles(files);
 
-                ReadFileVersions(files);
+                var oldVersions = Storage.ReadFileVersions(files);
 
                 while (true)
                 {
@@ -159,7 +157,7 @@ namespace BH.BaseRobot
 
                     if (file != null)
                     {
-                        if (!ScanFile(file))
+                        if (!ScanFile(oldVersions, file))
                             return false;
                     }
                     else
@@ -177,14 +175,14 @@ namespace BH.BaseRobot
             return true;
         }
 
-        private bool ScanFile(File file)
+        private bool ScanFile(IDictionary<string, string> oldVersions, File file)
         {
             try
             {
                 if (!OnBeforeFileScanning(file))
                     return false;
 
-                if (ShouldFileIndexed(file, file.Version, null))
+                if (ShouldFileIndexed(file, oldVersions[file.Name], file.Version))
                 {
                     try
                     {
@@ -231,7 +229,7 @@ namespace BH.BaseRobot
                             if (!OnBeforeFileIndexing(file))
                                 return;
 
-                            IndexFile(file);
+                            Storage.IndexFile(file);
                         }
                         finally
                         {
@@ -254,11 +252,6 @@ namespace BH.BaseRobot
             }
 
             return;
-        }
-
-        private bool IndexFile(File file)
-        {
-            return true;
         }
 
         #endregion

@@ -249,11 +249,10 @@ namespace BH.WCF
              });
         }
         
-        [OperationContract]
-        public List<DocumentName> ReadDocumentVersions(List<DocumentName> documentNames)
+        public IDictionary<string, string> ReadDocumentVersions(IEnumerable<string> fileNames)
         {
-            var dicDocumentNames = documentNames.ToDictionary(x => x.Name,
-                                                              x => x);
+            var dicDocumentNames = fileNames.ToDictionary(x => x,
+                                                          x => string.Empty);
             var foundDocumentNames = 0;
 
             foreach (var instance in Instances.Reverse<FTSearch>())
@@ -269,19 +268,19 @@ namespace BH.WCF
 
                     if (dicDocumentNames.ContainsKey(name))
                     {
-                        dicDocumentNames[name].Version = version;
+                        dicDocumentNames[name] = version;
 
                         foundDocumentNames++;
 
                         if(foundDocumentNames >= dicDocumentNames.Count)
                         {
-                            return documentNames;
+                            return dicDocumentNames;
                         }
                     }
                 }
             }
 
-            return documentNames;
+            return dicDocumentNames;
         }
 
         private FTSearch.SearchResult GetPortion(ref int skip,
