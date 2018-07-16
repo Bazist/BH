@@ -251,36 +251,39 @@ namespace BH.WCF
         
         public IDictionary<string, string> ReadDocumentVersions(IEnumerable<string> fileNames)
         {
-            var dicDocumentNames = fileNames.ToDictionary(x => x,
-                                                          x => string.Empty);
-            var foundDocumentNames = 0;
-
-            foreach (var instance in Instances.Reverse<FTSearch>())
+            return TryCatch(() =>
             {
-                var info = instance.GetInfo();
+                var dicDocumentNames = fileNames.ToDictionary(x => x,
+                                                          x => string.Empty);
+                var foundDocumentNames = 0;
 
-                for(uint docId = info.LastNameIDRAM; docId >= 1; docId--)
+                foreach (var instance in Instances.Reverse<FTSearch>())
                 {
-                    string[] nameAndVersion = instance.GetDocumentNameByID(docId).Split(';');
+                    var info = instance.GetInfo();
 
-                    string name = nameAndVersion[0];
-                    string version = nameAndVersion[1];
-
-                    if (dicDocumentNames.ContainsKey(name))
+                    for (uint docId = info.LastNameIDRAM; docId >= 1; docId--)
                     {
-                        dicDocumentNames[name] = version;
+                        string[] nameAndVersion = instance.GetDocumentNameByID(docId).Split(';');
 
-                        foundDocumentNames++;
+                        string name = nameAndVersion[0];
+                        string version = nameAndVersion[1];
 
-                        if(foundDocumentNames >= dicDocumentNames.Count)
+                        if (dicDocumentNames.ContainsKey(name))
                         {
-                            return dicDocumentNames;
+                            dicDocumentNames[name] = version;
+
+                            foundDocumentNames++;
+
+                            if (foundDocumentNames >= dicDocumentNames.Count)
+                            {
+                                return dicDocumentNames;
+                            }
                         }
                     }
                 }
-            }
 
-            return dicDocumentNames;
+                return dicDocumentNames;
+            });
         }
 
         private FTSearch.SearchResult GetPortion(ref int skip,
