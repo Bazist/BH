@@ -12,6 +12,7 @@ using BH.WCF;
 using System.IO;
 using System.Configuration;
 using BH.BoobenRobot;
+using BH.BaseRobot;
 
 namespace BH.WinService
 {
@@ -38,10 +39,7 @@ namespace BH.WinService
         }
 
         private static FTService _fts = new FTService();
-        private static string _indexedArchives = string.Empty;
-        //private static long _readBytes = 0;
-        //private static int _amountDocuments = 0;
-        private static Thread _job;
+        private static IEnumerable<IBaseRobot> _robots;
 
         public void TestStart()
         {
@@ -101,16 +99,30 @@ namespace BH.WinService
             }
         }
 
-        private void StartJob()
+        private void StartRobots()
         {
-            if (bool.Parse(ConfigurationManager.AppSettings["EnableJob"]))
+            if (bool.Parse(ConfigurationManager.AppSettings["EnableRobots"]))
             {
-                WriteLog("Start Job", EventLogEntryType.Information);
+                WriteLog("Start Robots", EventLogEntryType.Information);
 
+                var factory = RobotFactory.CreateFactory();
+
+                _robots = factory.CreateRobots();
+
+                foreach (var robot in _robots)
+                {
+                    robot.Start(_fts);
+                }
+
+                /*
                 _job = new Thread(() =>
                 {
                     try
                     {
+
+                        
+
+
                         IndexService indexService = new IndexService(_fts,
                                                                      x => WriteLog(x, EventLogEntryType.Error),
                                                                      x => Debug.WriteLine(x));
@@ -159,7 +171,7 @@ namespace BH.WinService
                             default:
                                 throw new Exception(jobType + " is not found");
                         }
-                    }
+                }
                     catch (Exception ex)
                     {
                         WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
@@ -172,8 +184,9 @@ namespace BH.WinService
                 );
 
                 _job.Start();
+                */
 
-                WriteLog("Job Started.", EventLogEntryType.Information);
+                WriteLog("Robots Started.", EventLogEntryType.Information);
             }
         }
 
@@ -181,7 +194,7 @@ namespace BH.WinService
         {
             StartService();
 
-            StartJob();
+            StartRobots();
         }
 
         protected override void OnStop()
@@ -191,9 +204,12 @@ namespace BH.WinService
             //start web service
             try
             {
-                if (_job != null)
+                if (_robots != null)
                 {
-                    _job.Abort();
+                    foreach(var robot in _robots)
+                    {
+                        robot.Stop();
+                    }
                 }
 
                 FTService.StopWebService();

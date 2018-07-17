@@ -50,7 +50,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueIndexing.cs" />
     <Compile Include="Scheduler.cs" />
-    <Compile Include="Statistic.cs" />
     <Compile Include="Storage.cs" />
     <Compile Include="TimeTable\RunEveryDayTimeTable.cs" />
     <Compile Include="TimeTable\RunNowTimeTable.cs" />

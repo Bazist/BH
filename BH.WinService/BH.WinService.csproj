@@ -85,6 +85,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BH.BaseRobot\BH.BaseRobot.csproj">
+      <Project>{a996adc9-2a42-48b9-aa74-532b2866c8c0}</Project>
+      <Name>BH.BaseRobot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BH.BoobenRobot\BH.BoobenRobot.csproj">
       <Project>{b2aef7ac-0e77-4ba7-8270-2ff637223ae1}</Project>
       <Name>BH.BoobenRobot</Name>

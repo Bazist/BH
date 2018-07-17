@@ -28,7 +28,8 @@ namespace BH.BaseRobot
 
         public void IndexFile(File file)
         {
-            _ftService.IndexText(file.Name, file.Version, file.Content);
+            if (_ftService.IndexText(file.Name, file.Version, file.Content))
+                _ftService.SaveIndex();
         }
 
         public bool IsFileExists(string name)

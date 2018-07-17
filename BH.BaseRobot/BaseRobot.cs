@@ -17,7 +17,8 @@ namespace BH.BaseRobot
 
     public interface IBaseRobot
     {
-        void Run();
+        void Start(FTService ftService);
+        void Stop();
     }
 
     public class BaseRobot : IBaseRobot
@@ -45,9 +46,9 @@ namespace BH.BaseRobot
 
         #region Virtual Methods
 
-        protected virtual Scheduler GetScheduler()
+        protected virtual TimeTable GetTimeTable()
         {
-            return new Scheduler(new RunNowTimeTable(), Run);
+            return new RunNowTimeTable();
         }
 
         protected virtual IEnumerable<Directory> GetDirectories()
@@ -88,14 +89,20 @@ namespace BH.BaseRobot
 
         #region Run Methods
 
-        public void Init(FTService ftService)
+        public void Start(FTService ftService)
         {
             Storage = new Storage(ftService);
             QueueIndexing = new QueueIndexing();
-            Scheduler = GetScheduler();
+            Scheduler = new Scheduler(GetTimeTable(), ScanAndIndex);
+            Scheduler.Start();
         }
 
-        public void Run()
+        public void Stop()
+        {
+            Scheduler.Abort();
+        }
+
+        public void ScanAndIndex()
         {
             ThreadPool.QueueUserWorkItem(x => ScanDirectories());
             ThreadPool.QueueUserWorkItem(x => IndexFiles());
