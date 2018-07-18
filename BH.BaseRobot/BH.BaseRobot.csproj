@@ -43,10 +43,9 @@
   <ItemGroup>
     <Compile Include="BaseRobot.cs" />
     <Compile Include="BaseRobotFactory.cs" />
-    <Compile Include="Configuration.cs" />
-    <Compile Include="Directory.cs" />
+    <Compile Include="Folder.cs" />
     <Compile Include="Error.cs" />
-    <Compile Include="File.cs" />
+    <Compile Include="Document.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueIndexing.cs" />
     <Compile Include="Scheduler.cs" />

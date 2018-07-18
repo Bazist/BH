@@ -7,12 +7,12 @@ using System.Threading;
 namespace BH.BaseRobot
 {
     //1. Booben Com
-    //2. Index Files
+    //2. Index Documents
     //3. Index DataTable
 
     //1. Hierarchy scan
-    //2. Do not scan one file twice (memory)
-    //3. Append new directories
+    //2. Do not scan one document twice (memory)
+    //3. Append new folders
     //4. Html/Text
 
     public interface IBaseRobot
@@ -28,17 +28,17 @@ namespace BH.BaseRobot
         protected virtual bool OnBeforeScanning() => true;
         protected virtual bool OnAfterScanning() => true;
 
-        protected virtual bool OnBeforeDirectoryScanning(Directory file) => true;
-        protected virtual bool OnAfterDirectoryScanning(Directory file) => true;
+        protected virtual bool OnBeforeFolderScanning(Folder document) => true;
+        protected virtual bool OnAfterFolderScanning(Folder document) => true;
 
-        protected virtual bool OnBeforeFileScanning(File file) => true;
-        protected virtual bool OnAfterFileScanning(File file) => true;
+        protected virtual bool OnBeforeDocumentScanning(Document document) => true;
+        protected virtual bool OnAfterDocumentScanning(Document document) => true;
 
-        protected virtual bool OnBeforeLoadFileContent(File file) => true;
-        protected virtual bool OnAfterLoadFileContent(File file) => true;
+        protected virtual bool OnBeforeLoadDocumentContent(Document document) => true;
+        protected virtual bool OnAfterLoadDocumentContent(Document document) => true;
 
-        protected virtual bool OnBeforeFileIndexing(File file) => true;
-        protected virtual bool OnAfterFileIndexing(File file) => true;
+        protected virtual bool OnBeforeDocumentIndexing(Document document) => true;
+        protected virtual bool OnAfterDocumentIndexing(Document document) => true;
         
         protected virtual bool OnError(Error error) => true;
 
@@ -51,20 +51,20 @@ namespace BH.BaseRobot
             return new RunNowTimeTable();
         }
 
-        protected virtual IEnumerable<Directory> GetDirectories()
+        protected virtual IEnumerable<Folder> GetFolders()
         {
-            return new[] { Directory.DefaultRoot };
+            return new[] { Folder.DefaultRoot };
         }
 
-        protected virtual IEnumerable<File> GetFiles(Directory directory)
+        protected virtual IEnumerable<Document> GetDocuments(Folder folder)
         {
-            return new File[] { };
+            return new Document[] { };
         }
 
-        protected virtual bool ShouldFileIndexed(File file, string oldVersion, string newVersion) => (newVersion == null ||
+        protected virtual bool ShouldDocumentIndexed(Document document, string oldVersion, string newVersion) => (newVersion == null ||
                                                                                                       newVersion != oldVersion);
                                    
-        protected virtual string LoadFileContent(File file)
+        protected virtual string LoadDocumentContent(Document document)
         {
             return null;
         }
@@ -104,11 +104,11 @@ namespace BH.BaseRobot
 
         public void ScanAndIndex()
         {
-            ThreadPool.QueueUserWorkItem(x => ScanDirectories());
-            ThreadPool.QueueUserWorkItem(x => IndexFiles());
+            ThreadPool.QueueUserWorkItem(x => ScanFolders());
+            ThreadPool.QueueUserWorkItem(x => IndexDocuments());
         }
 
-        private void ScanDirectories()
+        private void ScanFolders()
         {
             try
             {
@@ -117,16 +117,16 @@ namespace BH.BaseRobot
                 if (!OnBeforeScanning())
                     return;
 
-                var directories = GetDirectories();
-                QueueIndexing.EnqueDirectories(directories);
+                var folders = GetFolders();
+                QueueIndexing.EnqueFolders(folders);
 
                 while (true)
                 {
-                    var directory = QueueIndexing.DequeDirectory();
+                    var folder = QueueIndexing.DequeFolder();
 
-                    if (directory != null)
+                    if (folder != null)
                     {
-                        if (!ScanDirectory(directory))
+                        if (!ScanFolder(folder))
                             return;
                     }
                     else
@@ -145,26 +145,26 @@ namespace BH.BaseRobot
             return;
         }
 
-        private bool ScanDirectory(Directory directory)
+        private bool ScanFolder(Folder folder)
         {
             try
             {
-                if (!OnBeforeDirectoryScanning(directory))
+                if (!OnBeforeFolderScanning(folder))
                     return false;
 
-                var files = GetFiles(directory);
+                var documents = GetDocuments(folder);
 
-                QueueIndexing.EnqueFiles(files);
+                QueueIndexing.EnqueDocuments(documents);
 
-                var oldVersions = Storage.ReadFileVersions(files);
+                var oldVersions = Storage.ReadDocumentVersions(documents);
 
                 while (true)
                 {
-                    var file = QueueIndexing.DequeFile();
+                    var document = QueueIndexing.DequeDocument();
 
-                    if (file != null)
+                    if (document != null)
                     {
-                        if (!ScanFile(oldVersions, file))
+                        if (!ScanDocument(oldVersions, document))
                             return false;
                     }
                     else
@@ -176,50 +176,50 @@ namespace BH.BaseRobot
             }
             finally
             {
-                OnAfterDirectoryScanning(directory);
+                OnAfterFolderScanning(folder);
             }
 
             return true;
         }
 
-        private bool ScanFile(IDictionary<string, string> oldVersions, File file)
+        private bool ScanDocument(IDictionary<string, string> oldVersions, Document document)
         {
             try
             {
-                if (!OnBeforeFileScanning(file))
+                if (!OnBeforeDocumentScanning(document))
                     return false;
 
-                if (ShouldFileIndexed(file, oldVersions[file.Name], file.Version))
+                if (ShouldDocumentIndexed(document, oldVersions[document.Name], document.Version))
                 {
                     try
                     {
-                        if (!OnBeforeLoadFileContent(file))
+                        if (!OnBeforeLoadDocumentContent(document))
                             return false;
 
-                        string content = LoadFileContent(file);
+                        string content = LoadDocumentContent(document);
 
                         if(!string.IsNullOrEmpty(content))
                         {
-                            file.Content = content;
+                            document.Content = content;
 
-                            QueueIndexing.EnqueFileWithContent(file);
+                            QueueIndexing.EnqueDocumentWithContent(document);
                         }
                     }
                     finally
                     {
-                        OnAfterLoadFileContent(file);
+                        OnAfterLoadDocumentContent(document);
                     }
                 }
             }
             finally
             {
-                OnAfterFileScanning(file);
+                OnAfterDocumentScanning(document);
             }
 
             return true;
         }
 
-        private void IndexFiles()
+        private void IndexDocuments()
         {
             try
             {
@@ -227,25 +227,25 @@ namespace BH.BaseRobot
 
                 while (true)
                 {
-                    var file = QueueIndexing.DequeFileWithContent();
+                    var document = QueueIndexing.DequeDocumentWithContent();
 
-                    if (file != null)
+                    if (document != null)
                     {
                         try
                         {
-                            if (!OnBeforeFileIndexing(file))
+                            if (!OnBeforeDocumentIndexing(document))
                                 return;
 
-                            Storage.IndexFile(file);
+                            Storage.IndexDocument(document);
                         }
                         finally
                         {
-                            OnAfterFileIndexing(file);
+                            OnAfterDocumentIndexing(document);
                         }
                     }
                     else if(IsScanRunning)
                     {
-                        Thread.Sleep(TimeSpan.FromSeconds(1)); //wait files from scanning
+                        Thread.Sleep(TimeSpan.FromSeconds(1)); //wait documents from scanning
                     }
                     else
                     {
@@ -255,6 +255,8 @@ namespace BH.BaseRobot
             }
             finally
             {
+                Storage.SaveIndex();
+
                 IsIndexRunning = false;
             }
 

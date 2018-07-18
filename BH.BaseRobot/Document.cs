@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace BH.BaseRobot
 {
-    public class File
+    public class Document
     {
-        public File(Directory directory,
-                    string name,
-                    string content = null)
+        public Document(Folder folder,
+                        string name,
+                        string content = null)
         {
-            Directory = directory;
+            Folder = folder;
             Name = name;
             Content = content;
         }
 
-        public Directory Directory { get; private set; }
+        public Folder Folder { get; private set; }
 
         public string Name { get; }
 
@@ -26,7 +26,7 @@ namespace BH.BaseRobot
 
         public bool HasContent => !string.IsNullOrEmpty(Content);
 
-        public string FullPath => $"{Directory.FullPath}\\{Name}";
+        public string FullPath => $"{Folder.FullPath}\\{Name}";
 
         public string Version { get; set; }
 

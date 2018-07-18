@@ -7,68 +7,68 @@ namespace BH.BaseRobot
     {
         public QueueIndexing()
         {
-            _directories = new ConcurrentQueue<Directory>();
-            _files = new ConcurrentQueue<File>();
-            _filesWithContent = new ConcurrentQueue<File>();
+            _folders = new ConcurrentQueue<Folder>();
+            _documents = new ConcurrentQueue<Document>();
+            _documentsWithContent = new ConcurrentQueue<Document>();
         }
 
-        private ConcurrentQueue<Directory> _directories;
-        private ConcurrentQueue<File> _files;
-        private ConcurrentQueue<File> _filesWithContent;
+        private ConcurrentQueue<Folder> _folders;
+        private ConcurrentQueue<Document> _documents;
+        private ConcurrentQueue<Document> _documentsWithContent;
 
-        public void EnqueDirectory(Directory directory)
+        public void EnqueFolder(Folder directory)
         {
-            _directories.Enqueue(directory);
+            _folders.Enqueue(directory);
         }
 
-        public void EnqueDirectories(IEnumerable<Directory> directories)
+        public void EnqueFolders(IEnumerable<Folder> folders)
         {
-            foreach (var directory in directories)
-                EnqueDirectory(directory);
+            foreach (var folder in folders)
+                EnqueFolder(folder);
         }
 
-        public Directory DequeDirectory()
+        public Folder DequeFolder()
         {
-            Directory directory;
+            Folder folder;
 
-            if (_directories.TryDequeue(out directory))
-                return directory;
+            if (_folders.TryDequeue(out folder))
+                return folder;
             else
                 return null;
         }
 
-        public void EnqueFile(File file)
+        public void EnqueDocument(Document document)
         {
-            _files.Enqueue(file);
+            _documents.Enqueue(document);
         }
 
-        public void EnqueFiles(IEnumerable<File> files)
+        public void EnqueDocuments(IEnumerable<Document> documents)
         {
-            foreach (var file in files)
-                EnqueFile(file);
+            foreach (var document in documents)
+                EnqueDocument(document);
         }
 
-        public File DequeFile()
+        public Document DequeDocument()
         {
-            File file;
+            Document document;
 
-            if (_files.TryDequeue(out file))
-                return file;
+            if (_documents.TryDequeue(out document))
+                return document;
             else
                 return null;
         }
 
-        public void EnqueFileWithContent(File file)
+        public void EnqueDocumentWithContent(Document document)
         {
-            _filesWithContent.Enqueue(file);
+            _documentsWithContent.Enqueue(document);
         }
 
-        public File DequeFileWithContent()
+        public Document DequeDocumentWithContent()
         {
-            File file;
+            Document document;
 
-            if (_filesWithContent.TryDequeue(out file))
-                return file;
+            if (_documentsWithContent.TryDequeue(out document))
+                return document;
             else
                 return null;
         }

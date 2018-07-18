@@ -21,20 +21,25 @@ namespace BH.BaseRobot
             return _ftService.GetInfo();
         }
 
-        public IDictionary<string, string> ReadFileVersions(IEnumerable<File> files)
+        public IDictionary<string, string> ReadDocumentVersions(IEnumerable<Document> documents)
         {
-            return _ftService.ReadDocumentVersions(files.Select(x => x.Name).ToList());
+            return _ftService.ReadDocumentVersions(documents.Select(x => x.Name).ToList());
         }
 
-        public void IndexFile(File file)
+        public void IndexDocument(Document file)
         {
             if (_ftService.IndexText(file.Name, file.Version, file.Content))
-                _ftService.SaveIndex();
+                SaveIndex();
         }
 
-        public bool IsFileExists(string name)
+        public bool IsdocumentExists(string name)
         {
             return false;
+        }
+
+        public void SaveIndex()
+        {
+            _ftService.SaveIndex();
         }
     }
 }

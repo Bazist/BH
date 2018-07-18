@@ -27,7 +27,16 @@ namespace BH.BaseRobot
 
             foreach (var file in files)
             {
-                var assembly = Assembly.LoadFile(file);
+                Assembly assembly;
+
+                try
+                {
+                    assembly = Assembly.LoadFile(file);
+                }
+                catch (System.BadImageFormatException)
+                {
+                    continue;
+                }
 
                 if (assembly != null)
                 {
@@ -40,6 +49,7 @@ namespace BH.BaseRobot
                         yield return (T)Activator.CreateInstance(type);
                     }
                 }
+
             }
         }
 

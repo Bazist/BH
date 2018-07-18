@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace BH.BaseRobot
 {
-    public class Directory
+    public class Folder
     {
-        public Directory(string name,
-                         Directory parent = null)
+        public Folder(string name,
+                      Folder parent = null)
         {
             Name = name;
             Parent = parent;
@@ -14,9 +14,9 @@ namespace BH.BaseRobot
 
         public string Name { get; }
 
-        public Directory Parent { get; }
+        public Folder Parent { get; }
 
-        public static Directory DefaultRoot => new Directory("[Default Root]");
+        public static Folder DefaultRoot => new Folder("[Default Root]");
 
         public string FullPath
         {
@@ -28,7 +28,7 @@ namespace BH.BaseRobot
             }
         }
 
-        public IEnumerable<Directory> Ancestors
+        public IEnumerable<Folder> Ancestors
         {
             get
             {
