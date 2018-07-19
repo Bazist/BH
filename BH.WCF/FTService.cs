@@ -254,14 +254,18 @@ namespace BH.WCF
             return TryCatch(() =>
             {
                 var dicDocumentNames = fileNames.ToDictionary(x => x,
-                                                          x => string.Empty);
+                                                              x => string.Empty);
+
+                if (dicDocumentNames.Count == 0)
+                    return dicDocumentNames;
+
                 var foundDocumentNames = 0;
 
                 foreach (var instance in Instances.Reverse<FTSearch>())
                 {
                     var info = instance.GetInfo();
 
-                    for (uint docId = info.LastNameIDRAM; docId >= 1; docId--)
+                    for (uint docId = info.LastNameIDRAM - 1; docId >= 1; docId--)
                     {
                         string[] nameAndVersion = instance.GetDocumentNameByID(docId).Split(';');
 

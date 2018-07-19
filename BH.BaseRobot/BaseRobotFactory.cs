@@ -22,7 +22,8 @@ namespace BH.BaseRobot
             var path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             var files = System.IO.Directory.GetFiles(path, "*.dll", System.IO.SearchOption.AllDirectories)
-                                           .Except(new[] { Assembly.GetExecutingAssembly().Location });
+                                           .Where(x => !x.Contains(Assembly.GetExecutingAssembly().Location) && 
+                                                       !x.Contains("FTSearch.dll"));
 
 
             foreach (var file in files)
@@ -65,7 +66,7 @@ namespace BH.BaseRobot
 
         public IEnumerable<IBaseRobot> CreateRobots()
         {
-            return FindTypes<BaseRobot>();
+            return FindTypes<BaseRobot>().Where(x => x.IsEnabled);
         }
     }
 }

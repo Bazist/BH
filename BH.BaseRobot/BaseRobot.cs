@@ -69,6 +69,8 @@ namespace BH.BaseRobot
             return null;
         }
 
+        public virtual bool IsEnabled => true;
+
         #endregion
 
         #region Members
@@ -156,7 +158,12 @@ namespace BH.BaseRobot
 
                 QueueIndexing.EnqueDocuments(documents);
 
-                var oldVersions = Storage.ReadDocumentVersions(documents);
+                IDictionary<string, string> oldVersions = null;
+
+                if (documents.Any(x => x.HasVersion))
+                {
+                    oldVersions = Storage.ReadDocumentVersions(documents);
+                }
 
                 while (true)
                 {
@@ -189,19 +196,21 @@ namespace BH.BaseRobot
                 if (!OnBeforeDocumentScanning(document))
                     return false;
 
-                if (ShouldDocumentIndexed(document, oldVersions[document.Name], document.Version))
+                if (oldVersions == null ||
+                    ShouldDocumentIndexed(document, oldVersions[document.Name], document.Version))
                 {
                     try
                     {
                         if (!OnBeforeLoadDocumentContent(document))
                             return false;
 
-                        string content = LoadDocumentContent(document);
-
-                        if(!string.IsNullOrEmpty(content))
+                        if (!document.HasContent)
                         {
-                            document.Content = content;
+                            document.Content = LoadDocumentContent(document); ;
+                        }
 
+                        if(document.HasContent)
+                        {
                             QueueIndexing.EnqueDocumentWithContent(document);
                         }
                     }
