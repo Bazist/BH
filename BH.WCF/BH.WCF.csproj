@@ -7,8 +7,8 @@
     <ProjectGuid>{34F64742-DB2E-434A-BA1C-1C9474E501BF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FTServiceWCF</RootNamespace>
-    <AssemblyName>FTServiceWCF</AssemblyName>
+    <RootNamespace>BH.WCF</RootNamespace>
+    <AssemblyName>BH.WCF</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
