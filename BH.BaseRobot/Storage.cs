@@ -26,9 +26,12 @@ namespace BH.BaseRobot
             return _ftService.ReadDocumentVersions(documents.Select(x => x.Name).ToList());
         }
 
-        public void IndexDocument(Document file)
+        public void IndexDocument(Document file, string robotName)
         {
-            if (_ftService.IndexText(file.Name, file.Version, file.Content))
+            if (_ftService.IndexText(file.Name,
+                                     file.Version,
+                                     file.Content,
+                                     robotName))
                 SaveIndex();
         }
 

@@ -83,6 +83,7 @@ namespace BH.WinService
 
                 FTService.StartWebservice(_fts,
                                           ConfigurationManager.AppSettings["URL"],
+                                          LoadDocumentContent,
                                           ex => {
                                               WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
                                           });
@@ -96,6 +97,22 @@ namespace BH.WinService
                 Stop();
 
                 throw ex;
+            }
+        }
+
+        private string LoadDocumentContent(string documentName,
+                                           string documentVersion,
+                                           string robotName)
+        {
+            var robot = _robots.FirstOrDefault(x => x.Name == robotName);
+
+            if (robot != null)
+            {
+                return robot.LoadDocumentContent(documentName, documentVersion);
+            }
+            else
+            {
+                return null;
             }
         }
 

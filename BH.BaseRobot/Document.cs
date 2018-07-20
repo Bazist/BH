@@ -36,10 +36,5 @@ namespace BH.BaseRobot
         {
             return FullPath;
         }
-
-        public FTService.DocumentName ToDocumentName()
-        {
-            return new FTService.DocumentName { Name = Name, Version = Version };
-        }
     }
 }

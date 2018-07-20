@@ -312,7 +312,7 @@ namespace BH.Tests
             {
                 if (!string.IsNullOrEmpty(text))
                 {
-                    res = fts.IndexText(name, null, text);
+                    res = fts.IndexText(name, null, text, null);
                 }
             }
             catch (Exception ex)

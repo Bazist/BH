@@ -13,10 +13,19 @@ using System.Threading.Tasks;
 
 namespace BH.WCF
 {
+    
+
     [ServiceContract]
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class FTService
     {
+        #region Constructors
+        public FTService()
+        {
+
+        }
+        #endregion
+
         #region Classes
 
         public struct Info
@@ -50,8 +59,28 @@ namespace BH.WCF
 
         public class DocumentName
         {
-            public string Name;
-            public string Version;
+            public DocumentName(string name, string version, string robotName)
+            {
+                Name = name;
+                Version = version;
+                RobotName = robotName;
+            }
+
+            public string Name { get; }
+            public string Version { get; }
+            public string RobotName { get; }
+
+            public override string ToString()
+            {
+                return $"{Name};{Version};{RobotName}";
+            }
+
+            public static DocumentName Parse(string str)
+            {
+                var parts = str.Split(';');
+
+                return new DocumentName(parts[0], parts[1], parts[2]);
+            }
         }
 
         #endregion
@@ -74,6 +103,8 @@ namespace BH.WCF
 
         private static Action<Exception> _errorHandler = null;
 
+        private static Func<string, string, string, string> _documentContentResolver = null;
+
         #endregion
 
         #region Constructors
@@ -92,7 +123,7 @@ namespace BH.WCF
         [OperationContract]
         public bool IsStarted()
         {
-            return TryCatch<bool>(() =>
+            return TryCatch(() =>
             {
                 return Instances.Count > 0;
             });
@@ -119,7 +150,7 @@ namespace BH.WCF
         [OperationContract]
         public FTSearch.ConfigurationDLL GetConfiguration()
         {
-            return TryCatch<FTSearch.ConfigurationDLL>(() =>
+            return TryCatch(() =>
             {
                 return _configuration;
             });
@@ -128,7 +159,7 @@ namespace BH.WCF
         [OperationContract]
         public static FTSearch.ConfigurationDLL GetDefaultConfiguration()
         {
-            return TryCatch<FTSearch.ConfigurationDLL>(() =>
+            return TryCatch(() =>
             {
                 FTSearch.ConfigurationDLL conf = new FTSearch.ConfigurationDLL();
 
@@ -389,6 +420,24 @@ namespace BH.WCF
         }
 
         [OperationContract]
+        public string LoadDocumentContent(string documentName,
+                                          string documentVersion,
+                                          string robotName)
+        {
+            return TryCatch(() =>
+            {
+                if (_documentContentResolver != null)
+                {
+                    return _documentContentResolver(documentName, documentVersion, robotName);
+                }
+                else
+                {
+                    return null;
+                }
+            });
+        }
+
+        [OperationContract]
         public string CalculateTrend(string phrase, int count, int minPage, int maxPage)
         {
             return TryCatch(() =>
@@ -436,14 +485,19 @@ namespace BH.WCF
         }
 
         [OperationContract]
-        public bool IndexText(string documentName, string documentVersion, string contentText)
+        public bool IndexText(string documentName,
+                              string documentVersion,
+                              string contentText,
+                              string robotName)
         {
             return TryCatch<bool>(() =>
             {
                 if (!IsStarted())
                     throw new Exception("Service is not started.");
 
-                return ActiveInstance.IndexContent($"{documentName};{documentVersion}", contentText, FTSearch.ContentType.Text);
+                var docName = new DocumentName(documentName, documentVersion, robotName);
+
+                return ActiveInstance.IndexContent(docName.ToString(), contentText, FTSearch.ContentType.Text);
 
                 //{
                 //    foreach (var file in IndexedFilesInMemory)
@@ -757,8 +811,12 @@ namespace BH.WCF
             }
         }
 
-        public static void StartWebservice(FTService service, string url, Action<Exception> errorHandler = null)
+        public static void StartWebservice(FTService service,
+                                           string url,
+                                           Func<string, string, string, string> documentContentResolver = null,
+                                           Action<Exception> errorHandler = null)
         {
+            _documentContentResolver = documentContentResolver;
             _errorHandler = errorHandler;
 
             TryCatch(() =>

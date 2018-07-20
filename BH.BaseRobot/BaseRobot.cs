@@ -17,12 +17,25 @@ namespace BH.BaseRobot
 
     public interface IBaseRobot
     {
+        string Name { get; }
+
         void Start(FTService ftService);
         void Stop();
+
+        string LoadDocumentContent(string documentName, string documentVersion);
     }
 
     public class BaseRobot : IBaseRobot
     {
+        #region Constructors
+
+        public BaseRobot(string name = null)
+        {
+            Name = name;
+        }
+
+        #endregion
+
         #region Event Methods
 
         protected virtual bool OnBeforeScanning() => true;
@@ -61,13 +74,17 @@ namespace BH.BaseRobot
             return new Document[] { };
         }
 
-        protected virtual bool ShouldDocumentIndexed(Document document, string oldVersion, string newVersion) => (newVersion == null ||
-                                                                                                      newVersion != oldVersion);
+        protected virtual bool ShouldDocumentIndexed(Document document,
+                                                     string oldVersion,
+                                                     string newVersion) => (newVersion == null ||
+                                                                            newVersion != oldVersion);
                                    
-        protected virtual string LoadDocumentContent(Document document)
+        public string LoadDocumentContent(string documentName, string documentVersion)
         {
             return null;
         }
+
+        public string Name { get; }
 
         public virtual bool IsEnabled => true;
 
@@ -207,7 +224,7 @@ namespace BH.BaseRobot
 
                         if (!document.HasContent)
                         {
-                            document.Content = LoadDocumentContent(document); ;
+                            document.Content = LoadDocumentContent(document.Name, document.Version);
                         }
 
                         if(document.HasContent)
@@ -246,7 +263,7 @@ namespace BH.BaseRobot
                             if (!OnBeforeDocumentIndexing(document))
                                 return;
 
-                            Storage.IndexDocument(document);
+                            Storage.IndexDocument(document, Name);
                         }
                         finally
                         {
