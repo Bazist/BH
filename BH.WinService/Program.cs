@@ -47,21 +47,21 @@ namespace BH.WinService
                 return;
             }
 
-#if DEBUG
-            //run console
-
-            var ws = new WinService();
-            ws.TestStart();
-
-            while (true)
+            if (Environment.UserInteractive)
             {
-                Thread.Sleep(60000);
+                //run console
+
+                var ws = new WinService();
+                ws.TestStart();
+
+                while (true)
+                {
+                    Thread.Sleep(60000);
+                }
             }
-
-            //ws.TestStop();
-
-#else
-            ServiceBase[] ServicesToRun;
+            else
+            {
+                ServiceBase[] ServicesToRun;
 
                 ServicesToRun = new ServiceBase[]
                 {
@@ -69,7 +69,7 @@ namespace BH.WinService
                 };
 
                 ServiceBase.Run(ServicesToRun);
-#endif
+            }
         }
     }
 }
