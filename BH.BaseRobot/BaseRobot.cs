@@ -107,6 +107,7 @@ namespace BH.BaseRobot
         public void ScanAndIndex()
         {
             ThreadPool.QueueUserWorkItem(x => ScanFolders());
+            Thread.Sleep(100); //wait to run scan folders thread
             ThreadPool.QueueUserWorkItem(x => IndexDocuments());
         }
 

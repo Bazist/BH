@@ -77,7 +77,8 @@ public:
 		
 		CountDocuments++;
 
-		if(PrevDocNumber + 1 == docNumber 
+		if(PrevDocNumber
+		   && PrevDocNumber + 1 == docNumber 
 		   && CountPosition < 63)
 		{
 			uint32 header = *pCurrentHeader;
