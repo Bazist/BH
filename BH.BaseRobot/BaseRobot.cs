@@ -118,7 +118,10 @@ namespace BH.BaseRobot
 
         public void Stop()
         {
-            Scheduler.Abort();
+            if (Scheduler != null)
+            {
+                Scheduler.Abort();
+            }
         }
 
         public void ScanAndIndex()
