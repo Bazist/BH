@@ -246,18 +246,22 @@ namespace BH.WinService
         private void WriteLog(string message, EventLogEntryType eventType)
         {
             message = $"[{DateTime.Now.ToString()}] {message}; Memory: {System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024} mb.";
-#if DEBUG
-            Trace.WriteLine(message);
-#else
-            ((ISupportInitialize)(this.EventLog)).BeginInit();
-            if (!EventLog.SourceExists(this.EventLog.Source))
-            {
-                EventLog.CreateEventSource(this.EventLog.Source, this.EventLog.Log);
-            }
-            ((ISupportInitialize)(this.EventLog)).EndInit();
 
-            this.EventLog.WriteEntry(message, eventType);
-#endif
+            if (Environment.UserInteractive)
+            {
+                Trace.WriteLine(message);
+            }
+            else
+            {
+                ((ISupportInitialize)(this.EventLog)).BeginInit();
+                if (!EventLog.SourceExists(this.EventLog.Source))
+                {
+                    EventLog.CreateEventSource(this.EventLog.Source, this.EventLog.Log);
+                }
+                ((ISupportInitialize)(this.EventLog)).EndInit();
+
+                this.EventLog.WriteEntry(message, eventType);
+            }
         }
 
         //#region Index Files
