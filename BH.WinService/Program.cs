@@ -8,6 +8,8 @@ using System.Threading;
 using System.Diagnostics;
 using System.Configuration;
 using System.Reflection;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace BH.WinService
 {
@@ -22,7 +24,8 @@ namespace BH.WinService
             {
                 var proc = new System.Diagnostics.Process();
                 proc.StartInfo = new System.Diagnostics.ProcessStartInfo();
-                proc.StartInfo.FileName = ConfigurationManager.AppSettings["InstallutilPath"];
+
+                proc.StartInfo.FileName = Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "InstallUtil.exe");
 
                 switch (args[0])
                 {

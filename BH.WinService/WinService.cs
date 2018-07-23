@@ -11,7 +11,6 @@ using System.Threading;
 using BH.WCF;
 using System.IO;
 using System.Configuration;
-using BH.BoobenRobot;
 using BH.BaseRobot;
 
 namespace BH.WinService
@@ -20,15 +19,16 @@ namespace BH.WinService
     {
         public WinService()
         {
-#if !DEBUG
-            InitializeComponent();
+            if (!Environment.UserInteractive)
+            {
+                InitializeComponent();
 
-            this.ServiceName = @"BH.FTSearch";
-            this.EventLog.Source = this.ServiceName;
-            this.EventLog.Log = "Application";
+                this.ServiceName = @"BH.FTSearch";
+                this.EventLog.Source = this.ServiceName;
+                this.EventLog.Log = "Application";
 
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-#endif
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            }
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -223,7 +223,7 @@ namespace BH.WinService
             {
                 if (_robots != null)
                 {
-                    foreach(var robot in _robots)
+                    foreach (var robot in _robots)
                     {
                         robot.Stop();
                     }
