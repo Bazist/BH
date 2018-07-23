@@ -12,6 +12,7 @@ using BH.WCF;
 using System.IO;
 using System.Configuration;
 using BH.BaseRobot;
+using System.Reflection;
 
 namespace BH.WinService
 {
@@ -40,6 +41,7 @@ namespace BH.WinService
 
         private static FTService _fts = new FTService();
         private static IEnumerable<IBaseRobot> _robots;
+        private string CurrentDirectory => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
         public void TestStart()
         {
@@ -74,7 +76,14 @@ namespace BH.WinService
             {
                 var conf = FTService.GetDefaultConfiguration();
 
-                conf.SetIndexPath(ConfigurationManager.AppSettings["IndexPath"]);
+                var directory = ConfigurationManager.AppSettings["IndexPath"];
+
+                if (!Directory.Exists(directory))
+                {
+                    directory = Path.Combine(CurrentDirectory, directory);
+                }
+
+                conf.SetIndexPath(directory);
                 conf.LimitUsedMemory = ulong.Parse(ConfigurationManager.AppSettings["LimitUsedMemory"]);
 
                 _fts.SetConfiguration(conf);
@@ -245,7 +254,9 @@ namespace BH.WinService
 
         private void WriteLog(string message, EventLogEntryType eventType)
         {
-            message = $"[{DateTime.Now.ToString()}] {message}; Memory: {System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024} mb.";
+            message = $"[{DateTime.Now.ToString()}] {message}; Memory: {System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024} mb.\r\n";
+
+            File.AppendAllText(Path.Combine(CurrentDirectory, "log.txt"), message);
 
             if (Environment.UserInteractive)
             {

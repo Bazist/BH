@@ -845,7 +845,10 @@ namespace BH.WCF
         {
             TryCatch(() =>
             {
-                _host.Abort();
+                if (_host != null)
+                {
+                    _host.Abort();
+                }
             });
         }
 

@@ -20,7 +20,7 @@ namespace BH.WinService
         /// </summary>
         static void Main(string[] args)
         {
-            if(args.Length > 0)
+            if (args.Length > 0)
             {
                 var proc = new System.Diagnostics.Process();
                 proc.StartInfo = new System.Diagnostics.ProcessStartInfo();
