@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="5eb7673b-2fd5-47d6-8d3f-0a6cb9f44533" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="0678d194-0d7f-435f-a19d-bd6cda3be9fc" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -19,14 +19,14 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http:\\localhost:8080" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://localhost:5056" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="96f35782-aab5-438a-87e7-9eba24fe56fa" SourceId="1" SourceUrl="http://localhost:8080/?xsd=xsd2" />
-    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="17fee335-a083-4155-8955-9c3be7e7a4cc" SourceId="1" SourceUrl="http://localhost:8080/?disco" />
-    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="2241cc6e-14bc-4b25-94c9-782fc43acc60" SourceId="1" SourceUrl="http://localhost:8080/?xsd=xsd0" />
-    <MetadataFile FileName="FTService.wsdl" MetadataType="Wsdl" ID="12755b94-9ca5-497c-adeb-5e0720417fa9" SourceId="1" SourceUrl="http://localhost:8080/?wsdl" />
-    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="ad7b4b3a-441c-4b72-be8c-e6365ed7731f" SourceId="1" SourceUrl="http://localhost:8080/?xsd=xsd1" />
+    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="cb0c187e-6b75-4b93-8903-db5f81d8b4d7" SourceId="1" SourceUrl="http://localhost:5056/?xsd=xsd0" />
+    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="077a6aab-5166-4922-88da-a1520f05630b" SourceId="1" SourceUrl="http://localhost:5056/?xsd=xsd2" />
+    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="659db026-29c2-467e-bda5-389826c9eff7" SourceId="1" SourceUrl="http://localhost:5056/?disco" />
+    <MetadataFile FileName="FTService.wsdl" MetadataType="Wsdl" ID="52703f08-0267-4253-9a2e-3a82545f31af" SourceId="1" SourceUrl="http://localhost:5056/?wsdl" />
+    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="110c8f21-102d-4035-8086-3e1738ad4015" SourceId="1" SourceUrl="http://localhost:5056/?xsd=xsd1" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

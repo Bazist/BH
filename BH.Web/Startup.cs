@@ -10,7 +10,7 @@ namespace BH.Web
         {
             ConfigureAuth(app);
 
-            BH.FTServiceClient fts = new BH.FTServiceClient();
+            WebService.FTServiceClient fts = new WebService.FTServiceClient();
 
             if (!fts.IsStarted())
             {

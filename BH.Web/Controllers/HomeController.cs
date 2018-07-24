@@ -12,14 +12,14 @@ namespace BH.Web.Controllers
     {
         public ActionResult Index()
         {
-            BH.FTServiceClient fts = new BH.FTServiceClient();
+            WebService.FTServiceClient fts = new WebService.FTServiceClient();
             
             return View("Index", new SearchResult { StartPage = 1, CurrentPage = 1 });
         }
 
         public ActionResult Info()
         {
-            BH.FTServiceClient fts = new BH.FTServiceClient();
+            WebService.FTServiceClient fts = new WebService.FTServiceClient();
 
             if (!fts.IsStarted())
             {
@@ -64,7 +64,7 @@ namespace BH.Web.Controllers
                     result.TemplateName = Request.Params["tn"];
                 }
 
-                BH.FTServiceClient fts = new BH.FTServiceClient();
+                WebService.FTServiceClient fts = new WebService.FTServiceClient();
 
                 if (!fts.IsStarted())
                 {
@@ -75,17 +75,20 @@ namespace BH.Web.Controllers
 
                 if (string.IsNullOrEmpty(f)) //search phrase
                 {
-                    BH.FTSearchResult[] res = new BH.FTSearchResult[0];
+                    WebService.FTSearchSearchResult res = new WebService.FTSearchSearchResult();
 
                     if (!string.IsNullOrEmpty(result.Phrase))
                     {
-                        res = fts.SearchPhrase(result.Phrase, (result.TemplateName ?? string.Empty).Trim(), (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE, SearchResult.PAGE_SIZE);
+                        res = fts.SearchPhrase(result.Phrase,
+                                              (result.TemplateName ?? string.Empty).Trim(),
+                                              (int.Parse(cp) - 1) * SearchResult.PAGE_SIZE,
+                                              SearchResult.PAGE_SIZE);
                     }
 
                     return View("Index", new SearchResult
                     {
                         Phrase = result.Phrase,
-                        Results = res,
+                        Results = res.Results,
                         StartPage = int.Parse(sp),
                         CurrentPage = int.Parse(cp)
                     });
@@ -95,7 +98,8 @@ namespace BH.Web.Controllers
                     ViewBag.Title = f;
                     ViewBag.FileName = f;
 
-                    var content = fts.LoadContent(f, result.Phrase);
+                    //TODO Implement load content
+                    var content = string.Empty; //fts.LoadContent(f, result.Phrase);
 
                     content = content.Replace("<", "&lt;").Replace(">", "&gt;");
 

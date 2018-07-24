@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="FTService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:5056/?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:5056/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:5056/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/BH.WCF" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="FTService_IsStarted_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsStarted" />
+  </wsdl:message>
+  <wsdl:message name="FTService_IsStarted_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsStartedResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_GetConfiguration_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetConfiguration" />
+  </wsdl:message>
+  <wsdl:message name="FTService_GetConfiguration_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetConfigurationResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SetConfiguration_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetConfiguration" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SetConfiguration_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetConfigurationResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_Start_InputMessage">
+    <wsdl:part name="parameters" element="tns:Start" />
+  </wsdl:message>
+  <wsdl:message name="FTService_Start_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StartResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SearchPhrase_InputMessage">
+    <wsdl:part name="parameters" element="tns:SearchPhrase" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SearchPhrase_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SearchPhraseResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SearchQuery_InputMessage">
+    <wsdl:part name="parameters" element="tns:SearchQuery" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SearchQuery_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SearchQueryResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SearchPhraseRel_InputMessage">
+    <wsdl:part name="parameters" element="tns:SearchPhraseRel" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SearchPhraseRel_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SearchPhraseRelResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_StemContent_InputMessage">
+    <wsdl:part name="parameters" element="tns:StemContent" />
+  </wsdl:message>
+  <wsdl:message name="FTService_StemContent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StemContentResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_LoadDocumentContent_InputMessage">
+    <wsdl:part name="parameters" element="tns:LoadDocumentContent" />
+  </wsdl:message>
+  <wsdl:message name="FTService_LoadDocumentContent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoadDocumentContentResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_CalculateTrend_InputMessage">
+    <wsdl:part name="parameters" element="tns:CalculateTrend" />
+  </wsdl:message>
+  <wsdl:message name="FTService_CalculateTrend_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CalculateTrendResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_GetInfo_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetInfo" />
+  </wsdl:message>
+  <wsdl:message name="FTService_GetInfo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_IndexText_InputMessage">
+    <wsdl:part name="parameters" element="tns:IndexText" />
+  </wsdl:message>
+  <wsdl:message name="FTService_IndexText_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IndexTextResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SaveIndex_InputMessage">
+    <wsdl:part name="parameters" element="tns:SaveIndex" />
+  </wsdl:message>
+  <wsdl:message name="FTService_SaveIndex_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SaveIndexResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_MergeIndexes_InputMessage">
+    <wsdl:part name="parameters" element="tns:MergeIndexes" />
+  </wsdl:message>
+  <wsdl:message name="FTService_MergeIndexes_OutputMessage">
+    <wsdl:part name="parameters" element="tns:MergeIndexesResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_Stop_InputMessage">
+    <wsdl:part name="parameters" element="tns:Stop" />
+  </wsdl:message>
+  <wsdl:message name="FTService_Stop_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StopResponse" />
+  </wsdl:message>
+  <wsdl:message name="FTService_CheckIndexes_InputMessage">
+    <wsdl:part name="parameters" element="tns:CheckIndexes" />
+  </wsdl:message>
+  <wsdl:message name="FTService_CheckIndexes_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CheckIndexesResponse" />
+  </wsdl:message>
+  <wsdl:portType name="FTService">
+    <wsdl:operation name="IsStarted">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/IsStarted" message="tns:FTService_IsStarted_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/IsStartedResponse" message="tns:FTService_IsStarted_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetConfiguration">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/GetConfiguration" message="tns:FTService_GetConfiguration_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/GetConfigurationResponse" message="tns:FTService_GetConfiguration_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetConfiguration">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/SetConfiguration" message="tns:FTService_SetConfiguration_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/SetConfigurationResponse" message="tns:FTService_SetConfiguration_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Start">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/Start" message="tns:FTService_Start_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/StartResponse" message="tns:FTService_Start_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SearchPhrase">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/SearchPhrase" message="tns:FTService_SearchPhrase_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/SearchPhraseResponse" message="tns:FTService_SearchPhrase_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SearchQuery">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/SearchQuery" message="tns:FTService_SearchQuery_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/SearchQueryResponse" message="tns:FTService_SearchQuery_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SearchPhraseRel">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/SearchPhraseRel" message="tns:FTService_SearchPhraseRel_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/SearchPhraseRelResponse" message="tns:FTService_SearchPhraseRel_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StemContent">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/StemContent" message="tns:FTService_StemContent_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/StemContentResponse" message="tns:FTService_StemContent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="LoadDocumentContent">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/LoadDocumentContent" message="tns:FTService_LoadDocumentContent_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/LoadDocumentContentResponse" message="tns:FTService_LoadDocumentContent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CalculateTrend">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/CalculateTrend" message="tns:FTService_CalculateTrend_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/CalculateTrendResponse" message="tns:FTService_CalculateTrend_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetInfo">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/GetInfo" message="tns:FTService_GetInfo_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/GetInfoResponse" message="tns:FTService_GetInfo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="IndexText">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/IndexText" message="tns:FTService_IndexText_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/IndexTextResponse" message="tns:FTService_IndexText_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SaveIndex">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/SaveIndex" message="tns:FTService_SaveIndex_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/SaveIndexResponse" message="tns:FTService_SaveIndex_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="MergeIndexes">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/MergeIndexes" message="tns:FTService_MergeIndexes_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/MergeIndexesResponse" message="tns:FTService_MergeIndexes_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Stop">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/Stop" message="tns:FTService_Stop_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/StopResponse" message="tns:FTService_Stop_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CheckIndexes">
+      <wsdl:input wsam:Action="http://tempuri.org/FTService/CheckIndexes" message="tns:FTService_CheckIndexes_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/FTService/CheckIndexesResponse" message="tns:FTService_CheckIndexes_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_FTService" type="tns:FTService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="IsStarted">
+      <soap:operation soapAction="http://tempuri.org/FTService/IsStarted" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConfiguration">
+      <soap:operation soapAction="http://tempuri.org/FTService/GetConfiguration" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetConfiguration">
+      <soap:operation soapAction="http://tempuri.org/FTService/SetConfiguration" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Start">
+      <soap:operation soapAction="http://tempuri.org/FTService/Start" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchPhrase">
+      <soap:operation soapAction="http://tempuri.org/FTService/SearchPhrase" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchQuery">
+      <soap:operation soapAction="http://tempuri.org/FTService/SearchQuery" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchPhraseRel">
+      <soap:operation soapAction="http://tempuri.org/FTService/SearchPhraseRel" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StemContent">
+      <soap:operation soapAction="http://tempuri.org/FTService/StemContent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoadDocumentContent">
+      <soap:operation soapAction="http://tempuri.org/FTService/LoadDocumentContent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CalculateTrend">
+      <soap:operation soapAction="http://tempuri.org/FTService/CalculateTrend" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetInfo">
+      <soap:operation soapAction="http://tempuri.org/FTService/GetInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IndexText">
+      <soap:operation soapAction="http://tempuri.org/FTService/IndexText" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SaveIndex">
+      <soap:operation soapAction="http://tempuri.org/FTService/SaveIndex" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MergeIndexes">
+      <soap:operation soapAction="http://tempuri.org/FTService/MergeIndexes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Stop">
+      <soap:operation soapAction="http://tempuri.org/FTService/Stop" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CheckIndexes">
+      <soap:operation soapAction="http://tempuri.org/FTService/CheckIndexes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FTService">
+    <wsdl:port name="BasicHttpBinding_FTService" binding="tns:BasicHttpBinding_FTService">
+      <soap:address location="http://localhost:5056/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

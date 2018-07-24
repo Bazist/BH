@@ -77,7 +77,7 @@ namespace BH.Web.Model
         [TemplateNameAttribute]
         public string TemplateName { get; set; }
 
-        public BH.FTSearchResult[] Results { get; set; }
+        public WebService.FTSearchResult[] Results { get; set; }
 
         public static string FormatSize(ulong size)
         {

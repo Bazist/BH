@@ -8,14 +8,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BH {
+namespace BH.Web.WebService {
     using System.Runtime.Serialization;
     using System;
     
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.ConfigurationDLL", Namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.ConfigurationDLL", Namespace="http://schemas.datacontract.org/2004/07/BH.WCF")]
     [System.SerializableAttribute()]
     public partial class FTSearchConfigurationDLL : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -348,7 +348,84 @@ namespace BH {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.Result", Namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.SearchResult", Namespace="http://schemas.datacontract.org/2004/07/BH.WCF")]
+    [System.SerializableAttribute()]
+    public partial class FTSearchSearchResult : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private uint FullCountMatchesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string MatchWordsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private BH.Web.WebService.FTSearchResult[] ResultsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public uint FullCountMatches {
+            get {
+                return this.FullCountMatchesField;
+            }
+            set {
+                if ((this.FullCountMatchesField.Equals(value) != true)) {
+                    this.FullCountMatchesField = value;
+                    this.RaisePropertyChanged("FullCountMatches");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string MatchWords {
+            get {
+                return this.MatchWordsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.MatchWordsField, value) != true)) {
+                    this.MatchWordsField = value;
+                    this.RaisePropertyChanged("MatchWords");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public BH.Web.WebService.FTSearchResult[] Results {
+            get {
+                return this.ResultsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ResultsField, value) != true)) {
+                    this.ResultsField = value;
+                    this.RaisePropertyChanged("Results");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.Result", Namespace="http://schemas.datacontract.org/2004/07/BH.WCF")]
     [System.SerializableAttribute()]
     public partial struct FTSearchResult : System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -359,7 +436,7 @@ namespace BH {
         private string NameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private BH.FTSearchResultPosition[] PositionsField;
+        private BH.Web.WebService.FTSearchResultPosition[] PositionsField;
         
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -384,7 +461,7 @@ namespace BH {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public BH.FTSearchResultPosition[] Positions {
+        public BH.Web.WebService.FTSearchResultPosition[] Positions {
             get {
                 return this.PositionsField;
             }
@@ -408,7 +485,7 @@ namespace BH {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.ResultPosition", Namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.ResultPosition", Namespace="http://schemas.datacontract.org/2004/07/BH.WCF")]
     [System.SerializableAttribute()]
     public partial struct FTSearchResultPosition : System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -468,7 +545,212 @@ namespace BH {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FTService.Info", Namespace="http://schemas.datacontract.org/2004/07/FTServiceWCF")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTSearch.Selector", Namespace="http://schemas.datacontract.org/2004/07/BH.WCF")]
+    [System.SerializableAttribute()]
+    public partial class FTSearchSelector : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte AgregationSortTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte AgregationTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte ConditionTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string FilePathField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool IsSortAscField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string MaxBoundField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string MinBoundField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private uint Operand2Field;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte RangeTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte SelectorTypeField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte AgregationSortType {
+            get {
+                return this.AgregationSortTypeField;
+            }
+            set {
+                if ((this.AgregationSortTypeField.Equals(value) != true)) {
+                    this.AgregationSortTypeField = value;
+                    this.RaisePropertyChanged("AgregationSortType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte AgregationType {
+            get {
+                return this.AgregationTypeField;
+            }
+            set {
+                if ((this.AgregationTypeField.Equals(value) != true)) {
+                    this.AgregationTypeField = value;
+                    this.RaisePropertyChanged("AgregationType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte ConditionType {
+            get {
+                return this.ConditionTypeField;
+            }
+            set {
+                if ((this.ConditionTypeField.Equals(value) != true)) {
+                    this.ConditionTypeField = value;
+                    this.RaisePropertyChanged("ConditionType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string FilePath {
+            get {
+                return this.FilePathField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.FilePathField, value) != true)) {
+                    this.FilePathField = value;
+                    this.RaisePropertyChanged("FilePath");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsSortAsc {
+            get {
+                return this.IsSortAscField;
+            }
+            set {
+                if ((this.IsSortAscField.Equals(value) != true)) {
+                    this.IsSortAscField = value;
+                    this.RaisePropertyChanged("IsSortAsc");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string MaxBound {
+            get {
+                return this.MaxBoundField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.MaxBoundField, value) != true)) {
+                    this.MaxBoundField = value;
+                    this.RaisePropertyChanged("MaxBound");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string MinBound {
+            get {
+                return this.MinBoundField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.MinBoundField, value) != true)) {
+                    this.MinBoundField = value;
+                    this.RaisePropertyChanged("MinBound");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public uint Operand2 {
+            get {
+                return this.Operand2Field;
+            }
+            set {
+                if ((this.Operand2Field.Equals(value) != true)) {
+                    this.Operand2Field = value;
+                    this.RaisePropertyChanged("Operand2");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte RangeType {
+            get {
+                return this.RangeTypeField;
+            }
+            set {
+                if ((this.RangeTypeField.Equals(value) != true)) {
+                    this.RangeTypeField = value;
+                    this.RaisePropertyChanged("RangeType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte SelectorType {
+            get {
+                return this.SelectorTypeField;
+            }
+            set {
+                if ((this.SelectorTypeField.Equals(value) != true)) {
+                    this.SelectorTypeField = value;
+                    this.RaisePropertyChanged("SelectorType");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FTService.Info", Namespace="http://schemas.datacontract.org/2004/07/BH.WCF")]
     [System.SerializableAttribute()]
     public partial struct FTServiceInfo : System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -735,7 +1017,7 @@ namespace BH {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="BH.FTService")]
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WebService.FTService")]
     public interface FTService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/IsStarted", ReplyAction="http://tempuri.org/FTService/IsStartedResponse")]
@@ -745,22 +1027,16 @@ namespace BH {
         System.Threading.Tasks.Task<bool> IsStartedAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetConfiguration", ReplyAction="http://tempuri.org/FTService/GetConfigurationResponse")]
-        BH.FTSearchConfigurationDLL GetConfiguration();
+        BH.Web.WebService.FTSearchConfigurationDLL GetConfiguration();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetConfiguration", ReplyAction="http://tempuri.org/FTService/GetConfigurationResponse")]
-        System.Threading.Tasks.Task<BH.FTSearchConfigurationDLL> GetConfigurationAsync();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetDefaultConfiguration", ReplyAction="http://tempuri.org/FTService/GetDefaultConfigurationResponse")]
-        BH.FTSearchConfigurationDLL GetDefaultConfiguration();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetDefaultConfiguration", ReplyAction="http://tempuri.org/FTService/GetDefaultConfigurationResponse")]
-        System.Threading.Tasks.Task<BH.FTSearchConfigurationDLL> GetDefaultConfigurationAsync();
+        System.Threading.Tasks.Task<BH.Web.WebService.FTSearchConfigurationDLL> GetConfigurationAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SetConfiguration", ReplyAction="http://tempuri.org/FTService/SetConfigurationResponse")]
-        void SetConfiguration(BH.FTSearchConfigurationDLL configuration);
+        void SetConfiguration(BH.Web.WebService.FTSearchConfigurationDLL configuration);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SetConfiguration", ReplyAction="http://tempuri.org/FTService/SetConfigurationResponse")]
-        System.Threading.Tasks.Task SetConfigurationAsync(BH.FTSearchConfigurationDLL configuration);
+        System.Threading.Tasks.Task SetConfigurationAsync(BH.Web.WebService.FTSearchConfigurationDLL configuration);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/Start", ReplyAction="http://tempuri.org/FTService/StartResponse")]
         void Start(int instanceNumber);
@@ -769,22 +1045,52 @@ namespace BH {
         System.Threading.Tasks.Task StartAsync(int instanceNumber);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhrase", ReplyAction="http://tempuri.org/FTService/SearchPhraseResponse")]
-        BH.FTSearchResult[] SearchPhrase(string phrase, string templateName, int skip, int take);
+        BH.Web.WebService.FTSearchSearchResult SearchPhrase(string phrase, string templateName, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhrase", ReplyAction="http://tempuri.org/FTService/SearchPhraseResponse")]
-        System.Threading.Tasks.Task<BH.FTSearchResult[]> SearchPhraseAsync(string phrase, string templateName, int skip, int take);
+        System.Threading.Tasks.Task<BH.Web.WebService.FTSearchSearchResult> SearchPhraseAsync(string phrase, string templateName, int skip, int take);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchQuery", ReplyAction="http://tempuri.org/FTService/SearchQueryResponse")]
+        BH.Web.WebService.FTSearchSearchResult SearchQuery(BH.Web.WebService.FTSearchSelector[] selectors, int minPage, int maxPage, int skip, bool agregateBySubject);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchQuery", ReplyAction="http://tempuri.org/FTService/SearchQueryResponse")]
+        System.Threading.Tasks.Task<BH.Web.WebService.FTSearchSearchResult> SearchQueryAsync(BH.Web.WebService.FTSearchSelector[] selectors, int minPage, int maxPage, int skip, bool agregateBySubject);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhraseRel", ReplyAction="http://tempuri.org/FTService/SearchPhraseRelResponse")]
+        BH.Web.WebService.FTSearchSearchResult SearchPhraseRel(string phrase, int minPage, int maxPage, int skip, int take);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SearchPhraseRel", ReplyAction="http://tempuri.org/FTService/SearchPhraseRelResponse")]
+        System.Threading.Tasks.Task<BH.Web.WebService.FTSearchSearchResult> SearchPhraseRelAsync(string phrase, int minPage, int maxPage, int skip, int take);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/StemContent", ReplyAction="http://tempuri.org/FTService/StemContentResponse")]
+        string StemContent(string contentText);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/StemContent", ReplyAction="http://tempuri.org/FTService/StemContentResponse")]
+        System.Threading.Tasks.Task<string> StemContentAsync(string contentText);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/LoadDocumentContent", ReplyAction="http://tempuri.org/FTService/LoadDocumentContentResponse")]
+        string LoadDocumentContent(string documentName, string documentVersion, string robotName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/LoadDocumentContent", ReplyAction="http://tempuri.org/FTService/LoadDocumentContentResponse")]
+        System.Threading.Tasks.Task<string> LoadDocumentContentAsync(string documentName, string documentVersion, string robotName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/CalculateTrend", ReplyAction="http://tempuri.org/FTService/CalculateTrendResponse")]
+        string CalculateTrend(string phrase, int count, int minPage, int maxPage);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/CalculateTrend", ReplyAction="http://tempuri.org/FTService/CalculateTrendResponse")]
+        System.Threading.Tasks.Task<string> CalculateTrendAsync(string phrase, int count, int minPage, int maxPage);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetInfo", ReplyAction="http://tempuri.org/FTService/GetInfoResponse")]
-        BH.FTServiceInfo GetInfo();
+        BH.Web.WebService.FTServiceInfo GetInfo();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/GetInfo", ReplyAction="http://tempuri.org/FTService/GetInfoResponse")]
-        System.Threading.Tasks.Task<BH.FTServiceInfo> GetInfoAsync();
+        System.Threading.Tasks.Task<BH.Web.WebService.FTServiceInfo> GetInfoAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/IndexText", ReplyAction="http://tempuri.org/FTService/IndexTextResponse")]
-        bool IndexText(string aliasName, string contentText);
+        bool IndexText(string documentName, string documentVersion, string contentText, string robotName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/IndexText", ReplyAction="http://tempuri.org/FTService/IndexTextResponse")]
-        System.Threading.Tasks.Task<bool> IndexTextAsync(string aliasName, string contentText);
+        System.Threading.Tasks.Task<bool> IndexTextAsync(string documentName, string documentVersion, string contentText, string robotName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/SaveIndex", ReplyAction="http://tempuri.org/FTService/SaveIndexResponse")]
         void SaveIndex();
@@ -809,21 +1115,15 @@ namespace BH {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/CheckIndexes", ReplyAction="http://tempuri.org/FTService/CheckIndexesResponse")]
         System.Threading.Tasks.Task CheckIndexesAsync();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/LoadContent", ReplyAction="http://tempuri.org/FTService/LoadContentResponse")]
-        string LoadContent(string name, string aroundPhrase);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/FTService/LoadContent", ReplyAction="http://tempuri.org/FTService/LoadContentResponse")]
-        System.Threading.Tasks.Task<string> LoadContentAsync(string name, string aroundPhrase);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface FTServiceChannel : BH.FTService, System.ServiceModel.IClientChannel {
+    public interface FTServiceChannel : BH.Web.WebService.FTService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class FTServiceClient : System.ServiceModel.ClientBase<BH.FTService>, BH.FTService {
+    public partial class FTServiceClient : System.ServiceModel.ClientBase<BH.Web.WebService.FTService>, BH.Web.WebService.FTService {
         
         public FTServiceClient() {
         }
@@ -852,27 +1152,19 @@ namespace BH {
             return base.Channel.IsStartedAsync();
         }
         
-        public BH.FTSearchConfigurationDLL GetConfiguration() {
+        public BH.Web.WebService.FTSearchConfigurationDLL GetConfiguration() {
             return base.Channel.GetConfiguration();
         }
         
-        public System.Threading.Tasks.Task<BH.FTSearchConfigurationDLL> GetConfigurationAsync() {
+        public System.Threading.Tasks.Task<BH.Web.WebService.FTSearchConfigurationDLL> GetConfigurationAsync() {
             return base.Channel.GetConfigurationAsync();
         }
         
-        public BH.FTSearchConfigurationDLL GetDefaultConfiguration() {
-            return base.Channel.GetDefaultConfiguration();
-        }
-        
-        public System.Threading.Tasks.Task<BH.FTSearchConfigurationDLL> GetDefaultConfigurationAsync() {
-            return base.Channel.GetDefaultConfigurationAsync();
-        }
-        
-        public void SetConfiguration(BH.FTSearchConfigurationDLL configuration) {
+        public void SetConfiguration(BH.Web.WebService.FTSearchConfigurationDLL configuration) {
             base.Channel.SetConfiguration(configuration);
         }
         
-        public System.Threading.Tasks.Task SetConfigurationAsync(BH.FTSearchConfigurationDLL configuration) {
+        public System.Threading.Tasks.Task SetConfigurationAsync(BH.Web.WebService.FTSearchConfigurationDLL configuration) {
             return base.Channel.SetConfigurationAsync(configuration);
         }
         
@@ -884,28 +1176,68 @@ namespace BH {
             return base.Channel.StartAsync(instanceNumber);
         }
         
-        public BH.FTSearchResult[] SearchPhrase(string phrase, string templateName, int skip, int take) {
+        public BH.Web.WebService.FTSearchSearchResult SearchPhrase(string phrase, string templateName, int skip, int take) {
             return base.Channel.SearchPhrase(phrase, templateName, skip, take);
         }
         
-        public System.Threading.Tasks.Task<BH.FTSearchResult[]> SearchPhraseAsync(string phrase, string templateName, int skip, int take) {
+        public System.Threading.Tasks.Task<BH.Web.WebService.FTSearchSearchResult> SearchPhraseAsync(string phrase, string templateName, int skip, int take) {
             return base.Channel.SearchPhraseAsync(phrase, templateName, skip, take);
         }
         
-        public BH.FTServiceInfo GetInfo() {
+        public BH.Web.WebService.FTSearchSearchResult SearchQuery(BH.Web.WebService.FTSearchSelector[] selectors, int minPage, int maxPage, int skip, bool agregateBySubject) {
+            return base.Channel.SearchQuery(selectors, minPage, maxPage, skip, agregateBySubject);
+        }
+        
+        public System.Threading.Tasks.Task<BH.Web.WebService.FTSearchSearchResult> SearchQueryAsync(BH.Web.WebService.FTSearchSelector[] selectors, int minPage, int maxPage, int skip, bool agregateBySubject) {
+            return base.Channel.SearchQueryAsync(selectors, minPage, maxPage, skip, agregateBySubject);
+        }
+        
+        public BH.Web.WebService.FTSearchSearchResult SearchPhraseRel(string phrase, int minPage, int maxPage, int skip, int take) {
+            return base.Channel.SearchPhraseRel(phrase, minPage, maxPage, skip, take);
+        }
+        
+        public System.Threading.Tasks.Task<BH.Web.WebService.FTSearchSearchResult> SearchPhraseRelAsync(string phrase, int minPage, int maxPage, int skip, int take) {
+            return base.Channel.SearchPhraseRelAsync(phrase, minPage, maxPage, skip, take);
+        }
+        
+        public string StemContent(string contentText) {
+            return base.Channel.StemContent(contentText);
+        }
+        
+        public System.Threading.Tasks.Task<string> StemContentAsync(string contentText) {
+            return base.Channel.StemContentAsync(contentText);
+        }
+        
+        public string LoadDocumentContent(string documentName, string documentVersion, string robotName) {
+            return base.Channel.LoadDocumentContent(documentName, documentVersion, robotName);
+        }
+        
+        public System.Threading.Tasks.Task<string> LoadDocumentContentAsync(string documentName, string documentVersion, string robotName) {
+            return base.Channel.LoadDocumentContentAsync(documentName, documentVersion, robotName);
+        }
+        
+        public string CalculateTrend(string phrase, int count, int minPage, int maxPage) {
+            return base.Channel.CalculateTrend(phrase, count, minPage, maxPage);
+        }
+        
+        public System.Threading.Tasks.Task<string> CalculateTrendAsync(string phrase, int count, int minPage, int maxPage) {
+            return base.Channel.CalculateTrendAsync(phrase, count, minPage, maxPage);
+        }
+        
+        public BH.Web.WebService.FTServiceInfo GetInfo() {
             return base.Channel.GetInfo();
         }
         
-        public System.Threading.Tasks.Task<BH.FTServiceInfo> GetInfoAsync() {
+        public System.Threading.Tasks.Task<BH.Web.WebService.FTServiceInfo> GetInfoAsync() {
             return base.Channel.GetInfoAsync();
         }
         
-        public bool IndexText(string aliasName, string contentText) {
-            return base.Channel.IndexText(aliasName, contentText);
+        public bool IndexText(string documentName, string documentVersion, string contentText, string robotName) {
+            return base.Channel.IndexText(documentName, documentVersion, contentText, robotName);
         }
         
-        public System.Threading.Tasks.Task<bool> IndexTextAsync(string aliasName, string contentText) {
-            return base.Channel.IndexTextAsync(aliasName, contentText);
+        public System.Threading.Tasks.Task<bool> IndexTextAsync(string documentName, string documentVersion, string contentText, string robotName) {
+            return base.Channel.IndexTextAsync(documentName, documentVersion, contentText, robotName);
         }
         
         public void SaveIndex() {
@@ -938,14 +1270,6 @@ namespace BH {
         
         public System.Threading.Tasks.Task CheckIndexesAsync() {
             return base.Channel.CheckIndexesAsync();
-        }
-        
-        public string LoadContent(string name, string aroundPhrase) {
-            return base.Channel.LoadContent(name, aroundPhrase);
-        }
-        
-        public System.Threading.Tasks.Task<string> LoadContentAsync(string name, string aroundPhrase) {
-            return base.Channel.LoadContentAsync(name, aroundPhrase);
         }
     }
 }

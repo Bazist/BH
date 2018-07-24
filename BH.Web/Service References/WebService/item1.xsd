@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/FTServiceWCF" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/FTServiceWCF" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8080/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/BH.WCF" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/BH.WCF" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:5056/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:complexType name="FTSearch.ConfigurationDLL">
     <xs:sequence>
       <xs:element minOccurs="0" name="AutoSaveIndex" type="xs:boolean" />
@@ -25,6 +25,14 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="FTSearch.ConfigurationDLL" nillable="true" type="tns:FTSearch.ConfigurationDLL" />
+  <xs:complexType name="FTSearch.SearchResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="FullCountMatches" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="MatchWords" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Results" nillable="true" type="tns:ArrayOfFTSearch.Result" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FTSearch.SearchResult" nillable="true" type="tns:FTSearch.SearchResult" />
   <xs:complexType name="ArrayOfFTSearch.Result">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="FTSearch.Result" type="tns:FTSearch.Result" />
@@ -61,6 +69,28 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="FTSearch.ResultPosition" nillable="true" type="tns:FTSearch.ResultPosition" />
+  <xs:complexType name="ArrayOfFTSearch.Selector">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FTSearch.Selector" nillable="true" type="tns:FTSearch.Selector" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfFTSearch.Selector" nillable="true" type="tns:ArrayOfFTSearch.Selector" />
+  <xs:complexType name="FTSearch.Selector">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AgregationSortType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="AgregationType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="ConditionType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="FilePath" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsSortAsc" type="xs:boolean" />
+      <xs:element minOccurs="0" name="MaxBound" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MinBound" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Operand2" type="xs:unsignedInt" />
+      <xs:element minOccurs="0" name="RangeType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="SelectorType" type="xs:unsignedByte" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FTSearch.Selector" nillable="true" type="tns:FTSearch.Selector" />
   <xs:complexType name="FTService.Info">
     <xs:annotation>
       <xs:appinfo>
