@@ -69,6 +69,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_76436D78C56546C0AC4A000FC2D841BF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8E24ADF7913A4506844EE4780D91B474"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -88,6 +94,12 @@
         "Entry"
         {
         "MsmKey" = "8:_EED3061728F246D28DA577912098F071"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F06A23FB75ED4278AA0FB7F5F89D92C5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -349,6 +361,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_76436D78C56546C0AC4A000FC2D841BF"
+            {
+            "SourcePath" = "8:License.rtf"
+            "TargetName" = "8:License.rtf"
+            "Tag" = "8:"
+            "Folder" = "8:_BD64695180D146A0B8B1B86F64E675FE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BA83BDF5FD48DA74576E2CABA32D065A"
             {
             "AssemblyRegister" = "3:1"
@@ -378,6 +410,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F06A23FB75ED4278AA0FB7F5F89D92C5"
+            {
+            "SourcePath" = "8:ReadMe.rtf"
+            "TargetName" = "8:ReadMe.rtf"
+            "Tag" = "8:"
+            "Folder" = "8:_BD64695180D146A0B8B1B86F64E675FE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }
@@ -459,7 +511,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Full Text Search"
         "ProductCode" = "8:{B65DF522-1316-4B95-BF82-D92D4516C1C0}"
-        "PackageCode" = "8:{14119254-4B63-4EE5-B35D-1A6AEE69ECD3}"
+        "PackageCode" = "8:{2D7BCB4D-EE16-4615-BC61-0CD3DD830090}"
         "UpgradeCode" = "8:{29C82B77-15CB-49EB-9CCD-308F62671788}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -956,7 +1008,8 @@
                             "Type" = "3:6"
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
-                            "Setting" = "3:0"
+                            "Setting" = "3:2"
+                            "Value" = "8:_76436D78C56546C0AC4A000FC2D841BF"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "Sunken"
@@ -1077,7 +1130,8 @@
                             "Type" = "3:6"
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
-                            "Setting" = "3:0"
+                            "Setting" = "3:2"
+                            "Value" = "8:_F06A23FB75ED4278AA0FB7F5F89D92C5"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "Sunken"
