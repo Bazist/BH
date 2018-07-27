@@ -932,7 +932,7 @@ namespace BH.WCF
             //release pointers
             for (int i = 0; i < selectors.Count; i++)
             {
-                Marshal.Release(ptrs[i]);
+                Marshal.FreeHGlobal(ptrs[i]);
             }
 
             //releaseQueryResult

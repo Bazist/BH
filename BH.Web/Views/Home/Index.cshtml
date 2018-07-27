@@ -1,5 +1,5 @@
 ﻿
-@using FTSearchWeb.Model
+@using BH.Web.Model
 
 @model SearchResult
 
@@ -62,7 +62,7 @@
                 {
                     if (Model.Results.Length > 0)
                     {
-                        foreach (FTSearchWeb.BH.FTSearchResult res in Model.Results)
+                        foreach (BH.Web.WebService.FTSearchResult res in Model.Results)
                         {
                             <tr>
                                 <td nowrap>
