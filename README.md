@@ -20,7 +20,7 @@ Largest database is hosted only on one virtual machine.
 Note: Search is designed without calculate distances or order between words.
 - Ability to use ranking algorithm with **Machine Learning** based on associative sequences
 - The engine based on **HArray** described [here](https://github.com/Bazist/HArray)
-- Used as engine for: [booben.com](http:\\booben.com)
+- Used as engine for: [booben.com](http://booben.com)
 ------------------
 
 ## Three simple steps to install all infrastructure
