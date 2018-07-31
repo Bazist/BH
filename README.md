@@ -19,7 +19,7 @@ Largest database is hosted only on one virtual machine.
 - Flexible **query language** provides search by phrase/word/dictionary with stemming, detect trends. 
 Note: Search is designed without calculate distances or order between words.
 - Ability to use ranking algorithm with **Machine Learning** based on associative sequences
-- The engine based on HArray described [here](https://github.com/Bazist/HArray)
+- The engine based on **HArray** described [here](https://github.com/Bazist/HArray)
 - Used as engine for: [booben.com](http:\\booben.com)
 ------------------
 
