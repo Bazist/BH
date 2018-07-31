@@ -10,10 +10,19 @@ namespace BH.ExampleRobot
 {
     public class ExampleRobot : BaseRobot.BaseRobot
     {
+        private const string DocumentsPath = @"C:\FTS\TestDocs";
+
         protected override IEnumerable<Document> GetDocuments(Folder folder)
         {
-            return Directory.GetFiles(@"C:\FTS\TestDocs", "*.txt")
+            if (Directory.Exists(DocumentsPath))
+            {
+                return Directory.GetFiles(DocumentsPath, "*.txt")
                             .Select(x => new Document(folder, x, File.ReadAllText(x)));
+            }
+            else
+            {
+                throw new DirectoryNotFoundException(DocumentsPath);
+            }
         }
     }
 }
