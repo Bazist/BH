@@ -19,20 +19,17 @@ Largest database is hosted only on one virtual machine.
 - Flexible **query language** provides search by phrase/word/dictionary with stemming, detect trends. 
 Note: Search is designed without calculate distances or order between words.
 - Ability to use ranking algorithm with **Machine Learning** based on associative sequences
-- Used and tested every day. for example it's engine for: **[booben.com](http:\\booben.com)**
+- The engine based on HArray described [here](https://github.com/Bazist/HArray)
+- Used as engine for: [booben.com](http:\\booben.com)
 ------------------
 
 ## Three simple steps to install all infrastructure
 
-1. Install your BH\FTService as Windows Service
-https://github.com/Bazist/BH/tree/master/Install/Server
+1. Install your BH\FTService as Windows Service from here: https://github.com/Bazist/BH/tree/master/Install/Server
 
-2. Install your Web Search Site on IIS
-https://github.com/Bazist/BH/tree/master/Install/WebSite
+2. Install your Web Search Site on IIS from here: https://github.com/Bazist/BH/tree/master/Install/WebSite
 
-3. Make your custom Robot to fill database.
-Example here:
-https://github.com/Bazist/BH/tree/master/BH.ExampleRobot
+3. Make your custom Robot to fill database. Example here: https://github.com/Bazist/BH/tree/master/BH.ExampleRobot
 
 ------------------
 ### Example of simplest Robot
