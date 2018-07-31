@@ -19,7 +19,7 @@ Largest database is hosted only on one virtual machine.
 - Flexible **query language** provides search by phrase/word/dictionary with stemming, detect trends. 
 Note: Search is designed without calculate distances or order between words.
 - Ability to use ranking algorithm with **Machine Learning** based on associative sequences
-- Used and tested every day. for example it's engine for: **[http:\\booben.com](http:\\booben.com)**
+- Used and tested every day. for example it's engine for: **[booben.com](http:\\booben.com)**
 ------------------
 
 ## Three simple steps to install all infrastructure
