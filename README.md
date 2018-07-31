@@ -23,6 +23,12 @@ Note: Search is designed without calculate distances or order between words.
 - Used as engine for: [booben.com](http://booben.com)
 ------------------
 
+## Examples of Indexes
+
+![alt tag](https://raw.githubusercontent.com/Bazist/BH/master/TableOfIndexes.png)
+
+------------------
+
 ## Three simple steps to install all infrastructure
 
 1. Install your BH\FTService as Windows Service from here: https://github.com/Bazist/BH/tree/master/Install/Server
@@ -37,19 +43,14 @@ Note: Search is designed without calculate distances or order between words.
 ```c#
 public class ExampleRobot : BaseRobot.BaseRobot
 {
-    private const string DocumentsPath = @"C:\FTS\TestDocs";
-
     protected override IEnumerable<Document> GetDocuments(Folder folder)
     {
-        if (Directory.Exists(DocumentsPath))
-        {
-            return Directory.GetFiles(DocumentsPath, "*.txt")
-                        .Select(x => new Document(folder, x, File.ReadAllText(x)));
-        }
-        else
-        {
-            throw new DirectoryNotFoundException(DocumentsPath);
-        }
+         return new Document[]
+         {
+             new Document(folder, "GreenDoc", "Green"),
+             new Document(folder, "RedDoc", "Red"),
+             new Document(folder, "YelloDoc", "Yellow"),
+         };
     }
 }
 ```
