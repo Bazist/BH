@@ -274,7 +274,7 @@ namespace BH.WCF
                                    take,
                                    fts => fts.SearchPhrase(phrase,
                                                            templateName,
-                                                           int.MinValue,
+                                                           0,
                                                            int.MaxValue,
                                                            skip));
              });
