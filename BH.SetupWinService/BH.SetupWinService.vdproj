@@ -39,25 +39,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0C67FA5D8C7C6AB67AB16A8A5B782080"
-        "OwnerKey" = "8:_02B30D315120485BA0C22D35AE5588B2"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0C67FA5D8C7C6AB67AB16A8A5B782080"
+        "MsmKey" = "8:_5A2B4C485CD8219861D1AF7BF364F65F"
         "OwnerKey" = "8:_8E24ADF7913A4506844EE4780D91B474"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_31E46B6FB953DBD49611F222CD05EF69"
-        "OwnerKey" = "8:_8E24ADF7913A4506844EE4780D91B474"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_31E46B6FB953DBD49611F222CD05EF69"
+        "MsmKey" = "8:_5A2B4C485CD8219861D1AF7BF364F65F"
         "OwnerKey" = "8:_EED3061728F246D28DA577912098F071"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -81,20 +69,32 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_BA83BDF5FD48DA74576E2CABA32D065A"
-        "OwnerKey" = "8:_0C67FA5D8C7C6AB67AB16A8A5B782080"
+        "MsmKey" = "8:_EB0071FADE2CDFDF182481BB1B4277CB"
+        "OwnerKey" = "8:_02B30D315120485BA0C22D35AE5588B2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BA83BDF5FD48DA74576E2CABA32D065A"
-        "OwnerKey" = "8:_02B30D315120485BA0C22D35AE5588B2"
+        "MsmKey" = "8:_EB0071FADE2CDFDF182481BB1B4277CB"
+        "OwnerKey" = "8:_8E24ADF7913A4506844EE4780D91B474"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_EED3061728F246D28DA577912098F071"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EED651C30A8C6BF824FD5650A13DB0B9"
+        "OwnerKey" = "8:_EB0071FADE2CDFDF182481BB1B4277CB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EED651C30A8C6BF824FD5650A13DB0B9"
+        "OwnerKey" = "8:_02B30D315120485BA0C22D35AE5588B2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -112,13 +112,25 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_EED3061728F246D28DA577912098F071"
+        "OwnerKey" = "8:_5A2B4C485CD8219861D1AF7BF364F65F"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_31E46B6FB953DBD49611F222CD05EF69"
+        "OwnerKey" = "8:_EB0071FADE2CDFDF182481BB1B4277CB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_EED651C30A8C6BF824FD5650A13DB0B9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_EED3061728F246D28DA577912098F071"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -133,18 +145,6 @@
         "OwnerKey" = "8:_082E8FD2DE77B734785D97B2E0B6683F"
         "MsmSig" = "8:_UNDEFINED"
         }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0C67FA5D8C7C6AB67AB16A8A5B782080"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_BA83BDF5FD48DA74576E2CABA32D065A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
     }
     "Configurations"
     {
@@ -153,7 +153,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\BH.SetupWinService.msi"
+        "OutputFilename" = "8:..\\Install\\Server\\BH.SetupWinService.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -299,45 +299,14 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0C67FA5D8C7C6AB67AB16A8A5B782080"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5A2B4C485CD8219861D1AF7BF364F65F"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:BH.BaseRobot, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
+            "AssemblyAsmDisplayName" = "8:BH.WCF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_0C67FA5D8C7C6AB67AB16A8A5B782080"
-                    {
-                    "Name" = "8:BH.BaseRobot.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:BH.BaseRobot.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_BD64695180D146A0B8B1B86F64E675FE"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_31E46B6FB953DBD49611F222CD05EF69"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:BH.WCF, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
-                "ScatterAssemblies"
-                {
-                    "_31E46B6FB953DBD49611F222CD05EF69"
+                    "_5A2B4C485CD8219861D1AF7BF364F65F"
                     {
                     "Name" = "8:BH.WCF.dll"
                     "Attributes" = "3:512"
@@ -381,14 +350,45 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BA83BDF5FD48DA74576E2CABA32D065A"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_EB0071FADE2CDFDF182481BB1B4277CB"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:BH.WCF, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
+            "AssemblyAsmDisplayName" = "8:BH.BaseRobot, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_BA83BDF5FD48DA74576E2CABA32D065A"
+                    "_EB0071FADE2CDFDF182481BB1B4277CB"
+                    {
+                    "Name" = "8:BH.BaseRobot.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:BH.BaseRobot.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_BD64695180D146A0B8B1B86F64E675FE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_EED651C30A8C6BF824FD5650A13DB0B9"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:BH.WCF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_EED651C30A8C6BF824FD5650A13DB0B9"
                     {
                     "Name" = "8:BH.WCF.dll"
                     "Attributes" = "3:512"
@@ -511,7 +511,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Full Text Search"
         "ProductCode" = "8:{B65DF522-1316-4B95-BF82-D92D4516C1C0}"
-        "PackageCode" = "8:{2D7BCB4D-EE16-4615-BC61-0CD3DD830090}"
+        "PackageCode" = "8:{854219E6-8157-4C7D-8D45-6CC3B67F36A8}"
         "UpgradeCode" = "8:{29C82B77-15CB-49EB-9CCD-308F62671788}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1410,7 +1410,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_02B30D315120485BA0C22D35AE5588B2"
             {
-            "SourcePath" = "8:..\\BH.ExampleRobot\\obj\\x64\\Debug\\BH.ExampleRobot.dll"
+            "SourcePath" = "8:..\\BH.ExampleRobot\\obj\\Debug\\BH.ExampleRobot.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_6F784E2B6339497298ABE1E6B0458693"
@@ -1522,7 +1522,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_8E24ADF7913A4506844EE4780D91B474"
             {
-            "SourcePath" = "8:..\\BH.WinService\\obj\\x64\\Debug\\BH.WinService.exe"
+            "SourcePath" = "8:..\\BH.WinService\\obj\\Debug\\BH.WinService.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_BD64695180D146A0B8B1B86F64E675FE"
@@ -1634,7 +1634,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EED3061728F246D28DA577912098F071"
             {
-            "SourcePath" = "8:..\\BH.BaseRobot\\obj\\x64\\Debug\\BH.BaseRobot.dll"
+            "SourcePath" = "8:..\\BH.BaseRobot\\obj\\Debug\\BH.BaseRobot.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_6F784E2B6339497298ABE1E6B0458693"
