@@ -14,8 +14,7 @@
 - **High speed of searching** takes **few milliseconds** for a typical simple query on the web site.
 - The database is designed for **large datasets** on regular machines. 
 The largest known database contains more than **14 TB documents** and flow about **~120 gb new documents per day**. For all this is enough one virtual machine.
-- **Horizontal scalable** of instances, but in most cases is enough only machine. 
-Largest database is hosted only on one virtual machine.
+- **Horizontal scalable** of instances, but in most cases is enough only one machine.
 - Flexible **query language** provides search by phrase/word/dictionary with stemming, detect trends. 
 Note: Search is designed without calculate distances or order between words.
 - Ability to use ranking algorithm with **Machine Learning** based on associative sequences
