@@ -1,9 +1,10 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "DocumentsBlock.h"
 #include "DocumentsBlock.h"
 #include "HArrayFixRAM.h"
 #include "HArrayFixHDD.h"
 #include "DocumentsBlockPool.h"
+#include "DocumentsInfoPool.h"
 #include "RelevantResultPool.h"
 #include "BinaryFile.h"
 #include "FTSConfiguration.h"
@@ -35,6 +36,7 @@ public:
 		pBlockMemoryPool = new BlockMemoryPool(LastErrorMessage);
 		pPostSelectorPool = new PostSelectorPool(LastErrorMessage);
 		pDocumentsBlockPool = new DocumentsBlockPool(pBlockMemoryPool, pPostSelectorPool, LastErrorMessage);
+		pDocumentsInfoPool = new DocumentsInfoPool(LastErrorMessage);
 		pRelevantResultPool = new RelevantResultPool(LastErrorMessage);
 	}
 
@@ -68,6 +70,12 @@ public:
 		{
 			delete pDocumentsBlockPool;
 			pDocumentsBlockPool = 0;
+		}
+
+		if (pDocumentsInfoPool)
+		{
+			delete pDocumentsInfoPool;
+			pDocumentsInfoPool = 0;
 		}
 
 		if (pRelevantResultPool)
@@ -173,6 +181,7 @@ public:
 		uint32 maxPage);
 
 	double calculateDistance(const char* word,
+		uint32 maxMatched,
 		uchar8* pLevelBuffer,
 		uint32 countUsedDocNumbers,
 		uint32 level,
@@ -209,6 +218,21 @@ public:
 		uint32 count,
 		uint32 minPage,
 		uint32 maxPage);
+
+	void FTSInstance::initDataForSearchDistances();
+
+	static int FTSInstance::compareDocumentsCount(HArrayFixPair& pair1,
+												  HArrayFixPair& pair2,
+										          uint32 countKeySegments);
+
+	void FTSInstance::readBlocksFromFile(
+		DocumentsBlock* pDocumentsBlock,
+		uint32 minPage,
+		uint32 maxPage,
+		uchar8* pSourceBuffer,
+		ulong64& sourceFilePosition,
+		uint32& sourceBuffPosition,
+		uint32& sourceBuffLength);
 
 	void FTSInstance::buildWiki();
 
@@ -282,7 +306,7 @@ public:
 				else
 				{
 					//document on hdd
-					uint32 offset = (id - 1) * Info.DocumentNameSize + DOC_NAME_HEADER_SIZE;
+					uint32 offset = (id - docHeaderSize) * Info.DocumentNameSize + DOC_NAME_HEADER_SIZE;
 					pDocNameFile->read(name, offset, sizeName);
 				}
 			}
@@ -454,6 +478,7 @@ public:
 
 				pBlockMemoryPool->clear();
 				pDocumentsBlockPool->clear();
+				pDocumentsInfoPool->clear();
 				pRelevantResultPool->clear();
 				pPostSelectorPool->clear();
 			}
@@ -488,6 +513,7 @@ private:
 
 	static BlockMemoryPool* pBlockMemoryPool;
 	static DocumentsBlockPool* pDocumentsBlockPool;
+	static DocumentsInfoPool* pDocumentsInfoPool;
 	static RelevantResultPool* pRelevantResultPool;
 	static PostSelectorPool* pPostSelectorPool;
 
@@ -497,8 +523,9 @@ private:
 	BinaryFile* pDocNameFile;
 
 	HArrayFixPair* pAllKeysAndValuesRAM;
-	uint32* pStartScanWordsFrom;
 	uint32 pAllKeysAndValuesRAMCount;
+
+	uint32* pStartScanWordsFrom;
 
 	uint32 tempKey[25];
 
@@ -527,15 +554,15 @@ private:
 
 			if (Configuration.IsUseRussianAlphabet || Configuration.IsUseUkranianAlphabet)
 			{
-				if (c == (uchar8)'∏' || c == (uchar8)'®') //convert to "e"
+				if (c == (uchar8)'—ë' || c == (uchar8)'–Å') //convert to "e"
 				{
-					alphabet[c] = (uchar8)'Â';
+					alphabet[c] = (uchar8)'–µ';
 				}
-				else if ((uchar8)'‡' <= c && c <= (uchar8)'ˇ') //lower case
+				else if ((uchar8)'–∞' <= c && c <= (uchar8)'—è') //lower case
 				{
 					alphabet[c] = c;
 				}
-				else if ((uchar8)'¿' <= c && c <= (uchar8)'ﬂ') //upper case
+				else if ((uchar8)'–ê' <= c && c <= (uchar8)'–Ø') //upper case
 				{
 					alphabet[c] = c + 32;
 				}
@@ -543,19 +570,19 @@ private:
 
 			if (Configuration.IsUseUkranianAlphabet)
 			{
-				if (c == (uchar8)'≥' || c == (uchar8)'≤') //convert to "e"
+				if (c == (uchar8)'—ñ' || c == (uchar8)'–Ü') //convert to "e"
 				{
-					alphabet[c] = (uchar8)'≥';
+					alphabet[c] = (uchar8)'—ñ';
 				}
 
-				if (c == (uchar8)'ø' || c == (uchar8)'Ø') //convert to "e"
+				if (c == (uchar8)'—ó' || c == (uchar8)'–á') //convert to "e"
 				{
-					alphabet[c] = (uchar8)'ø';
+					alphabet[c] = (uchar8)'—ó';
 				}
 
-				if (c == (uchar8)'∫' || c == (uchar8)'™') //convert to "e"
+				if (c == (uchar8)'—î' || c == (uchar8)'–Ñ') //convert to "e"
 				{
-					alphabet[c] = (uchar8)'∫';
+					alphabet[c] = (uchar8)'—î';
 				}
 			}
 

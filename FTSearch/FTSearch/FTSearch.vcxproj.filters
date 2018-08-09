@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Document">
+      <UniqueIdentifier>{fb0b80dc-10df-411b-bc51-b45bc57f4c0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine">
+      <UniqueIdentifier>{34ef5e38-ae98-46ba-81eb-e08acce7499c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\File">
+      <UniqueIdentifier>{51505a4b-992a-4976-8ed2-4838c4ca21ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\HArray">
+      <UniqueIdentifier>{5ca4f3a6-6c5c-4844-8ead-23bf8ae202ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory">
+      <UniqueIdentifier>{03ab8577-51fd-4ab8-8450-1ce2656ba838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Structures">
+      <UniqueIdentifier>{06ee61bb-d636-4d44-8c2b-66f9719ef76e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\File">
+      <UniqueIdentifier>{2b97b27f-4faf-482b-ac28-c96c85f516c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HArray">
+      <UniqueIdentifier>{532a89cd-6571-4782-b673-278619016d54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{c5375e8f-26a4-42ec-894f-2bcd25b2d749}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PostSelector">
+      <UniqueIdentifier>{c65cc53f-030c-4d79-8f23-ccac447cda95}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="Export.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentsBlock.h">
+      <Filter>Header Files\Document</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentsName.h">
+      <Filter>Header Files\Document</Filter>
+    </ClInclude>
+    <ClInclude Include="FTSInstance.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="FTSInstanceInfo.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="FTSServer.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="BinaryFile.h">
+      <Filter>Header Files\File</Filter>
+    </ClInclude>
+    <ClInclude Include="RelevantResult.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="RelevantResultPool.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockMemory.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockMemoryPool.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Document.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Documents.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentsBlockPool.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="NumberList.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="FTSConfiguration.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="HArrayFixBase.h">
+      <Filter>Header Files\HArray</Filter>
+    </ClInclude>
+    <ClInclude Include="HArrayFixRAM.h">
+      <Filter>Header Files\HArray</Filter>
+    </ClInclude>
+    <ClInclude Include="HArrayFixHDD.h">
+      <Filter>Header Files\HArray</Filter>
+    </ClInclude>
+    <ClInclude Include="WordRaiting.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="Dictionary.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="DictionaryWord.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="PostSelector.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryResult.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryRow.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="Selector.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="PostSelectorPool.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="HArrayTextFile.h">
+      <Filter>Header Files\HArray</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentsInfo.h">
+      <Filter>Header Files\Document</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentsInfoPool.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BinaryFile.cpp">
+      <Filter>Source Files\File</Filter>
+    </ClCompile>
+    <ClCompile Include="FTServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixHDD_getValueByKey.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixRAM_insert.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixHDD_getValuesByRange.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixHDD_getValuesByTemplate.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixHDD_insert.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixRAM_getKeysAndValuesByRange.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixRAM_getValueByKey.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixRAM_getValuesByRange.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixRAM_getValuesByTemplate.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="FTSInstance_Index.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="FTSInstance_Search.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="FTSInstance_Log.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="FTSInstance_Save.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixHDD_getKeysAndValuesByRange.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="PostSelector.cpp">
+      <Filter>Source Files\PostSelector</Filter>
+    </ClCompile>
+    <ClCompile Include="HArrayFixRAM_scanBySelector.cpp">
+      <Filter>Source Files\HArray</Filter>
+    </ClCompile>
+    <ClCompile Include="FTSInstance.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
