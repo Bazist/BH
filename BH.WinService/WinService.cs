@@ -13,6 +13,7 @@ using System.IO;
 using System.Configuration;
 using BH.BaseRobot;
 using System.Reflection;
+using BH.BoobenRobot;
 
 namespace BH.WinService
 {
@@ -125,6 +126,41 @@ namespace BH.WinService
             }
         }
 
+        private static Thread _boobenJob;
+        private void StartBoobenJob()
+        {
+            if (bool.Parse(ConfigurationManager.AppSettings["EnableJob"]))
+            {
+                WriteLog("Start Job", EventLogEntryType.Information);
+
+                _boobenJob = new Thread(() =>
+                {
+                    try
+                    {
+                        IndexService indexService = new IndexService(_fts,
+                                                                     x => WriteLog(x, EventLogEntryType.Error),
+                                                                     x => Debug.WriteLine(x));
+
+                        indexService.Run();
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+
+                        Stop();
+
+                        throw ex;
+                    }
+                }
+                );
+
+                _boobenJob.Start();
+                _boobenJob.IsBackground = true;
+
+                WriteLog("Job Started.", EventLogEntryType.Information);
+            }
+        }
+
         private void StartRobots()
         {
             if (bool.Parse(ConfigurationManager.AppSettings["EnableRobots"]))
@@ -148,7 +184,14 @@ namespace BH.WinService
         {
             StartService();
 
-            StartRobots();
+            if (bool.Parse(ConfigurationManager.AppSettings["BoobenMode"]))
+            {
+                StartBoobenJob();
+            }
+            else
+            {
+                StartRobots();
+            }
         }
 
         protected override void OnStop()
@@ -158,6 +201,11 @@ namespace BH.WinService
             //start web service
             try
             {
+                if (_boobenJob != null)
+                {
+                    _boobenJob.Abort();
+                }
+
                 if (_robots != null)
                 {
                     foreach (var robot in _robots)

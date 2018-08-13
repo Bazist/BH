@@ -109,6 +109,10 @@
       <Project>{a996adc9-2a42-48b9-aa74-532b2866c8c0}</Project>
       <Name>BH.BaseRobot</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BH.BoobenRobot\BH.BoobenRobot.csproj">
+      <Project>{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}</Project>
+      <Name>BH.BoobenRobot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BH.WCF\BH.WCF.csproj">
       <Project>{34f64742-db2e-434a-ba1c-1c9474e501bf}</Project>
       <Name>BH.WCF</Name>
