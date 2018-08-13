@@ -15,19 +15,19 @@ public:
 		Size = size;
 		dictionary.Count = 0;
 
-		minWeight = MAX_INT;
+		minWeight = 0;
 	}
 
 	uint32 minWeight;
 	uint32 minWeightIndex;
-	
+
 	Dictionary dictionary;
-	
+
 	uint32 Size;
-	
+
 	void print()
 	{
-		for(uint32 i=0; i < dictionary.Count; i++)
+		for (uint32 i = 0; i < dictionary.Count; i++)
 		{
 			printf("%s => %d \n", dictionary.Words[i].Word, dictionary.Words[i].Weight);
 		}
@@ -45,14 +45,14 @@ public:
 
 	void addWord(char* word, uint32 docID, uint32 weight)
 	{
-		if(dictionary.Count < Size)
+		if (dictionary.Count < Size)
 		{
 			DictionaryWord& dicWord = dictionary.Words[dictionary.Count];
 			strcpy(dicWord.Word, word);
 			dicWord.DocID = docID;
 			dicWord.Weight = weight;
 
-			if(weight < minWeight)
+			if (weight < minWeight || minWeight == 0)
 			{
 				minWeight = weight;
 				minWeightIndex = dictionary.Count;
@@ -60,7 +60,7 @@ public:
 
 			dictionary.Count++;
 		}
-		else if(weight > minWeight)
+		else if (weight > minWeight)
 		{
 			//remove min distance
 			DictionaryWord& dicWord = dictionary.Words[minWeightIndex];
@@ -73,9 +73,9 @@ public:
 			minWeight = MAX_INT;
 			minWeightIndex = 0;
 
-			for(uint32 i=0; i < dictionary.Count; i++)
+			for (uint32 i = 0; i < dictionary.Count; i++)
 			{
-				if(dictionary.Words[i].Weight < minWeight)
+				if (dictionary.Words[i].Weight < minWeight)
 				{
 					minWeight = dictionary.Words[i].Weight;
 					minWeightIndex = i;

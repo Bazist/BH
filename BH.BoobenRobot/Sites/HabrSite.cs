@@ -22,17 +22,7 @@ namespace BH.BoobenRobot
         {
             return new List<Page>
             {
-                new Page() {URL = "http://habrahabr.ru/posts/api/"},
-                new Page() {URL = "http://habrahabr.ru/posts/administration//"},
-                new Page() {URL = "http://habrahabr.ru/posts/databases/"},
-                new Page() {URL = "http://habrahabr.ru/posts/security/"},
-                new Page() {URL = "http://habrahabr.ru/posts/design-and-media/"},
-                new Page() {URL = "http://habrahabr.ru/posts/programming/"},
-                new Page() {URL = "http://habrahabr.ru/posts/software/"},
-                new Page() {URL = "http://habrahabr.ru/posts/telecommunications/"},
-                new Page() {URL = "http://habrahabr.ru/posts/fw-and-cms/"},
-                new Page() {URL = "http://habrahabr.ru/posts/frontend/"},
-                new Page() {URL = "http://habrahabr.ru/posts/others/"},
+                new Page() {URL = "https://habr.com/all/"}
             };
         }
 

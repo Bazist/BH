@@ -19,12 +19,12 @@ public:
 	uint32 BlockPagesSize;
 
 	HeaderCell* pHeader;
-	
+
 	/*uint32* pActiveContent;
 	ContentTypeCell* pActiveContentType;
 	BranchCell* pActiveBranch;
 	BlockCell* pActiveBlock;*/
-	
+
 	ContentPage** pContentPages;
 	BranchPage** pBranchPages;
 	BlockPage** pBlockPages;
@@ -50,34 +50,34 @@ public:
 	uint32 lastBlockOffset;
 
 	void init(const char* path,
-			  const char* tableName,
-			  uint32 keyLen,
-			  uint32 valueLen, 
-			  uchar8 headerBase)
+		const char* tableName,
+		uint32 keyLen,
+		uint32 valueLen,
+		uchar8 headerBase)
 	{
 		init(path,
-			 tableName,
-			 keyLen,
-			 valueLen,
-			 headerBase,
-			 INIT_MAX_PAGES,
-			 INIT_MAX_PAGES,
-			 INIT_MAX_PAGES);
+			tableName,
+			keyLen,
+			valueLen,
+			headerBase,
+			INIT_MAX_PAGES,
+			INIT_MAX_PAGES,
+			INIT_MAX_PAGES);
 	}
 
 	void init(const char* path,
-			  const char* tableName,
-			  uint32 keyLen,
-			  uint32 valueLen, 
-			  uchar8 headerBase,
-			  uint32 contentPagesSize,
-			  uint32 branchPagesSize,
-			  uint32 blockPagesSize)
+		const char* tableName,
+		uint32 keyLen,
+		uint32 valueLen,
+		uchar8 headerBase,
+		uint32 contentPagesSize,
+		uint32 branchPagesSize,
+		uint32 blockPagesSize)
 	{
 		strcpy(Path, path);
 		strcpy(TableName, tableName);
 
-		if(keyLen & 0x3)
+		if (keyLen & 0x3)
 		{
 			KeyLen = keyLen / 4 + 1; //len in blocks
 		}
@@ -86,7 +86,7 @@ public:
 			KeyLen = keyLen / 4;
 		}
 
-		if(valueLen & 0x3)
+		if (valueLen & 0x3)
 		{
 			ValueLen = valueLen / 4 + 1;
 		}
@@ -98,8 +98,8 @@ public:
 		RowLen = KeyLen + ValueLen;
 
 		HeaderBase = headerBase;
-		HeaderBits = 32-headerBase;
-		HeaderSize = (0xFFFFFFFF>>HeaderBits) + 1;
+		HeaderBits = 32 - headerBase;
+		HeaderSize = (0xFFFFFFFF >> HeaderBits) + 1;
 
 		countFreeBranchCell = 0;
 
@@ -107,10 +107,10 @@ public:
 
 		pHeader = new HeaderCell[HeaderSize];
 		memset(pHeader, 0, HeaderSize * sizeof(HeaderCell));
-		
-		#ifndef _RELEASE
 
-		for(uint32 i=0; i<COUNT_TEMPS; i++)
+#ifndef _RELEASE
+
+		for (uint32 i = 0; i<COUNT_TEMPS; i++)
 		{
 			tempValues[i] = 0;
 			tempCaptions[i] = 0;
@@ -139,7 +139,7 @@ public:
 		tempCaptions[20] = "Fill Blocks 1..8";
 		tempCaptions[21] = "Next Block Level 3";
 
-		#endif
+#endif
 
 		pContentPages = new ContentPage*[contentPagesSize];
 		pBranchPages = new BranchPage*[branchPagesSize];
@@ -156,7 +156,7 @@ public:
 		ContentPagesSize = contentPagesSize;
 		BranchPagesSize = branchPagesSize;
 		BlockPagesSize = blockPagesSize;
-		
+
 		lastContentOffset = 1;
 		lastBranchOffset = 0;
 		lastBlockOffset = 0;
@@ -164,22 +164,22 @@ public:
 
 	/*void getPath(char* buff, char* fileName)
 	{
-		getPath(buff, Path, fileName, TableName);
+	getPath(buff, Path, fileName, TableName);
 	}
 
 	static void getPath(char* buff,
-						char* path, 
-						char* fileName, 
-						char* tableName)
+	char* path,
+	char* fileName,
+	char* tableName)
 	{
-		if(tableName[0])
-		{
-			sprintf(buff, "%s\\%s_%s.pg", path, fileName, tableName);
-		}
-		else
-		{
-			sprintf(buff, "%s\\%s.pg", path, fileName);
-		}
+	if(tableName[0])
+	{
+	sprintf(buff, "%s\\%s_%s.pg", path, fileName, tableName);
+	}
+	else
+	{
+	sprintf(buff, "%s\\%s.pg", path, fileName);
+	}
 	}*/
 
 	ulong64 getHeaderSize()
@@ -201,21 +201,21 @@ public:
 	{
 		return BlockPagesCount * sizeof(BlockPage);
 	}
-	
+
 	ulong64 getUsedMemory()
 	{
-		return	getHeaderSize() + 
-				getContentSize() + 
-				getBranchSize() +
-				getBlockSize();
+		return	getHeaderSize() +
+			getContentSize() +
+			getBranchSize() +
+			getBlockSize();
 	}
 
 	ulong64 getTotalMemory()
 	{
-		return	getHeaderSize() + 
-				getContentSize() + 
-				getBranchSize() +
-				getBlockSize();
+		return	getHeaderSize() +
+			getContentSize() +
+			getBranchSize() +
+			getBlockSize();
 	}
 
 	void clear()
@@ -223,7 +223,7 @@ public:
 		uint32 keyLen = KeyLen * 4;
 		uint32 valueLen = ValueLen * 4;
 		uint32 headerBase = HeaderBase;
-		
+
 		char path[1024];
 		strcpy(path, Path);
 
@@ -237,35 +237,35 @@ public:
 
 	/*void saveInfo()
 	{
-		char infoPath[1024];
-		
-		getPath(infoPath, "ha_info");
+	char infoPath[1024];
 
-		BinaryFile* pInfoFile = new BinaryFile(infoPath, true, true);
-		if(pInfoFile)
-		{
-			if(pInfoFile->open())
-			{
-				HArrayFixBaseInfo info;
+	getPath(infoPath, "ha_info");
 
-				info.Version = 1;
-				info.KeyLen = KeyLen * 4;
-				info.ValueLen = ValueLen * 4;
-				info.HeaderBase = HeaderBase;
-				info.CountPartitions = 1;
-				info.Partitions[0].ContentPagesCount = ContentPagesCount;
-				info.Partitions[0].BranchPagesCount = BranchPagesCount;
-				info.Partitions[0].BlockPagesCount = BlockPagesCount;
-				info.Partitions[0].LastContentOffset = lastContentOffset;
-				info.Partitions[0].LastBranchOffset = lastBranchOffset;
-				info.Partitions[0].LastBlockOffset = lastBlockOffset;
+	BinaryFile* pInfoFile = new BinaryFile(infoPath, true, true);
+	if(pInfoFile)
+	{
+	if(pInfoFile->open())
+	{
+	HArrayFixBaseInfo info;
 
-				pInfoFile->write(&info, 0, sizeof(HArrayFixBaseInfo));
-				pInfoFile->close();
+	info.Version = 1;
+	info.KeyLen = KeyLen * 4;
+	info.ValueLen = ValueLen * 4;
+	info.HeaderBase = HeaderBase;
+	info.CountPartitions = 1;
+	info.Partitions[0].ContentPagesCount = ContentPagesCount;
+	info.Partitions[0].BranchPagesCount = BranchPagesCount;
+	info.Partitions[0].BlockPagesCount = BlockPagesCount;
+	info.Partitions[0].LastContentOffset = lastContentOffset;
+	info.Partitions[0].LastBranchOffset = lastBranchOffset;
+	info.Partitions[0].LastBlockOffset = lastBlockOffset;
 
-				delete pInfoFile;
-			}
-		}
+	pInfoFile->write(&info, 0, sizeof(HArrayFixBaseInfo));
+	pInfoFile->close();
+
+	delete pInfoFile;
+	}
+	}
 	}*/
 
 	void load()
@@ -273,13 +273,17 @@ public:
 		HArrayTextFile file;
 
 		file.init(Path, TableName, KeyLen);
-				
+
 		HArrayFixPair* pairs = HArrayFixPair::CreateArray(1000000, 3);
 
 		file.open();
 
 		ulong64 blockNumber = 0;
 		uint32 wordInBlock = 0;
+
+		uint32 keyt[2];
+		keyt[0] = 757935405;
+		keyt[1] = 0;
 
 		while (true)
 		{
@@ -292,10 +296,17 @@ public:
 			//insert portion of keys
 			for (uint32 i = 0; i < count; i++)
 			{
+				/*if (pairs[i].Key[0] == 757935405 && pairs[i].Key[1] == 0)
+				printf("ok");*/
+
 				this->insert(pairs[i].Key, pairs[i].Value);
+
+				/*ulong64 val = this->getValueByKey(keyt);
+				if(val > 0 && val != 64778415)
+				printf("ok");*/
 			}
 		}
-		
+
 		file.close();
 
 		HArrayFixPair::DeleteArray(pairs);
@@ -313,9 +324,9 @@ public:
 
 		//get keys
 		uint32 readCount = getKeysAndValuesByRange(pKeysAndValuesRAM,
-													count,
-													0,
-													0);
+			count,
+			0,
+			0);
 
 		if (readCount != count)
 			return false;
@@ -324,10 +335,10 @@ public:
 		for (uint32 i = 0; i < count; i++)
 		{
 			file.insert(pKeysAndValuesRAM[i].Key,
-						pKeysAndValuesRAM[i].Value);
+				pKeysAndValuesRAM[i].Value);
 		}
-		
-		
+
+
 		file.close();
 
 		HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
@@ -338,165 +349,165 @@ public:
 	/*
 	void load()
 	{
-		char path[1024];
-		strcpy(path, Path);
+	char path[1024];
+	strcpy(path, Path);
 
-		destroy();
+	destroy();
 
-		char infoPath[1024];
-		char headerPath[1024];
-		char contentPath[1024];
-		char branchPath[1024];
-		char blockPath[1024];
+	char infoPath[1024];
+	char headerPath[1024];
+	char contentPath[1024];
+	char branchPath[1024];
+	char blockPath[1024];
 
-		getPath(infoPath, "ha_dic");
-		getPath(headerPath, "ha_header");
-		getPath(contentPath, "ha_content_part1");
-		getPath(branchPath, "ha_branch_part1");
-		getPath(blockPath, "ha_block_part1");
+	getPath(infoPath, "ha_dic");
+	getPath(headerPath, "ha_header");
+	getPath(contentPath, "ha_content_part1");
+	getPath(branchPath, "ha_branch_part1");
+	getPath(blockPath, "ha_block_part1");
 
-		HArrayFixBaseInfo info;
+	HArrayFixBaseInfo info;
 
-		//header
-		BinaryFile* pInfoFile = new BinaryFile(infoPath, false, false);
-		if(pInfoFile->open())
-		{
-			pInfoFile->read(&info, 0, sizeof(HArrayFixBaseInfo));
+	//header
+	BinaryFile* pInfoFile = new BinaryFile(infoPath, false, false);
+	if(pInfoFile->open())
+	{
+	pInfoFile->read(&info, 0, sizeof(HArrayFixBaseInfo));
 
-			init(Path,
-				 TableName,
-				 info.KeyLen,
-				 info.ValueLen,
-				 info.HeaderBase,
-				 info.Partitions[0].ContentPagesCount + 1,
-				 info.Partitions[0].BranchPagesCount + 1,
-				 info.Partitions[0].BlockPagesCount + 1);
+	init(Path,
+	TableName,
+	info.KeyLen,
+	info.ValueLen,
+	info.HeaderBase,
+	info.Partitions[0].ContentPagesCount + 1,
+	info.Partitions[0].BranchPagesCount + 1,
+	info.Partitions[0].BlockPagesCount + 1);
 
-			ContentPagesCount = info.Partitions[0].ContentPagesCount;
-			BranchPagesCount = info.Partitions[0].BranchPagesCount;
-			BlockPagesCount = info.Partitions[0].BlockPagesCount;
+	ContentPagesCount = info.Partitions[0].ContentPagesCount;
+	BranchPagesCount = info.Partitions[0].BranchPagesCount;
+	BlockPagesCount = info.Partitions[0].BlockPagesCount;
 
-			lastContentOffset = info.Partitions[0].LastContentOffset;
-			lastBranchOffset = info.Partitions[0].LastBranchOffset;
-			lastBlockOffset = info.Partitions[0].LastBlockOffset;
-						
-			pInfoFile->close();
-			delete pInfoFile;
-		}
+	lastContentOffset = info.Partitions[0].LastContentOffset;
+	lastBranchOffset = info.Partitions[0].LastBranchOffset;
+	lastBlockOffset = info.Partitions[0].LastBlockOffset;
 
-		//header
-		BinaryFile* pHeaderFile = new BinaryFile(headerPath, false, false);
-		if(pHeaderFile->open())
-		{
-			pHeaderFile->read(pHeader, HeaderSize*sizeof(HeaderCell));
-			pHeaderFile->close();
-			delete pHeaderFile;
-		}
-		
-		//content
-		BinaryFile* pContentPagesFile = new BinaryFile(contentPath, false, false);
-		if(pContentPagesFile->open())
-		{
-			for(uint32 i=0; i<ContentPagesCount; i++)
-			{
-				pContentPages[i] = new ContentPage();
-				pContentPagesFile->read(pContentPages[i], sizeof(ContentPage));
-			}
-
-			pContentPagesFile->close();
-			delete pContentPagesFile;
-		}
-		
-		//barnches
-		BinaryFile* pBranchPagesFile = new BinaryFile(branchPath, false, false);
-		if(pBranchPagesFile->open())
-		{
-			for(uint32 i=0; i<BranchPagesCount; i++)
-			{
-				pBranchPages[i] = new BranchPage();
-				pBranchPagesFile->read(pBranchPages[i], sizeof(BranchPage));
-			}
-
-			pBranchPagesFile->close();
-			delete pBranchPagesFile;
-		}
-
-		//blocks
-		BinaryFile* pBlockPagesFile = new BinaryFile(blockPath, false, false);
-		if(pBlockPagesFile->open())
-		{
-			for(uint32 i=0; i<BlockPagesCount; i++)
-			{
-				pBlockPages[i] = new BlockPage();
-				pBlockPagesFile->read(pBlockPages[i], sizeof(BlockPage));
-			}
-
-			pBlockPagesFile->close();
-			delete pBlockPagesFile;
-		}
+	pInfoFile->close();
+	delete pInfoFile;
 	}
-	
+
+	//header
+	BinaryFile* pHeaderFile = new BinaryFile(headerPath, false, false);
+	if(pHeaderFile->open())
+	{
+	pHeaderFile->read(pHeader, HeaderSize*sizeof(HeaderCell));
+	pHeaderFile->close();
+	delete pHeaderFile;
+	}
+
+	//content
+	BinaryFile* pContentPagesFile = new BinaryFile(contentPath, false, false);
+	if(pContentPagesFile->open())
+	{
+	for(uint32 i=0; i<ContentPagesCount; i++)
+	{
+	pContentPages[i] = new ContentPage();
+	pContentPagesFile->read(pContentPages[i], sizeof(ContentPage));
+	}
+
+	pContentPagesFile->close();
+	delete pContentPagesFile;
+	}
+
+	//barnches
+	BinaryFile* pBranchPagesFile = new BinaryFile(branchPath, false, false);
+	if(pBranchPagesFile->open())
+	{
+	for(uint32 i=0; i<BranchPagesCount; i++)
+	{
+	pBranchPages[i] = new BranchPage();
+	pBranchPagesFile->read(pBranchPages[i], sizeof(BranchPage));
+	}
+
+	pBranchPagesFile->close();
+	delete pBranchPagesFile;
+	}
+
+	//blocks
+	BinaryFile* pBlockPagesFile = new BinaryFile(blockPath, false, false);
+	if(pBlockPagesFile->open())
+	{
+	for(uint32 i=0; i<BlockPagesCount; i++)
+	{
+	pBlockPages[i] = new BlockPage();
+	pBlockPagesFile->read(pBlockPages[i], sizeof(BlockPage));
+	}
+
+	pBlockPagesFile->close();
+	delete pBlockPagesFile;
+	}
+	}
+
 	void save()
 	{
-		saveInfo();
-		
-		char headerPath[1024];
-		char contentPath[1024];
-		char branchPath[1024];
-		char blockPath[1024];
+	saveInfo();
 
-		getPath(headerPath, "ha_header");
-		getPath(contentPath, "ha_content_part1");
-		getPath(branchPath, "ha_branch_part1");
-		getPath(blockPath, "ha_block_part1");
+	char headerPath[1024];
+	char contentPath[1024];
+	char branchPath[1024];
+	char blockPath[1024];
 
-		//header
-		BinaryFile* pHeaderFile = new BinaryFile(headerPath, true, true);
-		if(pHeaderFile->open())
-		{
-			pHeaderFile->write(pHeader, HeaderSize*sizeof(HeaderCell));
-			pHeaderFile->close();
-			delete pHeaderFile;
-		}
-		
-		//content
-		BinaryFile* pContentPagesFile = new BinaryFile(contentPath, true, true);
-		if(pContentPagesFile->open())
-		{
-			for(uint32 i=0; i<ContentPagesCount; i++)
-			{
-				pContentPagesFile->write(pContentPages[i], sizeof(ContentPage));
-			}
+	getPath(headerPath, "ha_header");
+	getPath(contentPath, "ha_content_part1");
+	getPath(branchPath, "ha_branch_part1");
+	getPath(blockPath, "ha_block_part1");
 
-			pContentPagesFile->close();
-			delete pContentPagesFile;
-		}
-		
-		//barnches
-		BinaryFile* pBranchPagesFile = new BinaryFile(branchPath, true, true);
-		if(pBranchPagesFile->open())
-		{
-			for(uint32 i=0; i<BranchPagesCount; i++)
-			{
-				pBranchPagesFile->write(pBranchPages[i], sizeof(BranchPage));
-			}
+	//header
+	BinaryFile* pHeaderFile = new BinaryFile(headerPath, true, true);
+	if(pHeaderFile->open())
+	{
+	pHeaderFile->write(pHeader, HeaderSize*sizeof(HeaderCell));
+	pHeaderFile->close();
+	delete pHeaderFile;
+	}
 
-			pBranchPagesFile->close();
-			delete pBranchPagesFile;
-		}
+	//content
+	BinaryFile* pContentPagesFile = new BinaryFile(contentPath, true, true);
+	if(pContentPagesFile->open())
+	{
+	for(uint32 i=0; i<ContentPagesCount; i++)
+	{
+	pContentPagesFile->write(pContentPages[i], sizeof(ContentPage));
+	}
 
-		//blocks
-		BinaryFile* pBlockPagesFile = new BinaryFile(blockPath, true, true);
-		if(pBlockPagesFile->open())
-		{
-			for(uint32 i=0; i<BlockPagesCount; i++)
-			{
-				pBlockPagesFile->write(pBlockPages[i], sizeof(BlockPage));
-			}
+	pContentPagesFile->close();
+	delete pContentPagesFile;
+	}
 
-			pBlockPagesFile->close();
-			delete pBlockPagesFile;
-		}
+	//barnches
+	BinaryFile* pBranchPagesFile = new BinaryFile(branchPath, true, true);
+	if(pBranchPagesFile->open())
+	{
+	for(uint32 i=0; i<BranchPagesCount; i++)
+	{
+	pBranchPagesFile->write(pBranchPages[i], sizeof(BranchPage));
+	}
+
+	pBranchPagesFile->close();
+	delete pBranchPagesFile;
+	}
+
+	//blocks
+	BinaryFile* pBlockPagesFile = new BinaryFile(blockPath, true, true);
+	if(pBlockPagesFile->open())
+	{
+	for(uint32 i=0; i<BlockPagesCount; i++)
+	{
+	pBlockPagesFile->write(pBlockPages[i], sizeof(BlockPage));
+	}
+
+	pBlockPagesFile->close();
+	delete pBlockPagesFile;
+	}
 	}
 	*/
 
@@ -512,14 +523,14 @@ public:
 	{
 		uint32 newSizeContentPages = ContentPagesSize * 2;
 		ContentPage** pTempContentPages = new ContentPage*[newSizeContentPages];
-			
-		uint32 j=0;
-		for(; j < ContentPagesSize ; j++)
+
+		uint32 j = 0;
+		for (; j < ContentPagesSize; j++)
 		{
 			pTempContentPages[j] = pContentPages[j];
 		}
 
-		for(; j < newSizeContentPages ; j++)
+		for (; j < newSizeContentPages; j++)
 		{
 			pTempContentPages[j] = 0;
 		}
@@ -534,14 +545,14 @@ public:
 	{
 		uint32 newSizeBranchPages = BranchPagesSize * 2;
 		BranchPage** pTempBranchPages = new BranchPage*[newSizeBranchPages];
-			
-		uint32 j=0;
-		for(; j < BranchPagesSize ; j++)
+
+		uint32 j = 0;
+		for (; j < BranchPagesSize; j++)
 		{
 			pTempBranchPages[j] = pBranchPages[j];
 		}
 
-		for(; j < newSizeBranchPages ; j++)
+		for (; j < newSizeBranchPages; j++)
 		{
 			pTempBranchPages[j] = 0;
 		}
@@ -556,14 +567,14 @@ public:
 	{
 		uint32 newSizeBlockPages = BlockPagesSize * 2;
 		BlockPage** pTempBlockPages = new BlockPage*[newSizeBlockPages];
-			
-		uint32 j=0;
-		for(; j < BlockPagesSize ; j++)
+
+		uint32 j = 0;
+		for (; j < BlockPagesSize; j++)
 		{
 			pTempBlockPages[j] = pBlockPages[j];
 		}
 
-		for(; j < newSizeBlockPages ; j++)
+		for (; j < newSizeBlockPages; j++)
 		{
 			pTempBlockPages[j] = 0;
 		}
@@ -573,11 +584,11 @@ public:
 
 		BlockPagesSize = newSizeBlockPages;
 	}
-	
+
 	//INSERT =============================================================================================================
 
 	bool insert(uint32* key, ulong64 value);
-	
+
 	//void insertVar(uint32* key, uint32 keyLen, uint32* value, uint32 valLen);
 
 	//GET =============================================================================================================
@@ -585,112 +596,112 @@ public:
 	ulong64 getValueByKey(uint32* key);
 
 	//uint32* getValueByVarKey(uint32* key, uint32 keyLen);
-	
+
 	//RANGE =============================================================================================================
-	void getValuesByRangeFromBlock(ulong64* values, 
-									uint32& count,
-									uint32 size,
-									uint32 contentOffset,
-									uint32 keyOffset,
-									uint32 blockOffset,
-									uint32* minKey,
-									uint32* maxKey);
-	
-	void getValuesByRange(ulong64* values, 
-								uint32& count,
-								uint32 size,
-								uint32 keyOffset, 
-								uint32 contentOffset,
-								uint32* minKey,
-								uint32* maxKey);
-	
-	uint32 getValuesByRange(ulong64* values, 
-						 uint32 size, 
-						 uint32* minKey, 
-						 uint32* maxKey);
-	
+	void getValuesByRangeFromBlock(ulong64* values,
+		uint32& count,
+		uint32 size,
+		uint32 contentOffset,
+		uint32 keyOffset,
+		uint32 blockOffset,
+		uint32* minKey,
+		uint32* maxKey);
+
+	void getValuesByRange(ulong64* values,
+		uint32& count,
+		uint32 size,
+		uint32 keyOffset,
+		uint32 contentOffset,
+		uint32* minKey,
+		uint32* maxKey);
+
+	uint32 getValuesByRange(ulong64* values,
+		uint32 size,
+		uint32* minKey,
+		uint32* maxKey);
+
 	//RANGE keys and values =============================================================================================================
 	void sortItems(HArrayFixPair* pairs,
-				   int startIndex,
-				   int endIndex);
-	
+		int startIndex,
+		int endIndex);
+
 	void getKeysAndValuesByRangeFromBlock(HArrayFixPair* pairs,
-										  uint32& count,
-										  uint32 size,
-										  uint32 contentOffset,
-										  uint32 keyOffset,
-										  uint32 blockOffset,
-										  uint32* minKey,
-										  uint32* maxKey);
-	
+		uint32& count,
+		uint32 size,
+		uint32 contentOffset,
+		uint32 keyOffset,
+		uint32 blockOffset,
+		uint32* minKey,
+		uint32* maxKey);
+
 	void getKeysAndValuesByRange(HArrayFixPair* pairs,
-								 uint32& count,
-								 uint32 size,
-								 uint32 keyOffset, 
-								 uint32 contentOffset,
-								 uint32* minKey,
-								 uint32* maxKey);
-	
+		uint32& count,
+		uint32 size,
+		uint32 keyOffset,
+		uint32 contentOffset,
+		uint32* minKey,
+		uint32* maxKey);
+
 	uint32 getKeysAndValuesByRange(HArrayFixPair* pairs,
-								 uint32 size, 
-								 uint32* minKey, 
-								 uint32* maxKey);
-	
+		uint32 size,
+		uint32* minKey,
+		uint32* maxKey);
+
 	//scan by selector
 	bool getKeysAndValuesByRangeFromBlock(HArrayVisitor* pVisitor,
-										  uint32* key,
-										  uint32 contentOffset,
-										  uint32 keyOffset,
-										  uint32 blockOffset,
-										  uint32* startKey,
-										  uint32* endKey);
+		uint32* key,
+		uint32 contentOffset,
+		uint32 keyOffset,
+		uint32 blockOffset,
+		uint32* startKey,
+		uint32* endKey);
 
 	bool getKeysAndValuesByRange(HArrayVisitor* pVisitor,
-								uint32* key,
-								uint32 keyOffset, 
-								uint32 contentOffset,
-								uint32* startKey,
-								uint32* endKey);
+		uint32* key,
+		uint32 keyOffset,
+		uint32 contentOffset,
+		uint32* startKey,
+		uint32* endKey);
 
 	void scanByVisitor(HArrayVisitor* pVisitor);
 
 	//TEMPLATE ====================================================================================================
 
 	void getValuesByTemplateFromBlock(ulong64* values,
-									uint32& count,
-									uint32 size,
-									uint32 contentOffset,
-									uint32 keyOffset,
-									uint32 blockOffset,
-									uint32* minKey,
-									uint32* maxKey);
-	
-	void getValuesByTemplate(ulong64* values, 
-							uint32& count,
-							uint32 size,
-							uint32 keyOffset, 
-							uint32 contentOffset,
-							uint32* minKey,
-							uint32* maxKey);
-	
-	uint32 getValuesByTemplate(ulong64* values, 
-							uint32 size, 
-							uint32* minKey, 
-							uint32* maxKey);
+		uint32& count,
+		uint32 size,
+		uint32 contentOffset,
+		uint32 keyOffset,
+		uint32 blockOffset,
+		uint32* minKey,
+		uint32* maxKey);
+
+	void getValuesByTemplate(ulong64* values,
+		uint32& count,
+		uint32 size,
+		uint32 keyOffset,
+		uint32 contentOffset,
+		uint32* minKey,
+		uint32* maxKey);
+
+	uint32 getValuesByTemplate(ulong64* values,
+		uint32 size,
+		uint32* minKey,
+		uint32* maxKey);
 
 	//=============================================================================================================
 
 	void destroy()
 	{
-		if(pHeader)
+		if (pHeader)
 		{
 			delete[] pHeader;
 			pHeader = 0;
 		}
 
-		if(pContentPages)
+		if (pContentPages)
 		{
-			for(uint32 i=0; i<ContentPagesCount; i++)
+			for (uint32 i = 0; i<ContentPagesCount; i++)
 			{
 				delete pContentPages[i];
 			}
@@ -699,20 +710,20 @@ public:
 			pContentPages = 0;
 		}
 
-		if(pBranchPages)
+		if (pBranchPages)
 		{
-			for(uint32 i=0; i<BranchPagesCount; i++)
+			for (uint32 i = 0; i<BranchPagesCount; i++)
 			{
 				delete pBranchPages[i];
 			}
-			
+
 			delete[] pBranchPages;
 			pBranchPages = 0;
 		}
 
-		if(pBlockPages)
+		if (pBlockPages)
 		{
-			for(uint32 i=0; i<BlockPagesCount; i++)
+			for (uint32 i = 0; i<BlockPagesCount; i++)
 			{
 				delete pBlockPages[i];
 			}

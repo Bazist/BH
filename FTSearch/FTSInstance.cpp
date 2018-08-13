@@ -7,6 +7,7 @@ uint32* FTSInstance::pResultDocNumbers = 0;
 
 BlockMemoryPool* FTSInstance::pBlockMemoryPool = 0;
 DocumentsBlockPool* FTSInstance::pDocumentsBlockPool = 0;
+DocumentsInfoPool* FTSInstance::pDocumentsInfoPool = 0;
 RelevantResultPool* FTSInstance::pRelevantResultPool = 0;
 PostSelectorPool* FTSInstance::pPostSelectorPool = 0;
 

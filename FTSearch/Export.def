@@ -18,3 +18,4 @@ EXPORTS
    searchQuery @16
    releaseQueryResult @17
    searchNewMems @18
+   initSearchRel @19

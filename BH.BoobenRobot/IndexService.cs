@@ -544,6 +544,8 @@ namespace BH.BoobenRobot
 
             this.IndexEqueue();
 
+            _service.InitSearchRel();
+
             try
             {
                 //run spiders

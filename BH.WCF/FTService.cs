@@ -168,7 +168,7 @@ namespace BH.WCF
 
                 conf.IndexPath = indexPath;
 
-                conf.MemoryMode = (uint)FTSearch.MemoryMode.HDD;
+                conf.MemoryMode = (uint)FTSearch.MemoryMode.InMemory;
                 conf.AutoStemmingOn = 8;
                 conf.MinLenWord = 3;
                 conf.MaxLenWord = 64;
@@ -404,6 +404,18 @@ namespace BH.WCF
                                       fts => fts.SearchPhraseRel(phrase,
                                                                  minPage,
                                                                  maxPage));
+            });
+        }
+
+        [OperationContract]
+        public void InitSearchRel()
+        {
+            TryCatch(() =>
+            {
+                foreach (var fts in Instances)
+                {
+                    fts.InitSearchRel();
+                }
             });
         }
 

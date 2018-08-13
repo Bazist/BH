@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+Ôªø#include "StdAfx.h"
 #include "FTSInstance.h"
 
 void FTSInstance::createIndex()
@@ -11,30 +11,30 @@ void FTSInstance::createIndex()
 
 	char documentPath[1024];
 	char documentNamePath[1024];
-	
+
 	Configuration.getDocumentPath(documentPath);
 	Configuration.getDocumentNamePath(documentNamePath);
-	
+
 	pDocFile = new BinaryFile(documentPath, true, true);
 	pDocNameFile = new BinaryFile(documentNamePath, true, true);
 
-	if(!pDocFile->open())
+	if (!pDocFile->open())
 	{
 		logError("File %s is not open.", documentPath);
-		
+
 		delete pDocFile;
-		
+
 		delete pDocNameFile;
 
 		HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 
 		return;
 	}
-		
-	if(!pDocNameFile->open())
+
+	if (!pDocNameFile->open())
 	{
 		logError("File %s is not open.", documentNamePath);
-		
+
 		pDocFile->close();
 		delete pDocFile;
 
@@ -47,87 +47,87 @@ void FTSInstance::createIndex()
 
 	//save version and info
 	pDocFile->setPosition(getDocHeaderSize());
-	
+
 	pDocNameFile->writeInt(&UNIQUE_IDENTIFIER);
 	pDocNameFile->writeInt(&Info.Version);
-	
+
 	uint32 count;
-	
+
 	//save haWordsRAM
 	count = haWordsRAM.getKeysAndValuesByRange(pKeysAndValuesRAM,
-												Info.CountWordsRAM,
-												0, 
-												0);
-	
+		Info.CountWordsRAM,
+		0,
+		0);
+
 	//check errors ===========================================
-	if(count != Info.CountWordsRAM)
+	if (count != Info.CountWordsRAM)
 	{
 		logError("createIndex.haWordsRAM. Wrong count.");
 	}
 
-	if(count)
+	if (count)
 	{
-		for(uint32 i=0; i < count - 1; i++)
+		for (uint32 i = 0; i < count - 1; i++)
 		{
-			if(pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i+1], countKeySegments) != -1)
+			if (pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i + 1], countKeySegments) != -1)
 			{
 				logError("createIndex.haWordsRAM. Array is not sorted.");
 			}
 		}
 	}
 	//========================================================
-	
+
 	uint32 buffFilledLength = 0;
 
 	uint32 controlValue = 0;
 
 	//clear hdd before filling
-	for(uint32 i=0; i < Info.CountWordsRAM; i++)
+	for (uint32 i = 0; i < Info.CountWordsRAM; i++)
 	{
 		/*if(key == 141261)
 		{
-			i = i;
+		i = i;
 		}*/
 
 		ulong64 position = pDocFile->getPosition() + buffFilledLength;
 
-		/*if(isWord("·‡ÁËÒÚ", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
+		/*if(isWord("–±–∞–∑–∏—Å—Ç", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
 		{
-			position = position;
+		position = position;
 		}*/
 
 		//update position to save pages later
 		haWordsRAM.insert(pKeysAndValuesRAM[i].Key,
-						  position);
+			position);
 
 		//check errors ===========================================
-		for(uint32 j=0; j < haWordsRAM.KeyLen; j++)
+		for (uint32 j = 0; j < haWordsRAM.KeyLen; j++)
 		{
 			controlValue += pKeysAndValuesRAM[i].Key[j];
 		}
 
 		controlValue += position;
 		//========================================================
-		
+
 		//save doc
 		uint32 id = pKeysAndValuesRAM[i].Value;
 
 		DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(id);
 
 		pDocumentsBlock->writeBlocksToFile(pDocFile,
-											(uchar8*)pBuffer,
-											MAX_SIZE_BUFFER,
-											buffFilledLength, 
-											0,
-											0); 
+			(uchar8*)pBuffer,
+			MAX_SIZE_BUFFER,
+			buffFilledLength,
+			0,
+			0);
 
 		pBuffer[buffFilledLength++] = 0; //null terminated
-		
-		/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
-		{
-			pDocumentsBlock->clear();
-			pDocumentsBlockPool->releaseObject(pDocumentsBlock);
-		}*/
+
+										 /*if(Configuration.MemoryMode != IN_MEMORY_MODE)
+										 {
+										 pDocumentsBlock->clear();
+										 pDocumentsBlockPool->releaseObject(pDocumentsBlock);
+										 }*/
 
 		Info.CountWordsHDD++;
 	}
@@ -184,16 +184,16 @@ void FTSInstance::createIndex()
 
 	////==========================================================
 
-	if(buffFilledLength > 0)
+	if (buffFilledLength > 0)
 	{
 		pDocFile->write(pBuffer, buffFilledLength);
 		buffFilledLength = 0;
 	}
 
 	documentsName.writeBlocksToFile(pDocNameFile,
-									(uchar8*)pBuffer,
-									MAX_SIZE_BUFFER,
-									buffFilledLength);
+		(uchar8*)pBuffer,
+		MAX_SIZE_BUFFER,
+		buffFilledLength);
 
 	//save dictionary pages
 	haWordsHDD.close();
@@ -205,26 +205,26 @@ void FTSInstance::createIndex()
 	Info.CountWordsHDD = Info.CountWordsRAM;
 
 	//rollback changes in ram
-	
-	if(Configuration.MemoryMode == IN_MEMORY_MODE)
+
+	if (Configuration.MemoryMode == IN_MEMORY_MODE)
 	{
 		//rollback update
-		for(uint32 i=0; i < Info.CountWordsRAM; i++)
+		for (uint32 i = 0; i < Info.CountWordsRAM; i++)
 		{
 			haWordsRAM.insert(pKeysAndValuesRAM[i].Key,
-							  pKeysAndValuesRAM[i].Value);
+				pKeysAndValuesRAM[i].Value);
 		}
 	}
 	else
 	{
 		haWordsRAM.clear();
-		
+
 		Info.CountWordsRAM = 0;
 
 		documentsName.clear();
 		//documentsName.FilePosition = pDocNameFile->getPosition();
 	}
-	
+
 	//save header
 	Info.LastNameIDHDD = Info.LastNameIDRAM;
 
@@ -272,27 +272,27 @@ void FTSInstance::updateIndex()
 
 	BinaryFile* pDocFileTemp = new BinaryFile(documentPathTemp, true, true); //create new
 	BinaryFile* pDocNameFileTemp = new BinaryFile(documentNamePathTemp, true, true); //create new
-	
-	//open doc files
-	if(!pDocFile->open())
+
+																					 //open doc files
+	if (!pDocFile->open())
 	{
 		logError("File %s is not open.", documentPath);
 		goto destroy;
 	}
 
-	if(!pDocNameFile->open())
+	if (!pDocNameFile->open())
 	{
 		logError("File %s is not open.", documentNamePath);
 		goto destroy;
 	}
 
-	if(!pDocFileTemp->open())
+	if (!pDocFileTemp->open())
 	{
 		logError("File %s is not open.", documentPathTemp);
 		goto destroy;
 	}
 
-	if(!pDocNameFileTemp->open())
+	if (!pDocNameFileTemp->open())
 	{
 		logError("File %s is not open.", documentNamePathTemp);
 		goto destroy;
@@ -305,7 +305,7 @@ void FTSInstance::updateIndex()
 	//========================================================
 	pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
 	uchar8* pDestBuffer = (uchar8*)pBuffer;
-	
+
 	ulong64 sourceFilePosition = docHeaderSize; //version + unique identifier + info
 	uint32 sourceBuffPosition = 0;
 	uint32 sourceBuffLength = 0;
@@ -317,22 +317,22 @@ void FTSInstance::updateIndex()
 	printf("Get keys from RAM...\n");
 
 	uint32 count = haWordsRAM.getKeysAndValuesByRange(pKeysAndValuesRAM,
-													Info.CountWordsRAM, 
-													0, 
-													0);
+		Info.CountWordsRAM,
+		0,
+		0);
 
 	//check errors ===========================================
-	if(count != Info.CountWordsRAM)
+	if (count != Info.CountWordsRAM)
 	{
 		logError("createIndex.haWordsRAM. Wrong count.");
 		goto destroy;
 	}
 
-	if(count)
+	if (count)
 	{
-		for(uint32 i=0; i < count - 1; i++)
+		for (uint32 i = 0; i < count - 1; i++)
 		{
-			if(pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i+1], countKeySegments) != -1)
+			if (pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i + 1], countKeySegments) != -1)
 			{
 				logError("createIndex.haWordsRAM. Array is not sorted.");
 				goto destroy;
@@ -364,8 +364,8 @@ void FTSInstance::updateIndex()
 
 	//create temp HDD table
 	haWordsHDDTemp.init(indexPath,
-						"temp", 
-						haWordsRAM.KeyLen);
+		"temp",
+		haWordsRAM.KeyLen);
 
 	haWordsHDDTemp.create();
 
@@ -374,47 +374,47 @@ void FTSInstance::updateIndex()
 	//copy schema partitions
 	/*if (haWordsHDD.countPartitions > 1)
 	{
-		HeaderCell* headerCells = new HeaderCell[haWordsHDD.HeaderSize];
-		haWordsHDD.readHeaderCellsHDD(headerCells, 0, haWordsHDD.HeaderSize);
+	HeaderCell* headerCells = new HeaderCell[haWordsHDD.HeaderSize];
+	haWordsHDD.readHeaderCellsHDD(headerCells, 0, haWordsHDD.HeaderSize);
 
-		for (uint32 i = 0; i < haWordsHDD.HeaderSize; i++)
-		{
-			if (headerCells[i].Partition)
-			{
-				*(uint32*)&headerCells[i] = 0;
+	for (uint32 i = 0; i < haWordsHDD.HeaderSize; i++)
+	{
+	if (headerCells[i].Partition)
+	{
+	*(uint32*)&headerCells[i] = 0;
 
-				haWordsHDDTemp.writeHeaderCellHDD(headerCells[i], i);
-			}
-		}
+	haWordsHDDTemp.writeHeaderCellHDD(headerCells[i], i);
+	}
+	}
 
-		delete[] headerCells;
+	delete[] headerCells;
 	}*/
 
 	uint32 oldControlValue = 0;
 	uint32 newControlValue = 0;
 
-	while(true)
+	while (true)
 	{
 		//get data
 		//bool isBufferNotEnough = false;
 
 		uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
-															  MAX_SIZE_BUFFER, 
-															  blockNumber,
-															  wordInBlock);
+			MAX_SIZE_BUFFER,
+			blockNumber,
+			wordInBlock);
 
 		/*if(isBufferNotEnough)
 		{
-			logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
-			goto destroy;
+		logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
+		goto destroy;
 		}*/
 
 		//check errors ===========================================
-		if(countHDD)
+		if (countHDD)
 		{
-			for(uint32 i=0; i < countHDD - 1; i++)
+			for (uint32 i = 0; i < countHDD - 1; i++)
 			{
-				if(pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i+1], countKeySegments) != -1)
+				if (pKeysAndValuesHDD[i].compareKeys(pKeysAndValuesHDD[i + 1], countKeySegments) != -1)
 				{
 					logError("createIndex.haWordsHDD. Array is not sorted.");
 					goto destroy;
@@ -424,7 +424,7 @@ void FTSInstance::updateIndex()
 
 		//========================================================
 
-		if(countHDD == 0 && currKeyRAM == Info.CountWordsRAM)
+		if (countHDD == 0 && currKeyRAM == Info.CountWordsRAM)
 		{
 			//exit
 			break;
@@ -432,22 +432,22 @@ void FTSInstance::updateIndex()
 
 		uint32 currKeyHDD = 0;
 
-		while(true)
+		while (true)
 		{
 			//merge keys
 			printf("\rMerge keys: %u/%u %u/%u", currKeyRAM, Info.CountWordsRAM, currKeyHDD, countHDD);
 
 			int compareResult;
-			
-			if(currKeyRAM < Info.CountWordsRAM && currKeyHDD < countHDD)
+
+			if (currKeyRAM < Info.CountWordsRAM && currKeyHDD < countHDD)
 			{
 				compareResult = pKeysAndValuesRAM[currKeyRAM].compareKeys(pKeysAndValuesHDD[currKeyHDD], countKeySegments);
 			}
-			else if(currKeyRAM < Info.CountWordsRAM && countHDD == 0)
+			else if (currKeyRAM < Info.CountWordsRAM && countHDD == 0)
 			{
 				compareResult = -1; //exists only on RAM and no new portions
 			}
-			else if(currKeyHDD < countHDD)
+			else if (currKeyHDD < countHDD)
 			{
 				compareResult = 1; //exists only on HDD
 			}
@@ -467,9 +467,9 @@ void FTSInstance::updateIndex()
 			//}
 
 			//check errors ===========================================
-			if(compareResult == 0 || compareResult == 1)
+			if (compareResult == 0 || compareResult == 1)
 			{
-				for(uint32 j=0; j < haWordsRAM.KeyLen; j++)
+				for (uint32 j = 0; j < haWordsRAM.KeyLen; j++)
 				{
 					oldControlValue += pKeysAndValuesHDD[currKeyHDD].Key[j];
 				}
@@ -478,7 +478,7 @@ void FTSInstance::updateIndex()
 			}
 			//========================================================
 
-			if(compareResult == -1) //KEY IS EXISTS ONLY ON RAM ===================================================
+			if (compareResult == -1) //KEY IS EXISTS ONLY ON RAM ===================================================
 			{
 				//get positions
 
@@ -486,68 +486,68 @@ void FTSInstance::updateIndex()
 
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(id);
 
-				/*if(isWord("·‡ÁËÒÚ", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
+				/*if(isWord("–±–∞–∑–∏—Å—Ç", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
 				{
-					docPosition = docPosition;
+				docPosition = docPosition;
 				}*/
 
 				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
-		
+
 				//insert or update
 				haWordsHDDTemp.insert(pKeysAndValuesRAM[currKeyRAM].Key, docTempPosition);
-				
+
 				//check errors ===========================================
-				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
+				for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
 				{
 					newControlValue += pKeysAndValuesRAM[currKeyRAM].Key[i];
 				}
 
 				newControlValue += docTempPosition;
 				//========================================================
-				
+
 				uint32 lastDocNumber = 0;
 
 				//Save blocks from RAM
-				pDocumentsBlock->writeBlocksToFile(pDocFileTemp, 
-												   pDestBuffer, 
-												   MAX_SIZE_BUFFER, 
-												   destBuffPosition,
-												   0,
-												   lastDocNumber); 
-		
+				pDocumentsBlock->writeBlocksToFile(pDocFileTemp,
+					pDestBuffer,
+					MAX_SIZE_BUFFER,
+					destBuffPosition,
+					0,
+					lastDocNumber);
+
 				pDestBuffer[destBuffPosition++] = 0; //null terminated
-		
-				/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
-				{
-					pDocumentsBlock->clear();
-					pDocumentsBlockPool->releaseObject(pDocumentsBlock);
-				}*/
+
+													 /*if(Configuration.MemoryMode != IN_MEMORY_MODE)
+													 {
+													 pDocumentsBlock->clear();
+													 pDocumentsBlockPool->releaseObject(pDocumentsBlock);
+													 }*/
 
 				Info.CountWordsHDD++;
-				
+
 				currKeyRAM++;
 			}
-			else if(compareResult == 0) //KEY IS EXISTS ON RAM AND HDD ===================================================
+			else if (compareResult == 0) //KEY IS EXISTS ON RAM AND HDD ===================================================
 			{
 				//get positions
 				uint32 id = pKeysAndValuesRAM[currKeyRAM].Value;
 
 				DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(id);
-		
+
 				ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
 
-				/*if(isWord("·‡ÁËÒÚ", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
+				/*if(isWord("–±–∞–∑–∏—Å—Ç", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
 				{
-					docPosition = docPosition;
+				docPosition = docPosition;
 				}*/
 
 				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
-		
+
 				//update
 				haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
-				
+
 				//check errors ===========================================
-				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
+				for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
 				{
 					newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
 				}
@@ -559,43 +559,43 @@ void FTSInstance::updateIndex()
 				uint32 lastDocNumber = 0;
 
 				//A. Read and save blocks from HDD
-				if(docPosition == sourceFilePosition + sourceBuffPosition)
+				if (docPosition == sourceFilePosition + sourceBuffPosition)
 				{
-					moveDocFileBlocks(pDocFile, 
-									  pDocFileTemp, 
-									  pSourceBuffer, 
-									  pDestBuffer, 
-									  sourceFilePosition, 
-									  sourceBuffPosition, 
-									  sourceBuffLength, 
-									  destBuffPosition, 
-									  destBuffLength,
-									  MAX_SIZE_BUFFER,
-									  0,
-									  lastDocNumber,
-									  Info.LastNameIDRAM);
+					moveDocFileBlocks(pDocFile,
+						pDocFileTemp,
+						pSourceBuffer,
+						pDestBuffer,
+						sourceFilePosition,
+						sourceBuffPosition,
+						sourceBuffLength,
+						destBuffPosition,
+						destBuffLength,
+						MAX_SIZE_BUFFER,
+						0,
+						lastDocNumber,
+						Info.LastNameIDRAM);
 				}
 				else
 				{
 					logError("Read corrupted.");
 					goto destroy;
 				}
-				
+
 				//B. Save blocks from RAM
-				pDocumentsBlock->writeBlocksToFile(pDocFileTemp, 
-												   pDestBuffer, 
-												   MAX_SIZE_BUFFER, 
-												   destBuffPosition,
-												   0,
-												   lastDocNumber); 
-		
+				pDocumentsBlock->writeBlocksToFile(pDocFileTemp,
+					pDestBuffer,
+					MAX_SIZE_BUFFER,
+					destBuffPosition,
+					0,
+					lastDocNumber);
+
 				pDestBuffer[destBuffPosition++] = 0; //null terminated
-		
-				/*if(Configuration.MemoryMode != IN_MEMORY_MODE)
-				{
-					pDocumentsBlock->clear();
-					pDocumentsBlockPool->releaseObject(pDocumentsBlock);
-				}*/
+
+													 /*if(Configuration.MemoryMode != IN_MEMORY_MODE)
+													 {
+													 pDocumentsBlock->clear();
+													 pDocumentsBlockPool->releaseObject(pDocumentsBlock);
+													 }*/
 
 				currKeyRAM++;
 				currKeyHDD++;
@@ -605,18 +605,18 @@ void FTSInstance::updateIndex()
 				//get positions
 				ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
 
-				/*if(isWord("·‡ÁËÒÚ", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
+				/*if(isWord("–±–∞–∑–∏—Å—Ç", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
 				{
-					docPosition = docPosition;
+				docPosition = docPosition;
 				}*/
 
 				ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
-		
+
 				//update
 				haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 				//check errors ===========================================
-				for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
+				for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
 				{
 					newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
 				}
@@ -627,30 +627,30 @@ void FTSInstance::updateIndex()
 				uint32 lastDocNumber = 0;
 
 				//Read and save blocks from HDD
-				if(docPosition == sourceFilePosition + sourceBuffPosition)
+				if (docPosition == sourceFilePosition + sourceBuffPosition)
 				{
-					moveDocFileBlocks(pDocFile, 
-									  pDocFileTemp, 
-									  pSourceBuffer, 
-									  pDestBuffer, 
-									  sourceFilePosition, 
-									  sourceBuffPosition, 
-									  sourceBuffLength, 
-									  destBuffPosition, 
-									  destBuffLength,
-									  MAX_SIZE_BUFFER,
-									  0,
-									  lastDocNumber,
-									  Info.LastNameIDRAM);
+					moveDocFileBlocks(pDocFile,
+						pDocFileTemp,
+						pSourceBuffer,
+						pDestBuffer,
+						sourceFilePosition,
+						sourceBuffPosition,
+						sourceBuffLength,
+						destBuffPosition,
+						destBuffLength,
+						MAX_SIZE_BUFFER,
+						0,
+						lastDocNumber,
+						Info.LastNameIDRAM);
 				}
 				else
 				{
 					logError("Read corrupted.");
 					goto destroy;
 				}
-				
+
 				pDestBuffer[destBuffPosition++] = 0; //null terminated
-		
+
 				currKeyHDD++;
 			}
 		}
@@ -663,14 +663,14 @@ void FTSInstance::updateIndex()
 		pDocumentsBlockPool->releaseObjects();
 	}
 
-	if(destBuffPosition > 0)
+	if (destBuffPosition > 0)
 	{
 		pDocFileTemp->write(pDestBuffer, destBuffPosition);
 		destBuffPosition = 0;
 	}
 
 	//check errors ===========================================
-	if(Info.ControlValue != oldControlValue)
+	if (Info.ControlValue != oldControlValue)
 	{
 		logError("HDD Control value is wrong.");
 		goto destroy;
@@ -697,19 +697,19 @@ void FTSInstance::updateIndex()
 
 	//B. Save blocks from RAM
 	documentsName.writeBlocksToFile(pDocNameFileTemp,
-									pDestBuffer,
-									MAX_SIZE_BUFFER,
-									destBuffPosition);
+		pDestBuffer,
+		MAX_SIZE_BUFFER,
+		destBuffPosition);
 
 	pDocNameFileTemp->flush();
-	
+
 	//save info
 	haWordsHDDTemp.flush();
 
-	if(Configuration.MemoryMode != IN_MEMORY_MODE)
+	if (Configuration.MemoryMode != IN_MEMORY_MODE)
 	{
 		haWordsRAM.clear();
-		
+
 		Info.CountWordsRAM = 0;
 
 		documentsName.clear();
@@ -725,12 +725,12 @@ void FTSInstance::updateIndex()
 	pDocFileTemp->write(&Info, sizeof(Info));
 	pDocFileTemp->flush();
 
-destroy:	
-	
+destroy:
+
 	//1. Close tables
 	haWordsHDD.close();
 	haWordsHDDTemp.close();
-	
+
 	closeDicIndex();
 
 	closeDocIndex();
@@ -742,8 +742,8 @@ destroy:
 
 	pDocNameFileTemp->close();
 	delete pDocNameFileTemp;
-	
-	if(!Info.HasError)
+
+	if (!Info.HasError)
 	{
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPath);
@@ -768,17 +768,17 @@ destroy:
 
 	memset(pBuffer, 0, MAX_SIZE_BUFFER);
 
-	if(pKeysAndValuesRAM)
+	if (pKeysAndValuesRAM)
 	{
 		HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 	}
 
-	if(pKeysAndValuesHDD)
+	if (pKeysAndValuesHDD)
 	{
 		HArrayFixPair::DeleteArray(pKeysAndValuesHDD);
 	}
 
-	if(pSourceBuffer)
+	if (pSourceBuffer)
 	{
 		delete[] pSourceBuffer;
 	}
@@ -794,7 +794,7 @@ void FTSInstance::importIndex(const char* importPath)
 		return;
 
 	//save index first
-	if(Info.CountWordsRAM)
+	if (Info.CountWordsRAM)
 	{
 		saveIndex();
 	}
@@ -813,7 +813,7 @@ void FTSInstance::importIndex(const char* importPath)
 
 	HArrayTextFile haWordsHDDImport;
 	HArrayTextFile haWordsHDDTemp;
-	
+
 	uchar8* pSourceBuffer = 0;
 	uchar8* pSourceBufferImport = 0;
 
@@ -846,39 +846,39 @@ void FTSInstance::importIndex(const char* importPath)
 
 	BinaryFile* pDocFileTemp = new BinaryFile(documentPathTemp, true, true); //create new
 	BinaryFile* pDocNameFileTemp = new BinaryFile(documentNamePathTemp, true, true); //create new
-	
-	//open doc files
-	if(!pDocFile->open())
+
+																					 //open doc files
+	if (!pDocFile->open())
 	{
 		logError("File %s is not open.", documentPath);
 		goto destroy;
 	}
 
-	if(!pDocNameFile->open())
+	if (!pDocNameFile->open())
 	{
 		logError("File %s is not open.", documentNamePath);
 		goto destroy;
 	}
 
-	if(!pDocFileImport->open())
+	if (!pDocFileImport->open())
 	{
 		logError("File %s is not open.", documentPathImport);
 		goto destroy;
 	}
 
-	if(!pDocNameFileImport->open())
+	if (!pDocNameFileImport->open())
 	{
 		logError("File %s is not open.", documentNamePathImport);
 		goto destroy;
 	}
 
-	if(!pDocFileTemp->open())
+	if (!pDocFileTemp->open())
 	{
 		logError("File %s is not open.", documentPathTemp);
 		goto destroy;
 	}
 
-	if(!pDocNameFileTemp->open())
+	if (!pDocNameFileTemp->open())
 	{
 		logError("File %s is not open.", documentNamePathTemp);
 		goto destroy;
@@ -892,13 +892,13 @@ void FTSInstance::importIndex(const char* importPath)
 	pDocFileImport->readInt(&codeVersionImport);
 
 	pDocFileImport->read(&infoImport, sizeof(FTSInstanceInfo));
-	
+
 	infoImport.LastErrorMessage = LastErrorMessage;
 
-	if(uniqueIdentifierImport != UNIQUE_IDENTIFIER ||
-	   codeVersionImport != CODE_VERSION ||
-	   Info.Version != infoImport.Version ||
-	   Info.DocumentNameSize != infoImport.DocumentNameSize)
+	if (uniqueIdentifierImport != UNIQUE_IDENTIFIER ||
+		codeVersionImport != CODE_VERSION ||
+		Info.Version != infoImport.Version ||
+		Info.DocumentNameSize != infoImport.DocumentNameSize)
 	{
 		logError("Indexes doesn't match with settings.");
 		goto destroy;
@@ -914,7 +914,7 @@ void FTSInstance::importIndex(const char* importPath)
 	pSourceBufferImport = new uchar8[MAX_SIZE_BUFFER];
 
 	uchar8* pDestBuffer = (uchar8*)pBuffer;
-	
+
 	ulong64 sourceFilePosition = docHeaderSize; //version + unique identifier + info
 	uint32 sourceBuffPosition = 0;
 	uint32 sourceBuffLength = 0;
@@ -933,13 +933,13 @@ void FTSInstance::importIndex(const char* importPath)
 
 	//get data from import hdd
 	pKeysAndValuesHDDImport = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
-	
+
 	uint32 currKeyHDD = MAX_INT;
 	uint32 currKeyHDDImport = MAX_INT;
-	
+
 	uint32 countHDD = MAX_INT;
 	uint32 countHDDImport = MAX_INT;
-	
+
 	ulong64 blockNumber = 0;
 	uint32 wordInBlock = 0;
 
@@ -948,21 +948,21 @@ void FTSInstance::importIndex(const char* importPath)
 
 	//open haWordsHDD
 	haWordsHDD.open();
-	
+
 	char indexPath[1024];
 	Configuration.getIndexPath(indexPath);
 
 	//create import HDD table
 	haWordsHDDImport.init(importPath,
-							"", 
-							Configuration.AutoStemmingOn / 4);
+		"",
+		Configuration.AutoStemmingOn / 4);
 
 	haWordsHDDImport.open();
 
 	//create temp HDD table
 	haWordsHDDTemp.init(indexPath,
-						"temp", 
-						Configuration.AutoStemmingOn / 4);
+		"temp",
+		Configuration.AutoStemmingOn / 4);
 
 	haWordsHDDTemp.create();
 	//haWordsHDDTemp.create(BIN_FILE_BUFFER_SIZE, haWordsHDD.countPartitions);
@@ -970,42 +970,42 @@ void FTSInstance::importIndex(const char* importPath)
 	//copy schema partitions
 	/*if (haWordsHDD.countPartitions > 1)
 	{
-		HeaderCell* headerCells = new HeaderCell[haWordsHDD.HeaderSize];
-		haWordsHDD.readHeaderCellsHDD(headerCells, 0, haWordsHDD.HeaderSize);
+	HeaderCell* headerCells = new HeaderCell[haWordsHDD.HeaderSize];
+	haWordsHDD.readHeaderCellsHDD(headerCells, 0, haWordsHDD.HeaderSize);
 
-		for (uint32 i = 0; i < haWordsHDD.HeaderSize; i++)
-		{
-			if (headerCells[i].Partition)
-			{
-				*(uint32*)&headerCells[i] = 0;
+	for (uint32 i = 0; i < haWordsHDD.HeaderSize; i++)
+	{
+	if (headerCells[i].Partition)
+	{
+	*(uint32*)&headerCells[i] = 0;
 
-				haWordsHDDTemp.writeHeaderCellHDD(headerCells[i], i);
-			}
-		}
+	haWordsHDDTemp.writeHeaderCellHDD(headerCells[i], i);
+	}
+	}
 
-		delete[] headerCells;
+	delete[] headerCells;
 	}*/
 
 	uint32 oldControlValue = 0;
 	uint32 newControlValue = 0;
 
-	while(true)
+	while (true)
 	{
 		//get data from hdd
-		if(currKeyHDD == countHDD && countHDD)
+		if (currKeyHDD == countHDD && countHDD)
 		{
 			//bool isBufferNotEnough = false;
 
 			currKeyHDD = 0;
 			countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
-															  MAX_SIZE_BUFFER, 
-															  blockNumber,
-															  wordInBlock);
+				MAX_SIZE_BUFFER,
+				blockNumber,
+				wordInBlock);
 
 			/*if(isBufferNotEnough)
 			{
-				logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
-				goto destroy;
+			logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
+			goto destroy;
 			}*/
 
 			//check errors ===========================================
@@ -1023,24 +1023,24 @@ void FTSInstance::importIndex(const char* importPath)
 		}
 
 		//get data from hdd import
-		if(currKeyHDDImport == countHDDImport && countHDDImport)
+		if (currKeyHDDImport == countHDDImport && countHDDImport)
 		{
 			//bool isBufferNotEnough = false;
 
 			currKeyHDDImport = 0;
 			countHDDImport = haWordsHDDImport.getKeysAndValuesByPortions(pKeysAndValuesHDDImport,
-																		MAX_SIZE_BUFFER, 
-																		blockNumberImport,
-																		wordInBlockImport);
+				MAX_SIZE_BUFFER,
+				blockNumberImport,
+				wordInBlockImport);
 
 			/*if(isBufferNotEnough)
 			{
-				logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
-				goto destroy;
+			logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
+			goto destroy;
 			}*/
 		}
-		
-		if(!countHDD && !countHDDImport)
+
+		if (!countHDD && !countHDDImport)
 		{
 			//exit if no merge items
 			break;
@@ -1049,16 +1049,16 @@ void FTSInstance::importIndex(const char* importPath)
 		printf("\rMerge keys: %u/%u %u/%u", currKeyHDDImport, countHDDImport, currKeyHDD, countHDD);
 
 		int compareResult;
-			
-		if(currKeyHDD < countHDD && currKeyHDDImport < countHDDImport)
+
+		if (currKeyHDD < countHDD && currKeyHDDImport < countHDDImport)
 		{
 			compareResult = pKeysAndValuesHDDImport[currKeyHDDImport].compareKeys(pKeysAndValuesHDD[currKeyHDD], countKeySegments);
 		}
-		else if(currKeyHDD < countHDD)
+		else if (currKeyHDD < countHDD)
 		{
 			compareResult = 1; //exists only on HDD
 		}
-		else if(currKeyHDDImport < countHDDImport)
+		else if (currKeyHDDImport < countHDDImport)
 		{
 			compareResult = -1; //exists only on RAM and no new portions
 		}
@@ -1068,9 +1068,9 @@ void FTSInstance::importIndex(const char* importPath)
 		}
 
 		//check errors ===========================================
-		if(compareResult == 0 || compareResult == 1)
+		if (compareResult == 0 || compareResult == 1)
 		{
-			for(uint32 j=0; j < haWordsRAM.KeyLen; j++)
+			for (uint32 j = 0; j < haWordsRAM.KeyLen; j++)
 			{
 				oldControlValue += pKeysAndValuesHDD[currKeyHDD].Key[j];
 			}
@@ -1079,18 +1079,18 @@ void FTSInstance::importIndex(const char* importPath)
 		}
 		//========================================================
 
-		if(compareResult == -1) //KEY IS EXISTS ONLY ON IMPORT ===================================================
+		if (compareResult == -1) //KEY IS EXISTS ONLY ON IMPORT ===================================================
 		{
 			//get positions
 			ulong64 docPosition = pKeysAndValuesHDDImport[currKeyHDDImport].Value;
-			
+
 			ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
 
 			//update
 			haWordsHDDTemp.insert(pKeysAndValuesHDDImport[currKeyHDDImport].Key, docTempPosition);
 
 			//check errors ===========================================
-			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
+			for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
 			{
 				newControlValue += pKeysAndValuesHDDImport[currKeyHDDImport].Key[i];
 			}
@@ -1101,49 +1101,49 @@ void FTSInstance::importIndex(const char* importPath)
 			uint32 lastDocNumber = 0;
 
 			//Read and save blocks from HDD
-			if(docPosition == sourceFilePositionImport + sourceBuffPositionImport)
+			if (docPosition == sourceFilePositionImport + sourceBuffPositionImport)
 			{
-				uint32 baseDocNumber = Info.LastNameIDHDD - 1;
+				uint32 baseDocNumber = Info.LastNameIDHDD - docHeaderSize;
 
-				moveDocFileBlocks(pDocFileImport, 
-								  pDocFileTemp, 
-								  pSourceBufferImport, 
-								  pDestBuffer, 
-								  sourceFilePositionImport, 
-								  sourceBuffPositionImport, 
-								  sourceBuffLengthImport, 
-								  destBuffPosition, 
-								  destBuffLength,
-								  MAX_SIZE_BUFFER,
-								  baseDocNumber,
-								  lastDocNumber,
-								  Info.LastNameIDHDD + infoImport.LastNameIDHDD - 1);
+				moveDocFileBlocks(pDocFileImport,
+					pDocFileTemp,
+					pSourceBufferImport,
+					pDestBuffer,
+					sourceFilePositionImport,
+					sourceBuffPositionImport,
+					sourceBuffLengthImport,
+					destBuffPosition,
+					destBuffLength,
+					MAX_SIZE_BUFFER,
+					baseDocNumber,
+					lastDocNumber,
+					Info.LastNameIDHDD + infoImport.LastNameIDHDD - docHeaderSize);
 			}
 			else
 			{
 				logError("Read corrupted.");
 				goto destroy;
 			}
-			
+
 			pDestBuffer[destBuffPosition++] = 0; //null terminated
-		
+
 			currKeyHDDImport++;
 
 			//increment words
 			Info.CountWordsHDD++;
 		}
-		else if(compareResult == 0) //KEY IS EXISTS ON IMPORT AND HDD ===================================================
+		else if (compareResult == 0) //KEY IS EXISTS ON IMPORT AND HDD ===================================================
 		{
 			//get positions
 			ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
 
 			ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
-		
+
 			//update
 			haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 			//check errors ===========================================
-			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
+			for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
 			{
 				newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
 			}
@@ -1155,57 +1155,57 @@ void FTSInstance::importIndex(const char* importPath)
 			uint32 lastDocNumber = 0;
 
 			//A. Read and save blocks from HDD
-			if(docPosition == sourceFilePosition + sourceBuffPosition)
+			if (docPosition == sourceFilePosition + sourceBuffPosition)
 			{
-				moveDocFileBlocks(pDocFile, 
-								  pDocFileTemp, 
-								  pSourceBuffer, 
-								  pDestBuffer, 
-								  sourceFilePosition, 
-								  sourceBuffPosition, 
-								  sourceBuffLength, 
-								  destBuffPosition, 
-								  destBuffLength,
-								  MAX_SIZE_BUFFER,
-								  0,
-								  lastDocNumber,
-								  Info.LastNameIDHDD);
+				moveDocFileBlocks(pDocFile,
+					pDocFileTemp,
+					pSourceBuffer,
+					pDestBuffer,
+					sourceFilePosition,
+					sourceBuffPosition,
+					sourceBuffLength,
+					destBuffPosition,
+					destBuffLength,
+					MAX_SIZE_BUFFER,
+					0,
+					lastDocNumber,
+					Info.LastNameIDHDD);
 			}
 			else
 			{
 				logError("Read corrupted.");
 				goto destroy;
 			}
-			
+
 			//B. Save blocks from import
 			ulong64 docPositionImport = pKeysAndValuesHDDImport[currKeyHDDImport].Value;
 
-			if(docPositionImport == sourceFilePositionImport + sourceBuffPositionImport)
+			if (docPositionImport == sourceFilePositionImport + sourceBuffPositionImport)
 			{
-				uint32 baseDocNumber = Info.LastNameIDHDD - 1;
+				uint32 baseDocNumber = Info.LastNameIDHDD - docHeaderSize;
 
 				moveDocFileBlocks(pDocFileImport,
-								  pDocFileTemp, 
-								  pSourceBufferImport, 
-								  pDestBuffer, 
-								  sourceFilePositionImport, 
-								  sourceBuffPositionImport, 
-								  sourceBuffLengthImport, 
-								  destBuffPosition, 
-								  destBuffLength,
-								  MAX_SIZE_BUFFER,
-								  baseDocNumber,
-								  lastDocNumber,
-								  Info.LastNameIDHDD + infoImport.LastNameIDHDD - 1);
+					pDocFileTemp,
+					pSourceBufferImport,
+					pDestBuffer,
+					sourceFilePositionImport,
+					sourceBuffPositionImport,
+					sourceBuffLengthImport,
+					destBuffPosition,
+					destBuffLength,
+					MAX_SIZE_BUFFER,
+					baseDocNumber,
+					lastDocNumber,
+					Info.LastNameIDHDD + infoImport.LastNameIDHDD - docHeaderSize);
 			}
 			else
 			{
 				logError("Read corrupted.");
 				goto destroy;
 			}
-		
+
 			pDestBuffer[destBuffPosition++] = 0; //null terminated
-		
+
 			currKeyHDDImport++;
 			currKeyHDD++;
 		}
@@ -1214,9 +1214,9 @@ void FTSInstance::importIndex(const char* importPath)
 			//get positions
 			ulong64 docPosition = pKeysAndValuesHDD[currKeyHDD].Value;
 
-			/*if(isWord("·‡ÁËÒÚ", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
+			/*if(isWord("–±–∞–∑–∏—Å—Ç", pKeysAndValues[i].Key[0], pKeysAndValues[i].Key[1]))
 			{
-				docPosition = docPosition;
+			docPosition = docPosition;
 			}*/
 
 			ulong64 docTempPosition = pDocFileTemp->getPosition() + destBuffPosition;
@@ -1225,7 +1225,7 @@ void FTSInstance::importIndex(const char* importPath)
 			haWordsHDDTemp.insert(pKeysAndValuesHDD[currKeyHDD].Key, docTempPosition);
 
 			//check errors ===========================================
-			for(uint32 i=0; i < haWordsRAM.KeyLen; i++)
+			for (uint32 i = 0; i < haWordsRAM.KeyLen; i++)
 			{
 				newControlValue += pKeysAndValuesHDD[currKeyHDD].Key[i];
 			}
@@ -1236,30 +1236,30 @@ void FTSInstance::importIndex(const char* importPath)
 			uint32 lastDocNumber = 0;
 
 			//Read and save blocks from HDD
-			if(docPosition == sourceFilePosition + sourceBuffPosition)
+			if (docPosition == sourceFilePosition + sourceBuffPosition)
 			{
-				moveDocFileBlocks(pDocFile, 
-								  pDocFileTemp, 
-								  pSourceBuffer, 
-								  pDestBuffer, 
-								  sourceFilePosition, 
-								  sourceBuffPosition, 
-								  sourceBuffLength, 
-								  destBuffPosition, 
-								  destBuffLength,
-								  MAX_SIZE_BUFFER,
-								  0,
-								  lastDocNumber,
-								  Info.LastNameIDHDD);
+				moveDocFileBlocks(pDocFile,
+					pDocFileTemp,
+					pSourceBuffer,
+					pDestBuffer,
+					sourceFilePosition,
+					sourceBuffPosition,
+					sourceBuffLength,
+					destBuffPosition,
+					destBuffLength,
+					MAX_SIZE_BUFFER,
+					0,
+					lastDocNumber,
+					Info.LastNameIDHDD);
 			}
 			else
 			{
 				logError("Read corrupted.");
 				goto destroy;
 			}
-			
+
 			pDestBuffer[destBuffPosition++] = 0; //null terminated
-		
+
 			currKeyHDD++;
 		}
 
@@ -1269,19 +1269,19 @@ void FTSInstance::importIndex(const char* importPath)
 
 		if (strlen(error))
 		{
-			logError(error);
-			goto destroy;
+		logError(error);
+		goto destroy;
 		}*/
 	}
 
-	if(destBuffPosition > 0)
+	if (destBuffPosition > 0)
 	{
 		pDocFileTemp->write(pDestBuffer, destBuffPosition);
 		destBuffPosition = 0;
 	}
 
 	//check errors ===========================================
-	if(Info.ControlValue != oldControlValue)
+	if (Info.ControlValue != oldControlValue)
 	{
 		logError("HDD Control value is wrong.");
 		goto destroy;
@@ -1301,18 +1301,18 @@ void FTSInstance::importIndex(const char* importPath)
 	BinaryFile::copyFile(pDocNameFileImport, pDocNameFileTemp);
 
 	pDocNameFileTemp->flush();
-	
+
 	//save info
 	haWordsHDDTemp.flush();
 
-	if(Configuration.MemoryMode != IN_MEMORY_MODE)
+	if (Configuration.MemoryMode != IN_MEMORY_MODE)
 	{
 		Info.CountWordsRAM = 0;
 	}
 
 	//save header
-	Info.LastNameIDHDD += infoImport.LastNameIDHDD - 1;
-	Info.LastNameIDRAM += infoImport.LastNameIDRAM - 1; //new ids from here
+	Info.LastNameIDHDD += infoImport.LastNameIDHDD - docHeaderSize;
+	Info.LastNameIDRAM += infoImport.LastNameIDRAM - docHeaderSize; //new ids from here
 
 	pDocFileTemp->setPosition(0);
 	pDocFileTemp->writeInt(&UNIQUE_IDENTIFIER);
@@ -1320,17 +1320,17 @@ void FTSInstance::importIndex(const char* importPath)
 	pDocFileTemp->write(&Info, sizeof(Info));
 	pDocFileTemp->flush();
 
-destroy:	
-	
+destroy:
+
 	//1. Close tables
 	haWordsHDD.close();
 	haWordsHDDImport.close();
 	haWordsHDDTemp.close();
-	
+
 	closeDocIndex();
 
 	closeDocNameIndex();
-	
+
 	//close import index
 	pDocFileImport->close();
 	delete pDocFileImport;
@@ -1348,8 +1348,8 @@ destroy:
 	pDocNameFileTemp->close();
 	delete pDocNameFileTemp;
 	pDocNameFileTemp = 0;
-	
-	if(!Info.HasError)
+
+	if (!Info.HasError)
 	{
 		//2. Delete old files
 		BinaryFile::deleteFile(documentPath);
@@ -1374,22 +1374,22 @@ destroy:
 
 	memset(pBuffer, 0, MAX_SIZE_BUFFER);
 
-	if(pKeysAndValuesHDD)
+	if (pKeysAndValuesHDD)
 	{
 		HArrayFixPair::DeleteArray(pKeysAndValuesHDD);
 	}
 
-	if(pKeysAndValuesHDDImport)
+	if (pKeysAndValuesHDDImport)
 	{
 		HArrayFixPair::DeleteArray(pKeysAndValuesHDDImport);
 	}
 
-	if(pSourceBuffer)
+	if (pSourceBuffer)
 	{
 		delete[] pSourceBuffer;
 	}
 
-	if(pSourceBufferImport)
+	if (pSourceBufferImport)
 	{
 		delete[] pSourceBufferImport;
 	}
@@ -1430,12 +1430,12 @@ void FTSInstance::openOrCreateIndex(bool onlyCheckIndex)
 	//}
 
 	//index
-	if(isExistsIndex())
+	if (isExistsIndex())
 	{
 		openIndex(onlyCheckIndex);
 	}
 
-	if(Configuration.MemoryMode == IN_MEMORY_MODE)
+	if (Configuration.MemoryMode == IN_MEMORY_MODE)
 	{
 		closeDicIndex();
 
@@ -1452,28 +1452,28 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 	char documentPath[1024];
 	char documentNamePath[1024];
-	
+
 	Configuration.getDocumentPath(documentPath);
 	Configuration.getDocumentNamePath(documentNamePath);
-	
+
 	pDocFile = new BinaryFile(documentPath, false, false);
 	pDocNameFile = new BinaryFile(documentNamePath, false, false);
-		
-	if(!pDocFile->open())
+
+	if (!pDocFile->open())
 	{
 		logError("File %s is not open.", documentPath);
-		
+
 		delete pDocFile;
-		
+
 		delete pDocNameFile;
 
 		return;
 	}
-		
-	if(!pDocNameFile->open())
+
+	if (!pDocNameFile->open())
 	{
 		logError("File %s is not open.", documentNamePath);
-		
+
 		pDocFile->close();
 		delete pDocFile;
 
@@ -1495,24 +1495,24 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 	uint32 codeVersion2;
 	pDocNameFile->readInt(&codeVersion2);
 
-	if(uniqueIdentifier1 == UNIQUE_IDENTIFIER 
-	   && codeVersion1 == CODE_VERSION
-	   && uniqueIdentifier2 == UNIQUE_IDENTIFIER 
-	   && codeVersion2 == CODE_VERSION)
+	if (uniqueIdentifier1 == UNIQUE_IDENTIFIER
+		&& codeVersion1 == CODE_VERSION
+		&& uniqueIdentifier2 == UNIQUE_IDENTIFIER
+		&& codeVersion2 == CODE_VERSION)
 	{
 		pDocFile->read(&Info, sizeof(Info));
-		
+
 		Info.LastErrorMessage = LastErrorMessage;
 		//documentsName.FilePosition = (Info.LastNameID - INDEX_FILE_HEADER_SIZE) * Info.DocumentNameSize + INDEX_FILE_HEADER_SIZE;
 
 		Configuration.WordsHeaderBase = Info.WordsHeaderBase;
 
-		uint32 minDocID = 1;
+		uint32 minDocID = getDocHeaderSize();
 		uint32 maxDocID = Info.LastNameIDRAM;
-		
+
 		//haWordsRAM
 		//reinit haWordsRAM
-		if(Configuration.MemoryMode == IN_MEMORY_MODE)
+		if (Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
 			//load data to ram from hdd pages
 			haWordsHDD.close();
@@ -1520,35 +1520,35 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 			haWordsRAM.load();
 
 			Info.CountWordsRAM = Info.CountWordsHDD;
-			
+
 			haWordsHDD.open();
-			
+
 			//load documents
 			uchar8* pSourceBuffer = pBuffer;
-			
+
 			ulong64 sourceFilePosition = pDocFile->getPosition(); //version + unique identifier + info
 			uint32 sourceBuffPosition = 0;
 			uint32 sourceBuffLength = 0;
 
 			uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
-						
+
 			HArrayFixPair* pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
 			uint32 count = haWordsRAM.getKeysAndValuesByRange(pKeysAndValuesRAM,
-															Info.CountWordsRAM, 
-															0, 
-															0);
-			
-			if(count != Info.CountWordsRAM)
+				Info.CountWordsRAM,
+				0,
+				0);
+
+			if (count != Info.CountWordsRAM)
 			{
 				logError("Count != Info.CountWordsRAM");
-				
+
 				goto destroy1;
 			}
 
-			for(uint32 i=0; i < count - 1; i++)
+			for (uint32 i = 0; i < count - 1; i++)
 			{
-				if(pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i+1], countKeySegments) != -1)
+				if (pKeysAndValuesRAM[i].compareKeys(pKeysAndValuesRAM[i + 1], countKeySegments) != -1)
 				{
 					logError("openIndex.haWordsRAM. Array is not sorted.");
 				}
@@ -1556,38 +1556,47 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 			bool isFormatCorrupted = false;
 
-			uint32 id;
-
-			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->newObject(id);
-
-			for(uint32 i=0; i < Info.CountWordsRAM; i++)
+			for (uint32 i = 0; i < Info.CountWordsRAM; i++)
 			{
 				//check errors ================
 				//checkKeyAndValue("readIndex.haWordsRAM", prevKey, key, value, MAX_INT);
 				//prevKey = key;
 				//=============================
 
-				/*if(key == getCode("·‡ÁËÒÚ", 6))
+				/*if(key == getCode("–±–∞–∑–∏—Å—Ç", 6))
 				{
-					key = key;
+				key = key;
 				}*/
 
-				if(pKeysAndValuesRAM[i].Value == sourceFilePosition + sourceBuffPosition)
+				uint32 id;
+
+				DocumentsBlock* pDocumentsBlock;
+
+				if (!onlyCheckIndex)
+				{
+					pDocumentsBlock = pDocumentsBlockPool->newObject(id);
+				}
+				else
+				{
+					pDocumentsBlock = pDocumentsBlockPool->getTempObject();
+				}
+
+				if (pKeysAndValuesRAM[i].Value == sourceFilePosition + sourceBuffPosition)
 				{
 					pDocumentsBlock->readBlocksFromFile(pDocFile,
-														pSourceBuffer,
-														sourceFilePosition,
-														sourceBuffPosition,
-														sourceBuffLength,
-														MAX_SIZE_BUFFER,
-														minDocID,
-														maxDocID,
-														isFormatCorrupted);
+						pSourceBuffer,
+						sourceFilePosition,
+						sourceBuffPosition,
+						sourceBuffLength,
+						MAX_SIZE_BUFFER,
+						minDocID,
+						maxDocID,
+						isFormatCorrupted);
 
-					if(isFormatCorrupted)
+					if (isFormatCorrupted)
 					{
 						logError("Format corrupted.");
-						
+
 						goto destroy1;
 					}
 				}
@@ -1598,7 +1607,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 					goto destroy1;
 				}
 
-				if(!onlyCheckIndex)
+				if (!onlyCheckIndex)
 				{
 					haWordsRAM.insert(pKeysAndValuesRAM[i].Key, id);
 				}
@@ -1606,20 +1615,19 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 				{
 					//FOR TESTING !!! =====================================
 					pDocumentsBlock->clear();
-					//pDocumentsBlockPool->releaseObject(pDocumentsBlock);
 				}
 
 				//pKeysAndValuesRAM[i].Value = pDocumentsBlock->CountDocuments;
 				//=====================================================
 
-				if(getUsedMemory() >= Configuration.LimitUsedMemory)
+				if (getUsedMemory() >= Configuration.LimitUsedMemory)
 				{
 					logError("Configuration.LimitUsedMemory is exceed.");
 
 					goto destroy1;
 				}
 
-				if(Info.HasError)
+				if (Info.HasError)
 				{
 					goto destroy1;
 				}
@@ -1628,11 +1636,11 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 			//move doc name file to memory
 			sourceFilePosition = pDocNameFile->getPosition(); //version + unique identifier
 			moveDocNameFileBlocksToRAM(pDocNameFile,
-										&documentsName,
-										sourceFilePosition,
-										pSourceBuffer,
-										MAX_SIZE_BUFFER);
-			
+				&documentsName,
+				sourceFilePosition,
+				pSourceBuffer,
+				MAX_SIZE_BUFFER);
+
 			////get top words
 			//for(uint32 i = 0; i < Info.CountWordsRAM; i++)
 			//{
@@ -1665,10 +1673,10 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 			//bf.close();
 
-			destroy1:
+		destroy1:
 
 			memset(pBuffer, 0, MAX_SIZE_BUFFER);
-						
+
 			HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 
 			//documentsName.FilePosition = 0;
@@ -1680,7 +1688,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 			haWordsHDD2.init("c:\\fts\\instance1", "", 12, 4, 24);
 
 			haWordsHDD2.open();*/
-			
+
 			if (onlyCheckIndex)
 			{
 				uchar8* pSourceBuffer = (uchar8*)pBuffer;
@@ -1711,14 +1719,14 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 					bool isBufferNotEnough = false;
 
 					uint32 countHDD = haWordsHDD.getKeysAndValuesByPortions(pKeysAndValuesHDD,
-																			MAX_SIZE_BUFFER,
-																			blockNumber,
-																			wordInBlock);
+						MAX_SIZE_BUFFER,
+						blockNumber,
+						wordInBlock);
 
 					/*if (isBufferNotEnough)
 					{
-						logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
-						goto destroy2;
+					logError("The buffer MAX_SIZE_BUFFER is not enough to get portion from HDD.");
+					goto destroy2;
 					}*/
 
 					//check errors ===========================================
@@ -1752,14 +1760,14 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 							bool isFormatCorrupted = false;
 
 							pDocumentsBlock->readBlocksFromFile(pDocFile,
-																pSourceBuffer,
-																sourceFilePosition,
-																sourceBuffPosition,
-																sourceBuffLength,
-																MAX_SIZE_BUFFER,
-																minDocID,
-																maxDocID,
-																isFormatCorrupted);
+								pSourceBuffer,
+								sourceFilePosition,
+								sourceBuffPosition,
+								sourceBuffLength,
+								MAX_SIZE_BUFFER,
+								minDocID,
+								maxDocID,
+								isFormatCorrupted);
 
 							if (isFormatCorrupted)
 							{
@@ -1785,7 +1793,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 				HArrayFixPair::DeleteArray(pKeysAndValuesHDD);
 			}
 
-		
+
 
 			Info.CountWordsRAM = 0;
 		}
@@ -1799,7 +1807,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 bool FTSInstance::isExistsIndex()
 {
 	char documentPath[1024];
-	
+
 	Configuration.getDocumentPath(documentPath);
 
 	return BinaryFile::existsFile(documentPath);
@@ -1820,17 +1828,17 @@ uint32 FTSInstance::getRecoveryIndexState()
 	bool isDocumentPathTempExists = BinaryFile::existsFile(documentPathTemp);
 	bool isDocumentNamePathTempExists = BinaryFile::existsFile(documentNamePathTemp);
 
-	if(!isDocumentPathTempExists && 
-	   !isDocumentNamePathTempExists)
+	if (!isDocumentPathTempExists &&
+		!isDocumentNamePathTempExists)
 	{
 		//1. if there are no temp files, than Ok
 		return 0;
 	}
-	else if(isDocumentPathTempExists &&
-		    isDocumentNamePathTempExists)
+	else if (isDocumentPathTempExists &&
+		isDocumentNamePathTempExists)
 	{
 		//2. if there are all temp files, they are corrupted, just delete them
-		
+
 		return 2;
 	}
 	else
@@ -1869,7 +1877,7 @@ void FTSInstance::recoveryIndex()
 
 void FTSInstance::recoveryIndex(uint32 recoveryIndexState)
 {
-	if(recoveryIndexState == 0)
+	if (recoveryIndexState == 0)
 	{
 		//1. if there are no temp files, than Ok
 		return;
@@ -1881,30 +1889,30 @@ void FTSInstance::recoveryIndex(uint32 recoveryIndexState)
 	Configuration.getDocumentTempPath(documentPathTemp);
 	Configuration.getDocumentNameTempPath(documentNamePathTemp);
 
-	if(recoveryIndexState == 2)
+	if (recoveryIndexState == 2)
 	{
 		//2. if there are all temp files, they are corrupted, just delete them
 		BinaryFile::deleteFile(documentPathTemp);
 		BinaryFile::deleteFile(documentNamePathTemp);
 	}
-	else if(recoveryIndexState == 1)
+	else if (recoveryIndexState == 1)
 	{
 		char documentPath[1024];
 		char documentNamePath[1024];
-	
+
 		Configuration.getDocumentPath(documentPath);
 		Configuration.getDocumentNamePath(documentNamePath);
 
 		bool isDocumentPathTempExists = BinaryFile::existsFile(documentPathTemp);
 		bool isDocumentNamePathTempExists = BinaryFile::existsFile(documentNamePathTemp);
-		
+
 		//3. if there are some temp files, they are ok, rename rest of them
-		if(isDocumentPathTempExists)
+		if (isDocumentPathTempExists)
 		{
 			BinaryFile::renameFile(documentPathTemp, documentPath);
 		}
 
-		if(isDocumentNamePathTempExists)
+		if (isDocumentNamePathTempExists)
 		{
 			BinaryFile::renameFile(documentNamePathTemp, documentNamePath);
 		}
@@ -1963,9 +1971,9 @@ void FTSInstance::saveIndex()
 
 				/*if (!BinaryFile::createDirectory(Configuration.getIndexPath()))
 				{
-					logError("Can't create directory.");
+				logError("Can't create directory.");
 
-					return;
+				return;
 				}*/
 
 				Configuration.getIndexPath(haWordsRAM.Path);

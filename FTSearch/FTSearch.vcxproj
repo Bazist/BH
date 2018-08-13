@@ -160,8 +160,8 @@
     <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentCellBlockPool.h" />
     <ClInclude Include="DocumentCellPool.h" />
-    <ClInclude Include="DocumentInfo.h" />
-    <ClInclude Include="DocumentInfoPool.h" />
+    <ClInclude Include="DocumentsInfo.h" />
+    <ClInclude Include="DocumentsInfoPool.h" />
     <ClInclude Include="Documents.h" />
     <ClInclude Include="DocumentsBlock.h" />
     <ClInclude Include="DocumentsBlockPool.h" />

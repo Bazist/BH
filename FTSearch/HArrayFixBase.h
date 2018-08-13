@@ -58,7 +58,7 @@ public:
 struct HArrayFixBaseInfo
 {
 	uint32 Version;
-	
+
 	uint32 KeyLen;
 	uint32 ValueLen;
 
@@ -91,11 +91,11 @@ public:
 		char* pArray = new char[calcArrayMemory(count, countKeySegments)];
 
 		HArrayFixPair* pCurrentPair = (HArrayFixPair*)pArray;
-		uint32* pCurrentKey = (uint32*)(pArray + sizeof(HArrayFixPair) * count); 
+		uint32* pCurrentKey = (uint32*)(pArray + sizeof(HArrayFixPair) * count);
 
-		for(uint32 i=0; i < count; i++, 
-								 pCurrentPair++, 
-								 pCurrentKey += countKeySegments)
+		for (uint32 i = 0; i < count; i++,
+			pCurrentPair++,
+			pCurrentKey += countKeySegments)
 		{
 			pCurrentPair->Key = pCurrentKey;
 			pCurrentPair->Value = 0;
@@ -106,177 +106,30 @@ public:
 
 	static void DeleteArray(HArrayFixPair* pArray)
 	{
-		delete[] (char*)pArray;
-	}
-
-	static void sortByValue(HArrayFixPair* pKeysAndValues,
-							uint32 count,
-							bool isAsc,
-							uint32 countKeySegments)
-	{
-		int i = 0, j = count - 1;	// поставить указатели на исходные места
-
-		HArrayFixPair* tempKey;
-		HArrayFixPair* p;
-
-		p = &pKeysAndValues[count >> 1];	// центральный элемент
-										// процедура разделения
-
-		do
-		{
-			if (isAsc)
-			{
-				while (pKeysAndValues[i].compareKeys(*p, countKeySegments) < 0)
-				{
-					i++;
-				}
-
-				while (pKeysAndValues[j].compareKeys(*p, countKeySegments) > 0)
-				{
-					j--;
-				}
-			}
-			else
-			{
-				while (pKeysAndValues[i].compareKeys(*p, countKeySegments) > 0)
-				{
-					i++;
-				}
-
-				while (pKeysAndValues[j].compareKeys(*p, countKeySegments) < 0)
-				{
-					j--;
-				}
-			}
-
-			if (i <= j)
-			{
-				tempKey = &pKeysAndValues[i];
-				
-				pKeysAndValues[j].copyTo(pKeysAndValues[i], countKeySegments);
-
-				tempKey->copyTo(pKeysAndValues[j], countKeySegments);
-
-				i++;
-				j--;
-			}
-		} while (i <= j);
-
-
-		// рекурсивные вызовы, если есть, что сортировать 
-		if (j > 0)
-		{
-			sortByValue(pKeysAndValues, j, isAsc, countKeySegments);
-		}
-
-		if (count > i)
-		{
-			sortByValue(pKeysAndValues + i, count - i, isAsc, countKeySegments);
-		}
-	}
-
-	//TODO refactore, remove copy\past
-	static void sortByDocumentsCount(HArrayFixPair* pKeysAndValues,
-									 uint32 count,
-								     bool isAsc,
-									 uint32 countKeySegments)
-	{
-		int i = 0, j = count - 1;	// поставить указатели на исходные места
-
-		HArrayFixPair* tempKey;
-		HArrayFixPair* p;
-
-		p = &pKeysAndValues[count >> 1];	// центральный элемент
-											// процедура разделения
-
-		do
-		{
-			if (isAsc)
-			{
-				while (pKeysAndValues[i].compareDocumentsCount(*p, countKeySegments) < 0)
-				{
-					i++;
-				}
-
-				while (pKeysAndValues[j].compareDocumentsCount(*p, countKeySegments) > 0)
-				{
-					j--;
-				}
-			}
-			else
-			{
-				while (pKeysAndValues[i].compareDocumentsCount(*p, countKeySegments) > 0)
-				{
-					i++;
-				}
-
-				while (pKeysAndValues[j].compareDocumentsCount(*p, countKeySegments) < 0)
-				{
-					j--;
-				}
-			}
-
-			if (i <= j)
-			{
-				tempKey = &pKeysAndValues[i];
-
-				pKeysAndValues[j].copyTo(pKeysAndValues[i], countKeySegments);
-
-				tempKey->copyTo(pKeysAndValues[j], countKeySegments);
-
-				i++;
-				j--;
-			}
-		} while (i <= j);
-
-
-		// рекурсивные вызовы, если есть, что сортировать 
-		if (j > 0)
-		{
-			sortByValue(pKeysAndValues, j, isAsc, countKeySegments);
-		}
-
-		if (count > i)
-		{
-			sortByValue(pKeysAndValues + i, count - i, isAsc, countKeySegments);
-		}
+		delete[](char*)pArray;
 	}
 
 	uint32* Key; //use additional memory
 	ulong64 Value;
-	
+
 	//1 segment = 4 bytes
 	int compareKeys(HArrayFixPair& pair, uint32 countKeySegments)
 	{
-		for(uint32 i=0; i < countKeySegments; i++)
+		for (uint32 i = 0; i < countKeySegments; i++)
 		{
-			if(Key[i] < pair.Key[i])
+			if (Key[i] < pair.Key[i])
 				return -1;
-			
-			if(Key[i] > pair.Key[i])
+
+			if (Key[i] > pair.Key[i])
 				return 1;
 		}
 
 		return 0;
 	}
 
-	int compareDocumentsCount(HArrayFixPair& pair, uint32 countKeySegments)
-	{
-		DocumentsBlock* pDocumentsBlock1 = (DocumentsBlock*)Value;
-		DocumentsBlock* pDocumentsBlock2 = (DocumentsBlock*)pair.Value;
-
-		if (pDocumentsBlock1->CountDocuments < pDocumentsBlock2->CountDocuments)
-			return -1;
-
-		if (pDocumentsBlock1->CountDocuments > pDocumentsBlock2->CountDocuments)
-			return 1;
-		
-		return 0;
-	}
-
 	void copyTo(HArrayFixPair& pair, uint32 countKeySegments)
 	{
-		for(uint32 i=0; i < countKeySegments; i++)
+		for (uint32 i = 0; i < countKeySegments; i++)
 		{
 			pair.Key[i] = Key[i];
 		}
@@ -290,9 +143,9 @@ public:
 
 		uint32* segments = (uint32*)word;
 
-		for(uint32 i=0; i < len / 4; i++)
+		for (uint32 i = 0; i < len / 4; i++)
 		{
-			if(segments[i] != Key[i])
+			if (segments[i] != Key[i])
 				return false;
 		}
 
@@ -301,6 +154,80 @@ public:
 
 	~HArrayFixPair()
 	{
+	}
+};
+
+typedef int(*HArrayFixPairComparator)(HArrayFixPair& pair1, HArrayFixPair& pair2, uint32 countKeySegments);
+
+class HArrayFixPairUtils
+{
+public:
+	static void sort(HArrayFixPair* pKeysAndValues,
+		uint32 count,
+		bool isAsc,
+		uint32 countKeySegments,
+		HArrayFixPairComparator comparator)
+	{
+		int i = 0, j = count - 1;	// поставить указатели на исходные места
+
+		HArrayFixPair* tempKey = HArrayFixPair::CreateArray(1, countKeySegments);
+		HArrayFixPair* p;
+
+		p = &pKeysAndValues[count >> 1];	// центральный элемент
+											// процедура разделения
+
+		do
+		{
+			if (isAsc)
+			{
+				while (comparator(pKeysAndValues[i], *p, countKeySegments) < 0)
+				{
+					i++;
+				}
+
+				while (comparator(pKeysAndValues[j], *p, countKeySegments) > 0)
+				{
+					j--;
+				}
+			}
+			else
+			{
+				while (comparator(pKeysAndValues[i], *p, countKeySegments) > 0)
+				{
+					i++;
+				}
+
+				while (comparator(pKeysAndValues[j], *p, countKeySegments) < 0)
+				{
+					j--;
+				}
+			}
+
+			if (i <= j)
+			{
+				pKeysAndValues[i].copyTo(tempKey[0], countKeySegments);
+
+				pKeysAndValues[j].copyTo(pKeysAndValues[i], countKeySegments);
+
+				tempKey[0].copyTo(pKeysAndValues[j], countKeySegments);
+
+				i++;
+				j--;
+			}
+		} while (i <= j);
+
+		HArrayFixPair::DeleteArray(tempKey);
+
+		// рекурсивные вызовы, если есть, что сортировать 
+		if (j > 0)
+		{
+			sort(pKeysAndValues, j, isAsc, countKeySegments, comparator);
+		}
+
+		if (count > i)
+		{
+			sort(pKeysAndValues + i, count - i, isAsc, countKeySegments, comparator);
+		}
 	}
 };
 
@@ -353,7 +280,7 @@ class BlockPage
 public:
 	BlockPage()
 	{
-		for(uint32 i=0; i<MAX_SHORT; i++)
+		for (uint32 i = 0; i<MAX_SHORT; i++)
 		{
 			pBlock[i].Type = 0;
 		}

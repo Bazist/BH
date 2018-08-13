@@ -5,23 +5,17 @@
 #endif
 
 #include "stdafx.h"
-#include "BlockMemory.h"
+#include "DocumentsBlock.h"
 
-struct DocumentInfo
+struct DocumentsInfo
 {
 public:
-	DocumentInfo()
+	DocumentsInfo()
 	{
-		Number = 0;
-		FilePosition = 0;
-		pHeadBlockMemory = 0;
-		MemoryPosition = 0;
-		CountPosition = 0;
+
 	}
 
-	uint32 Number;
-	uint32 FilePosition;
-	BlockMemory* pHeadBlockMemory;
-	uint32 MemoryPosition;
-	uchar8 CountPosition;
+	uint32 CountDocuments;
+	ulong64 FilePosition;
+	DocumentsBlock* pDocumentsBlock;
 };

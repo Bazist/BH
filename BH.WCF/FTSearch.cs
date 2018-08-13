@@ -377,6 +377,9 @@ namespace BH.WCF
         [DllImport(DLL_PATH, EntryPoint = "searchPhraseRel", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static unsafe extern IntPtr searchPhraseRelDLL(System.UInt32 instanceNumber, byte* phrase, System.UInt32 phraseLen, System.UInt32 minPage, System.UInt32 maxPage);
 
+        [DllImport(DLL_PATH, EntryPoint = "initSearchRel", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        private static unsafe extern void initSearchRelDLL(System.UInt32 instanceNumber);
+
         [DllImport(DLL_PATH, EntryPoint = "searchQuery", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static unsafe extern IntPtr searchQueryDLL(System.UInt32 instanceNumber, IntPtr[] selectors, System.UInt32 countSelectors, System.UInt32 minPage, System.UInt32 maxPage, System.UInt32 skip, System.Boolean agregateBySubject);
 
@@ -732,6 +735,9 @@ namespace BH.WCF
                                                 int maxPage,
                                                 int skip)
         {
+            if (templateName == null)
+                templateName = string.Empty;
+
             SearchResult sr = new SearchResult();
             
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase),
@@ -844,6 +850,11 @@ namespace BH.WCF
             }
 
             return result;
+        }
+
+        public unsafe void InitSearchRel()
+        {
+            initSearchRelDLL(InstanceNumber);
         }
 
         public unsafe SearchResult SearchNewMems(DateTime startDate1,

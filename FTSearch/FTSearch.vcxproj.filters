@@ -55,9 +55,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DocumentInfo.h">
-      <Filter>Header Files\Document</Filter>
-    </ClInclude>
     <ClInclude Include="DocumentsBlock.h">
       <Filter>Header Files\Document</Filter>
     </ClInclude>
@@ -95,9 +92,6 @@
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
     <ClInclude Include="DocumentCellPool.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="DocumentInfoPool.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
     <ClInclude Include="Documents.h">
@@ -147,6 +141,12 @@
     </ClInclude>
     <ClInclude Include="HArrayTextFile.h">
       <Filter>Header Files\HArray</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentsInfoPool.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentsInfo.h">
+      <Filter>Header Files\Document</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
