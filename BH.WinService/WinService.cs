@@ -127,9 +127,9 @@ namespace BH.WinService
         }
 
         private static Thread _boobenJob;
-        private void StartBoobenJob()
+        private void StartBoobenRobots()
         {
-            if (bool.Parse(ConfigurationManager.AppSettings["EnableJob"]))
+            if (bool.Parse(ConfigurationManager.AppSettings["EnableRobots"]))
             {
                 WriteLog("Start Job", EventLogEntryType.Information);
 
@@ -186,7 +186,7 @@ namespace BH.WinService
 
             if (bool.Parse(ConfigurationManager.AppSettings["BoobenMode"]))
             {
-                StartBoobenJob();
+                StartBoobenRobots();
             }
             else
             {
