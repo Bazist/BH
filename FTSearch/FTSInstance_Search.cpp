@@ -452,6 +452,9 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 	if (!checkStartedInstance(true))
 		return;
 
+	if (!pStartScanWordsFrom)
+		return;
+
 	//1. Parse phrase
 	int* pWeightBuffer = new int[Info.LastNameIDRAM + 1];
 	uchar8* pLevelBuffer = new uchar8[Info.LastNameIDRAM + 1];

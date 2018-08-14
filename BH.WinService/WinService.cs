@@ -94,7 +94,8 @@ namespace BH.WinService
                 FTService.StartWebservice(_fts,
                                           ConfigurationManager.AppSettings["URL"],
                                           LoadDocumentContent,
-                                          ex => {
+                                          ex =>
+                                          {
                                               WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
                                           });
 

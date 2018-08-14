@@ -288,11 +288,9 @@ public:
 		if (!checkStartedInstance(true))
 			return;
 
-		uint32 docHeaderSize = getDocHeaderSize();
-
 		if (Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
-			uint32 offset = (id - docHeaderSize) * Info.DocumentNameSize;
+			uint32 offset = (id - 1) * Info.DocumentNameSize;
 			documentsName.getDocumentNameByOffset(name, offset, sizeName);
 		}
 		else
