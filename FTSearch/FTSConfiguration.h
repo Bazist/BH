@@ -139,6 +139,11 @@ public:
 
 	//bool IS_ANY_SEQUENCE_WORDS_IN_QUERY = false;
 
+	uint32 getCountKeySegments()
+	{
+		return AutoStemmingOn >> 2;
+	}
+
 	~FTSConfiguration()
 	{
 	}

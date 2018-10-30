@@ -63,7 +63,7 @@ namespace BH.BoobenRobot
             }
         }
 
-        private string GetFilePath(string code, string dashboardID, string docNumber, int pageNumber)
+        protected string GetFilePath(string code, string dashboardID, string docNumber, int pageNumber)
         {
             return GetDirectoryPath(docNumber) + GetDocCode(code, dashboardID, docNumber, pageNumber) + ".txt";
         }
@@ -427,7 +427,7 @@ namespace BH.BoobenRobot
                 }
                 catch (Exception ex)
                 {
-                    if (ex.Message.IndexOf("404") >= 0)
+                    //if (ex.Message.IndexOf("404") >= 0 || ex.Message.IndexOf("403") >= 0)
                     {
                         page.HtmlContent = string.Empty;
                         page.FileContent = string.Empty;
@@ -505,7 +505,10 @@ namespace BH.BoobenRobot
 
                 try
                 {
-                    _service.IndexText(docCode, null, page.FileContent, null);
+                    if (_service != null)
+                    {
+                        _service.IndexText(docCode, null, page.FileContent, null);
+                    }
                 }
                 catch
                 {
@@ -525,18 +528,18 @@ namespace BH.BoobenRobot
                 this.NextUpdate = DateTime.Now.Add(this.SiteDelay);
                 this.CurrentPage = null;
 
-                lock (_saveIndexLocker)
-                {
-                    _amountUpdated++;
+                //lock (_saveIndexLocker)
+                //{
+                //    _amountUpdated++;
 
-                    if (_amountUpdated >= Sites.Count)
-                    {
-                        //FTSearchService7.FTSearchServiceClient client = new FTSearchService7.FTSearchServiceClient();
-                        //client.SaveIndex();
+                //    if (_amountUpdated >= Sites.Count)
+                //    {
+                //        //FTSearchService7.FTSearchServiceClient client = new FTSearchService7.FTSearchServiceClient();
+                //        //client.SaveIndex();
 
-                        _amountUpdated = 0;
-                    }
-                }
+                //        _amountUpdated = 0;
+                //    }
+                //}
 
                 Thread.Sleep(this.SiteDelay);
             }
@@ -565,7 +568,7 @@ namespace BH.BoobenRobot
 
         public DateTime NextUpdate = DateTime.Now;
 
-        public void Run(object data)
+        public void Run()
         {
             while (true)
             {
@@ -855,9 +858,9 @@ namespace BH.BoobenRobot
             {
                 string href = match.Groups["href"].Value;
 
-                if (!Sites.Any(s => href.IndexOf(s.BaseUrl) >= 0 ||
-                                    href.IndexOf("forumimg.net") >= 0 ||
-                                    href.IndexOf("smil") >= 0)) //avoid smiles
+                if (!href.Contains(BaseUrl) &&
+                    !href.Contains("forumimg.net") &&
+                    !href.Contains("smil")) //avoid smiles
                 {
 
                     if (GetSize(href) > 1024 * 1024) //only big gifs

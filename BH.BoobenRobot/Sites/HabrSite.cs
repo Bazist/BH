@@ -38,33 +38,39 @@ namespace BH.BoobenRobot
 
         protected override List<Page> OnDashboardLoaded(Page page)
         {
-
             List<Page> pages = new List<Page>();
 
-            List<string> docs = ExtractByRegexp(page.HtmlContent, "id=\"post_(?<num>[0-9]+)\"");
-
-            //List<string> labels = ExtractByRegexp(page.HtmlContent, "<span class=\"all\">(?<num>[0-9а-яА-Я]+)</span>");
-
-            List<string> parts = this.GetParts(page.HtmlContent, "<div class=\"post-comments\">", "</div>");
-
-            if (docs.Count == parts.Count)
+            for (int i = 401386; i < 421214; i++)
             {
-                for (int i = docs.Count - 1; i >= 0; i--)
-                {
-                    string url = GetUrlByDocNumber(docs[i], 1, null);
+                string url = GetUrlByDocNumber(i.ToString(), 1, null);
 
-                    var labels = this.ExtractByRegexp(parts[i], ">(?<num>[0-9]+)<");
-
-                    if (labels.Count > 0)
-                    {
-                        CheckLabelAndAddPage(pages, url, labels[0]);
-                    }
-                    else
-                    {
-                        CheckLabelAndAddPage(pages, url, "0");
-                    }
-                }
+                CheckLabelAndAddPage(pages, url, DateTime.Now.ToString());
             }
+
+            //List<string> docs = ExtractByRegexp(page.HtmlContent, "id=\"post_(?<num>[0-9]+)\"");
+
+            ////List<string> labels = ExtractByRegexp(page.HtmlContent, "<span class=\"all\">(?<num>[0-9а-яА-Я]+)</span>");
+
+            //List<string> parts = this.GetParts(page.HtmlContent, "<div class=\"post-comments\">", "</div>");
+
+            //if (docs.Count == parts.Count)
+            //{
+            //for (int i = docs.Count - 1; i >= 0; i--)
+            //    {
+            //        string url = GetUrlByDocNumber(docs[i], 1, null);
+
+                    //var labels = this.ExtractByRegexp(parts[i], ">(?<num>[0-9]+)<");
+
+                    //if (labels.Count > 0)
+                    //{
+                    //    CheckLabelAndAddPage(pages, url, labels[0]);
+                    //}
+                    //else
+                    //{
+                    //    CheckLabelAndAddPage(pages, url, "0");
+                    //}
+            //   }
+            //}
 
             return pages;
         }
@@ -72,8 +78,9 @@ namespace BH.BoobenRobot
         protected override void OnPageLoaded(Page page)
         {
             //content
-            page.FileContent = GetMessages("<div class=\"content html_format\">", "</div>", "div", page.HtmlContent);
-            page.FileContent += " " + GetMessages("<div class=\"message html_format \">", "</div>", "div", page.HtmlContent, out page.CountMessages);
+            page.FileContent = GetMessages("<article", "</article>", "article", page.HtmlContent);
+            
+            page.FileContent += " " + GetMessages("<div class=\"comments-section\"", "</div>", "div", page.HtmlContent, out page.CountMessages);
 
             //check load next page
             page.NeedLoadNextPage = false;

@@ -21,7 +21,7 @@ namespace BH.BoobenRobot
         private Action<string> _logError;
         private Action<string> _logInfo;
 
-        public IndexService(FTService service, Action<string> logError, Action<string> logInfo)
+        public IndexService(FTService service, Action<string> logError, Action<string> logInfo, bool debugMode = false)
         {
             _service = service;
             _logError = logError;
@@ -30,9 +30,7 @@ namespace BH.BoobenRobot
             BH.BoobenRobot.Site.Sites = new List<Site>();
 
             BH.BoobenRobot.Site.Sites.Add(new PravdaSite(service));
-
             BH.BoobenRobot.Site.Sites.Add(new KhafSite(service));
-
             BH.BoobenRobot.Site.Sites.Add(new SearchengineSite(service));
             BH.BoobenRobot.Site.Sites.Add(new DouSite(service));
             BH.BoobenRobot.Site.Sites.Add(new GamedevSite(service));
@@ -533,38 +531,38 @@ namespace BH.BoobenRobot
             //IndexFiles();
 
             //index current period
-            ThreadPool.QueueUserWorkItem(x =>
-            {
-                var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            //ThreadPool.QueueUserWorkItem(x =>
+            //{
+            //    var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
-                DBHelpers.GetPages(IndexFile, null, startDate, startDate.AddMonths(1));
-            });
+            //    DBHelpers.GetPages(IndexFile, null, startDate, startDate.AddMonths(1));
+            //});
 
-            Thread.Sleep(500);
+            //Thread.Sleep(500);
 
-            this.IndexEqueue();
+            //this.IndexEqueue();
 
             _service.InitSearchRel();
 
-            try
-            {
-                //run spiders
-                foreach (Site site in BH.BoobenRobot.Site.Sites)
-                {
-                    //site.LoadLabels();
+            //try
+            //{
+            //    //run spiders
+            //    foreach (Site site in BH.BoobenRobot.Site.Sites)
+            //    {
+            //        //site.LoadLabels();
 
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(site.Run));
-                }
+            //        ThreadPool.QueueUserWorkItem(x => site.Run());
+            //    }
 
-                //refresh interface
-                UpdateStat();
+            //    //refresh interface
+            //    UpdateStat();
 
-                ThreadPool.QueueUserWorkItem(new WaitCallback(this.UpdateStat));
-            }
-            catch (Exception ex)
-            {
-                _logError(ex.Message);
-            }
+            //    ThreadPool.QueueUserWorkItem(new WaitCallback(this.UpdateStat));
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logError(ex.Message);
+            //}
         }
 
         private void IndexPrevMonth()

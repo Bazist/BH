@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO.Compression;
 using System.Threading;
 using BH.WCF;
+using BH.BoobenRobot;
 
 namespace BH.Tests
 {
@@ -756,6 +757,12 @@ namespace BH.Tests
             {
                 var str = x.ToString();
             }
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            var hs = new HabrSite(null);
+            hs.Run();
         }
     }
 }

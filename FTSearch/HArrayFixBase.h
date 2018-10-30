@@ -127,6 +127,20 @@ public:
 		return 0;
 	}
 
+	int compareKeys(uint32* key, uint32 countKeySegments)
+	{
+		for (uint32 i = 0; i < countKeySegments; i++)
+		{
+			if (Key[i] < key[i])
+				return -1;
+
+			if (Key[i] > key[i])
+				return 1;
+		}
+
+		return 0;
+	}
+
 	void copyTo(HArrayFixPair& pair, uint32 countKeySegments)
 	{
 		for (uint32 i = 0; i < countKeySegments; i++)
@@ -135,6 +149,16 @@ public:
 		}
 
 		pair.Value = Value;
+	}
+
+	void copyFrom(uint32* key, ulong64 value, uint32 countKeySegments)
+	{
+		for (uint32 i = 0; i < countKeySegments; i++)
+		{
+			Key[i] = key[i];
+		}
+
+		Value = value;
 	}
 
 	bool isWord(char* word)
@@ -158,6 +182,7 @@ public:
 };
 
 typedef int(*HArrayFixPairComparator)(HArrayFixPair& pair1, HArrayFixPair& pair2, uint32 countKeySegments);
+typedef void(*HArrayFixPairSwaper)(void* pData, HArrayFixPair* tempKey, uint32 i, uint32 j, uint32 countKeySegments);
 
 class HArrayFixPairUtils
 {
@@ -166,7 +191,9 @@ public:
 		uint32 count,
 		bool isAsc,
 		uint32 countKeySegments,
-		HArrayFixPairComparator comparator)
+		HArrayFixPairComparator comparator,
+		HArrayFixPairSwaper swaper,
+		void* pData)
 	{
 		int i = 0, j = count - 1;	// поставить указатели на исходные места
 
@@ -205,11 +232,13 @@ public:
 
 			if (i <= j)
 			{
-				pKeysAndValues[i].copyTo(tempKey[0], countKeySegments);
+				//pKeysAndValues[i].copyTo(tempKey[0], countKeySegments);
 
-				pKeysAndValues[j].copyTo(pKeysAndValues[i], countKeySegments);
+				//pKeysAndValues[j].copyTo(pKeysAndValues[i], countKeySegments);
 
-				tempKey[0].copyTo(pKeysAndValues[j], countKeySegments);
+				//tempKey[0].copyTo(pKeysAndValues[j], countKeySegments);
+
+				swaper(pData, tempKey, i, j, countKeySegments);
 
 				i++;
 				j--;
@@ -221,12 +250,12 @@ public:
 		// рекурсивные вызовы, если есть, что сортировать 
 		if (j > 0)
 		{
-			sort(pKeysAndValues, j, isAsc, countKeySegments, comparator);
+			sort(pKeysAndValues, j, isAsc, countKeySegments, comparator, swaper, pData);
 		}
 
 		if (count > i)
 		{
-			sort(pKeysAndValues + i, count - i, isAsc, countKeySegments, comparator);
+			sort(pKeysAndValues + i, count - i, isAsc, countKeySegments, comparator, swaper, pData);
 		}
 	}
 };

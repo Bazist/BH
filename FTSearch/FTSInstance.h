@@ -224,8 +224,14 @@ public:
 	void FTSInstance::initAssociativeSearch();
 
 	static int FTSInstance::compareDocumentsCount(HArrayFixPair& pair1,
-		HArrayFixPair& pair2,
-		uint32 countKeySegments);
+												  HArrayFixPair& pair2,
+												  uint32 countKeySegments);
+
+	static void FTSInstance::swapDocumentsCount(void* pData,
+												HArrayFixPair* tempKey,
+												uint32 i,
+												uint32 j,
+												uint32 countKeySegments);
 
 	void FTSInstance::readBlocksFromFile(
 		DocumentsBlock* pDocumentsBlock,
@@ -525,7 +531,7 @@ private:
 	HArrayFixPair* pAllKeysAndValuesRAM;
 	uint32 pAllKeysAndValuesRAMCount;
 
-	uint32* pStartScanWordsFrom;
+	SearchRelPreCalcInfo* pSearchRelPreCalcInfos;
 
 	DocumentsBlock** pZooms;
 
@@ -616,7 +622,7 @@ private:
 		pDocNameFile = 0;
 
 		pAllKeysAndValuesRAM = 0;
-		pStartScanWordsFrom = 0;
+		pSearchRelPreCalcInfos = 0;
 		pZooms = 0;
 
 		Info.init(Configuration.WordsHeaderBase,

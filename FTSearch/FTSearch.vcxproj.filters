@@ -148,6 +148,12 @@
     <ClInclude Include="DocumentsInfo.h">
       <Filter>Header Files\Document</Filter>
     </ClInclude>
+    <ClInclude Include="FilterWordsByDocumentsCount.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchRelPreCalcInfo.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

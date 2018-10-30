@@ -57,6 +57,7 @@
             this.btnCheckIndexes = new System.Windows.Forms.Button();
             this.btnStartJob = new System.Windows.Forms.Button();
             this.btnTest = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             this.gbIOSpeed.SuspendLayout();
             this.gbIndexSpeed.SuspendLayout();
             this.gbScan.SuspendLayout();
@@ -351,11 +352,22 @@
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.button3_Click);
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(114, 329);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 20;
+            this.button3.Text = "Robot";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(965, 720);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnStartJob);
             this.Controls.Add(this.btnCheckIndexes);
@@ -417,6 +429,7 @@
         private System.Windows.Forms.Button btnCheckIndexes;
         private System.Windows.Forms.Button btnStartJob;
         private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Button button3;
     }
 }
 
