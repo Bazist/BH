@@ -6,7 +6,7 @@ void FTSInstance::createIndex()
 	if (!checkStartedInstance(true))
 		return;
 
-	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+	uint32 countKeySegments = Configuration.getCountKeySegments();
 	HArrayFixPair* pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
 	char documentPath[1024];
@@ -253,7 +253,7 @@ void FTSInstance::updateIndex()
 	HArrayFixPair* pKeysAndValuesRAM = 0;
 	HArrayFixPair* pKeysAndValuesHDD = 0;
 
-	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+	uint32 countKeySegments = Configuration.getCountKeySegments();
 	pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
 	char documentPath[1024];
@@ -927,7 +927,7 @@ void FTSInstance::importIndex(const char* importPath)
 	uint32 destBuffLength = MAX_SIZE_BUFFER;
 
 	//get data by portions from HDD
-	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+	uint32 countKeySegments = Configuration.getCountKeySegments();
 
 	pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 
@@ -1530,7 +1530,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 			uint32 sourceBuffPosition = 0;
 			uint32 sourceBuffLength = 0;
 
-			uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+			uint32 countKeySegments = Configuration.getCountKeySegments();
 
 			HArrayFixPair* pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
@@ -1699,7 +1699,7 @@ void FTSInstance::openIndex(bool onlyCheckIndex)
 
 
 				//get data by portions from HDD
-				uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+				uint32 countKeySegments = Configuration.getCountKeySegments();
 				HArrayFixPair* pKeysAndValuesHDD = HArrayFixPair::CreateArray(MAX_SIZE_BUFFER, countKeySegments);
 
 				uint32 currKeyRAM = 0;

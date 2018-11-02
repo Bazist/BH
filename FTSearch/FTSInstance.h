@@ -16,6 +16,7 @@
 #include "WordRaiting.h"
 #include "Selector.h"
 #include "QueryResult.h"
+#include "SearchRelPreCalcInfo.h"
 
 class FTSInstance
 {
@@ -153,6 +154,11 @@ public:
 		uint32 maxPage);
 
 	void initSearchRel();
+	void initSearchRel(const char* sourceName, SearchRelPreCalcInfo* pSearchRelPreCalcInfo);
+
+	SearchRelPreCalcInfo* getSearchRelPreCalcInfo(const char* sourceName);
+
+	DocumentsBlock* getDocumentsBlockByWord(const char* word);
 
 	QueryResult* searchQuery(Selector** selectors,
 		uint32 countSelectors,
@@ -221,10 +227,9 @@ public:
 		uint32 minPage,
 		uint32 maxPage);
 
-	void FTSInstance::initAssociativeSearch();
-
-	static int FTSInstance::compareDocumentsCount(HArrayFixPair& pair1,
-												  HArrayFixPair& pair2,
+	static int FTSInstance::compareDocumentsCount(void* pData,
+												  uint32 i,
+												  uint32 pivot,
 												  uint32 countKeySegments);
 
 	static void FTSInstance::swapDocumentsCount(void* pData,
@@ -466,7 +471,7 @@ public:
 	bool checkMemory()
 	{
 		//need memory on buffer
-		uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+		uint32 countKeySegments = Configuration.getCountKeySegments();
 		uint32 needOnBufferMemory = HArrayFixPair::calcArrayMemory(Info.CountWordsRAM, countKeySegments) +
 			HArrayFixPair::calcArrayMemory(MAX_SIZE_BUFFER, countKeySegments);
 
@@ -532,8 +537,6 @@ private:
 	uint32 pAllKeysAndValuesRAMCount;
 
 	SearchRelPreCalcInfo* pSearchRelPreCalcInfos;
-
-	DocumentsBlock** pZooms;
 
 	uint32 tempKey[25];
 
@@ -623,8 +626,7 @@ private:
 
 		pAllKeysAndValuesRAM = 0;
 		pSearchRelPreCalcInfos = 0;
-		pZooms = 0;
-
+		
 		Info.init(Configuration.WordsHeaderBase,
 			Configuration.DocmentNameSize,
 			Configuration.RelevantLevel,

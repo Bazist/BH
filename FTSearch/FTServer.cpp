@@ -88,6 +88,8 @@ RelevantResult* searchPhraseRel(uint32 instanceNumber,
 
 void initSearchRel(uint32 instanceNumber)
 {
+	
+
 	for (uint32 i = 0; i < countInstances; i++)
 	{
 		if (instances[i]->Configuration.InstanceNumber == instanceNumber)

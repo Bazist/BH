@@ -189,7 +189,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 void FTSInstance::buildWiki()
 {
 	uint32 countWords;
-	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+	uint32 countKeySegments = Configuration.getCountKeySegments();
 
 	HArrayFixPair* pKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
@@ -227,17 +227,18 @@ void FTSInstance::buildWiki()
 	HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 }
 
-int FTSInstance::compareDocumentsCount(HArrayFixPair& pair1,
-									   HArrayFixPair& pair2,
+int FTSInstance::compareDocumentsCount(void* pData,
+									   uint32 i,
+									   uint32 pivot,
 									   uint32 countKeySegments)
 {
-	DocumentsBlock* pDocumentsBlock1 = pDocumentsBlockPool->getObject(pair1.Value);
-	DocumentsBlock* pDocumentsBlock2 = pDocumentsBlockPool->getObject(pair2.Value);
+	SearchRelPreCalcInfo* preCalcInfo = (SearchRelPreCalcInfo*)pData;
 
-	if (pDocumentsBlock1->CountDocuments < pDocumentsBlock2->CountDocuments)
+	
+	if (preCalcInfo->CountDocuments[i] < pivot)
 		return -1;
 
-	if (pDocumentsBlock1->CountDocuments > pDocumentsBlock2->CountDocuments)
+	if (preCalcInfo->CountDocuments[i] > pivot)
 		return 1;
 
 	return 0;
@@ -293,107 +294,98 @@ void FTSInstance::readBlocksFromFile(
 	}
 }
 
+DocumentsBlock* FTSInstance::getDocumentsBlockByWord(const char* word)
+{
+	HArrayVisitor::getPartWords(word,
+		strlen(word),
+		tempKey,
+		Configuration.AutoStemmingOn);
+
+	uint32 id = haWordsRAM.getValueByKey(tempKey);
+
+	if (id)
+	{
+		return pDocumentsBlockPool->getObject(id);
+	}
+}
+
+SearchRelPreCalcInfo* FTSInstance::getSearchRelPreCalcInfo(const char* sourceName)
+{
+	if(!sourceName)
+		return &pSearchRelPreCalcInfos[0];
+
+	for (uint32 i = 1; i < 2; i++)
+	{
+		if (!strcmp(pSearchRelPreCalcInfos[i].SourceName, sourceName))
+			return &pSearchRelPreCalcInfos[i];
+	}
+
+	return 0;
+}
+
 void FTSInstance::initSearchRel()
 {
-	uchar8* pSourceBuffer = new uchar8[MAX_SIZE_BUFFER];
-	memset(pSourceBuffer, 0, MAX_SIZE_BUFFER);
+	pSearchRelPreCalcInfos = new SearchRelPreCalcInfo[2];
 
-	ulong64 sourceFilePosition = 1;
-	uint32 sourceBuffPosition = 0;
-	uint32 sourceBuffLength = 0;
+	//initSearchRel(0, &pSearchRelPreCalcInfos[0]);
+	initSearchRel("shabr", &pSearchRelPreCalcInfos[1]);
+	//initSearchRel("sdou", &pSearchRelPreCalcInfos[2]);
+}
 
+void FTSInstance::initSearchRel(const char* sourceName, SearchRelPreCalcInfo* pSearchRelPreCalcInfo)
+{
 	uint32 minDocID = 1;
 	uint32 maxDocID = Info.LastNameIDRAM;
 
 	uint32 countKeySegments = Configuration.getCountKeySegments();
 
-	
-
-	//HArrayFixRAM* pTempHAWordsRAM = 0;
-
 	uint32 minAllowedCount = 25;
 	uint32 maxAllowedCount = Info.CountWordsRAM / 10; //10%
 
-	//save haWordsHDD
-	/*if (Configuration.MemoryMode != IN_MEMORY_MODE && Info.CountWordsHDD)
-	{
-	pTempHAWordsRAM = new HArrayFixRAM();
-
-	char indexPath[1024];
-	Configuration.getIndexPath(indexPath);
-
-	pTempHAWordsRAM->init(indexPath,
-	"",
-	Configuration.AutoStemmingOn,
-	4,
-	Configuration.WordsHeaderBase);
-
-	haWordsHDD.close();
-
-	pTempHAWordsRAM->load();
-
-	uint32 count = pTempHAWordsRAM->getKeysAndValuesByRange(pAllKeysAndValuesRAM,
-	Info.CountWordsHDD,
-	0,
-	0);
-
-	haWordsHDD.open();
-	}*/
-
-	pSearchRelPreCalcInfos = new SearchRelPreCalcInfo[1];
-
 	if (Info.CountWordsRAM)
 	{
-		FilterWordsByDocumentsCount calcCountWords(pDocumentsBlockPool, 0, minAllowedCount, maxAllowedCount, true, countKeySegments);
+		uchar8* pLevelBuffer = 0;
+
+		if (sourceName)
+		{
+			pLevelBuffer = new uchar8[Info.LastNameIDRAM + 1];
+			memset(pLevelBuffer, 0, Info.LastNameIDRAM + 1);
+
+			DocumentsBlock* pDocumentsBlock = getDocumentsBlockByWord(sourceName);
+
+			pDocumentsBlock->markMatchDocuments(pLevelBuffer, 0, 0, MAX_INT);
+		}
+
+		FilterWordsByDocumentsCount calcCountWords(pDocumentsBlockPool, 0, pLevelBuffer, minAllowedCount, maxAllowedCount, true, countKeySegments);
 		haWordsRAM.scanByVisitor(&calcCountWords);
 
-		pSearchRelPreCalcInfos[0].init("Full", calcCountWords.CountWords, countKeySegments);
+		pSearchRelPreCalcInfo->init(sourceName, calcCountWords.CountWords, countKeySegments);
 
-		FilterWordsByDocumentsCount fillCountWords(pDocumentsBlockPool, &pSearchRelPreCalcInfos[0], minAllowedCount, maxAllowedCount, false, countKeySegments);
-		
+		FilterWordsByDocumentsCount fillCountWords(pDocumentsBlockPool, pSearchRelPreCalcInfo, pLevelBuffer, minAllowedCount, maxAllowedCount, false, countKeySegments);
+		haWordsRAM.scanByVisitor(&fillCountWords);
+
+		if (pLevelBuffer)
+		{
+			delete[] pLevelBuffer;
+		}
+
 		//sort by count
-		HArrayFixPairUtils::sort(pSearchRelPreCalcInfos[0].Words,
-								 pSearchRelPreCalcInfos[0].CountWords,
-			true,
-			countKeySegments,
-			compareDocumentsCount,
-			swapDocumentsCount,
-			&fillCountWords);
-
-		//pAllKeysAndValuesRAM = HArrayFixPair::CreateArray(filter.CountWords, countKeySegments);
-		//pAllKeysAndValuesRAMCount = filter.CountWords;
+		HArrayFixPairUtils::sort(pSearchRelPreCalcInfo->CountDocuments,
+								 0,
+								 pSearchRelPreCalcInfo->CountWords - 1,
+								 true,
+								 countKeySegments,
+								 compareDocumentsCount,
+								 swapDocumentsCount,
+								 pSearchRelPreCalcInfo);
 	}
 
-	/*if (pTempHAWordsRAM)
-	{
-	pTempHAWordsRAM->destroy();
-
-	delete pTempHAWordsRAM;
-	}*/
-
-	
-
-	//calc optimal start scan positions
-	/*pStartScanWordsFrom = new uint32[Info.LastNameIDRAM];
-	memset(pStartScanWordsFrom, 0, Info.LastNameIDRAM * sizeof(uint32));
-
-	for (uint32 i = 0; i < pAllKeysAndValuesRAMCount; i++)
-	{
-		DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(pAllKeysAndValuesRAM[i].Value);
-
-		if (!pStartScanWordsFrom[pDocumentsBlock->CountDocuments])
-		{
-			pStartScanWordsFrom[pDocumentsBlock->CountDocuments] = i;
-		}
-	}*/
-
 	//make zooms
-	pZooms = new DocumentsBlock*[pAllKeysAndValuesRAMCount];
 	uint32 step = 10;
 
-	for (uint32 i = 0; i < pAllKeysAndValuesRAMCount; i++)
+	for (uint32 i = 0; i < pSearchRelPreCalcInfo->CountWords; i++)
 	{
-		DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(pAllKeysAndValuesRAM[i].Value);
+		DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(pSearchRelPreCalcInfo->Words[i].Value);
 
 		if (pDocumentsBlock->CountDocuments > step * 10)
 		{
@@ -402,15 +394,13 @@ void FTSInstance::initSearchRel()
 
 			pDocumentsBlock->makeZoom(pZoom, step, minDocID, maxDocID);
 
-			pZooms[i] = pZoom;
+			pSearchRelPreCalcInfo->Zooms[i] = pZoom;
 		}
 		else
 		{
-			pZooms[i] = 0;
+			pSearchRelPreCalcInfo->Zooms[i] = 0;
 		}
 	}
-
-	delete[] pSourceBuffer;
 }
 
 void FTSInstance::searchDistances(WordRaiting& wordRaiting,
@@ -436,27 +426,46 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 	uint32 countTotalDocuments = 0;
 
 	//mark first words
+	SearchRelPreCalcInfo* pSearchRelPreCalcInfo = 0;
 	uint32 level = 0;
+
+	char* searchWord;
 
 	for (uint32 i = 0; i < count; i++, level++)
 	{
-		markMatchDocuments(dics[i].Words[0].Word,
-			pWeightBuffer,
-			pLevelBuffer,
-			level,
-			countUsedDocNumbers,
-			countTotalDocuments,
-			minPage,
-			maxPage);
+		char* word = dics[i].Words[0].Word;
+
+		if (!strcmp(word, "shabr") ||
+		    !strcmp(word, "sdou"))
+		{
+			pSearchRelPreCalcInfo = getSearchRelPreCalcInfo(word);
+		}
+		else
+		{
+			searchWord = word;
+		}
+		
+		markMatchDocuments(word,
+				pWeightBuffer,
+				pLevelBuffer,
+				level,
+				countUsedDocNumbers,
+				countTotalDocuments,
+				minPage,
+				maxPage);
 	}
 
+	if (!pSearchRelPreCalcInfo)
+	{
+		pSearchRelPreCalcInfo = getSearchRelPreCalcInfo(0);
+	}
 
 	//pUsedDocNumbers;
 
 	//level = 1;
 
 	//calculate documents
-	uint32 countDocuments = 0;
+	/*uint32 countDocuments = 0;
 
 	for (uint32 i = 0; i < countUsedDocNumbers; i++)
 	{
@@ -468,36 +477,34 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 		}
 	}
 
-	printf("Count docs: %d\n", countDocuments);
+	printf("Count docs: %d\n", countDocuments);*/
 
 	char tempWord[16];
 	uint32 tempKey[16];
 
 	//dictionary was changed, find new position
-	SearchRelPreCalcInfo* pSearchRelPreCalcInfo = &pSearchRelPreCalcInfos[0];
-
 	uint32 start = 0;
 	uint32 stop = pSearchRelPreCalcInfo->CountWords;
 
-	char* word = dics[0].Words[0].Word;
-
 	uint32 countKeySegments = Configuration.getCountKeySegments();
 
-	HArrayVisitor::getPartWords(word, strlen(word), tempKey, countKeySegments * 4);
+	HArrayVisitor::getPartWords(searchWord, strlen(searchWord), tempKey, countKeySegments * 4);
 
 	for (uint32 i = 0; i < pSearchRelPreCalcInfo->CountWords; i++)
 	{
 		if (pSearchRelPreCalcInfo->Words[i].compareKeys(tempKey, countKeySegments) == 0) //find right word
 		{
-			uint32 countDocuments = pSearchRelPreCalcInfo->CountDocuments[i];
+			countTotalDocuments = pSearchRelPreCalcInfo->CountDocuments[i];
 
-			for (uint32 start = i; start > 0; start--) //find start range
+			for (start = i; start > 0; start--) //find start range
 			{
-				if (pSearchRelPreCalcInfo->CountDocuments[start] < countDocuments)
+				if (pSearchRelPreCalcInfo->CountDocuments[start] < countTotalDocuments)
 				{
 					break;
 				}
 			}
+
+			break;
 		}
 	}
 
@@ -512,7 +519,7 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 		DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(pSearchRelPreCalcInfo->Words[curr].Value);
 
 		uint32 count1 = countTotalDocuments;
-		uint32 count2 = pDocumentsBlock->CountDocuments;
+		uint32 count2 = pSearchRelPreCalcInfo->CountDocuments[curr];
 
 		uint32 maxMatched;
 		uint32 maxCount;
@@ -544,14 +551,14 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 
 			//calc zoom distance
 
-			if (pZooms[curr])
+			if (pSearchRelPreCalcInfo->Zooms[curr])
 			{
-				pZooms[curr]->calcMatchDocuments(pLevelBuffer,
-					level,
-					equals,
-					notEquals,
-					minPage,
-					maxPage);
+				pSearchRelPreCalcInfo->Zooms[curr]->calcMatchDocuments(pLevelBuffer,
+												 level,
+												 equals,
+												 notEquals,
+												 minPage,
+												 maxPage);
 
 				distance = equals * 100 * 20 / maxCount;
 
@@ -593,7 +600,6 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 					curr = start;
 					ascScanning = false;
 				}
-
 			}
 			else
 			{
@@ -2042,7 +2048,7 @@ void FTSInstance::extractDocument(uint32 docNumber,
 
 	if (!pAllKeysAndValuesRAM)
 	{
-		uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+		uint32 countKeySegments = Configuration.getCountKeySegments();
 
 		pAllKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 
@@ -2105,7 +2111,7 @@ RelevantResult* FTSInstance::searchNewMems(uint32 startDate1Year,
 	}
 
 	//always reload new words
-	uint32 countKeySegments = Configuration.AutoStemmingOn >> 2;
+	uint32 countKeySegments = Configuration.getCountKeySegments();
 
 	pAllKeysAndValuesRAM = HArrayFixPair::CreateArray(Info.CountWordsRAM, countKeySegments);
 	pAllKeysAndValuesRAMCount = Info.CountWordsRAM;

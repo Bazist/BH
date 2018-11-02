@@ -1157,6 +1157,114 @@ public:
 		}
 	}
 
+	inline void markMatchDocuments(uchar8* pLevelBuffer,
+		uchar8 level,
+		uint32 minPage,
+		uint32 maxPage)
+	{
+		uint32 currPosition = 0;
+
+		uint32 prevDocNumber = 0;
+
+		BlockMemory* pBlockMemory = pHeadBlockMemory;
+
+		while (true)
+		{
+			uchar8 header = pBlockMemory->pMemory[currPosition];
+
+			//read document number
+			uchar8 leftHeaderPart = (header >> 6);
+			uint32 rightHeaderPart = (header & 0x3F);
+
+			if (leftHeaderPart == 2)
+			{
+				prevDocNumber += rightHeaderPart;
+
+				if (prevDocNumber >= minPage)
+				{
+					if (prevDocNumber > maxPage)
+					{
+						return;
+					}
+
+					//mark documents
+					if (pLevelBuffer[prevDocNumber] == level)
+					{
+						pLevelBuffer[prevDocNumber]++;
+					}
+				}
+
+				//increment currPosition
+				currPosition++;
+
+				if (currPosition == BLOCK_SIZE)
+				{
+					pBlockMemory = pBlockMemory->pNextBlockMemory;
+
+					currPosition = 0;
+				}
+			}
+			else
+			{
+				//increment currPosition
+				currPosition++;
+
+				if (currPosition == BLOCK_SIZE)
+				{
+					pBlockMemory = pBlockMemory->pNextBlockMemory;
+
+					currPosition = 0;
+				}
+
+				uint32 sizeNumber = leftHeaderPart + 1;
+				uint32 deltaDocNumber = 0;
+
+				for (uint32 i = 0; i < sizeNumber; i++)
+				{
+					deltaDocNumber = (deltaDocNumber << 8) | (uchar8)pBlockMemory->pMemory[currPosition];
+
+					//increment currPosition
+					currPosition++;
+
+					if (currPosition == BLOCK_SIZE)
+					{
+						pBlockMemory = pBlockMemory->pNextBlockMemory;
+
+						currPosition = 0;
+					}
+				}
+
+				prevDocNumber += deltaDocNumber;
+
+				//mark documents
+				for (uint32 i = 0; i < rightHeaderPart; i++, prevDocNumber++)
+				{
+					if (prevDocNumber >= minPage)
+					{
+						if (prevDocNumber > maxPage)
+						{
+							return;
+						}
+
+						//mark documents
+						if (pLevelBuffer[prevDocNumber] == level)
+						{
+							pLevelBuffer[prevDocNumber]++;
+						}
+					}
+				}
+
+				prevDocNumber--;
+			}
+
+			if (pBlockMemory->pMemory[currPosition] == 0
+				|| (pBlockMemory->pNextBlockMemory == 0 && currPosition == CurrentSize))
+			{
+				return; //is last document
+			}
+		}
+	}
+
 	inline void markSelectorDocuments(PostSelector* pPostSelectorBuffer,
 									  uint32* pUsedDocNumbers,
 									  uint32& countUsedDocNumbers,
