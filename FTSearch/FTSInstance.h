@@ -125,7 +125,8 @@ public:
 
 	void searchMatch(WordRaiting& wordRaiting,
 		Dictionary& dictionary,
-		uint32 count,
+		uchar8* pLevelBuffer,
+		uint32 level,
 		uint32 minPage,
 		uint32 maxPage,
 		uchar8* excluded);
@@ -223,7 +224,8 @@ public:
 
 	void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 		Dictionary* dics,
-		uint32 count,
+		uchar8* pLevelBuffer,
+		uint32 countWords,
 		uint32 minPage,
 		uint32 maxPage);
 

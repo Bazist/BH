@@ -122,6 +122,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 				countUsedDocNumbers,
 				1,
 				level,
+				true,
 				minPage,
 				maxPage);
 
@@ -175,6 +176,7 @@ void FTSInstance::markMatchDocuments(const char* word,
 				countUsedDocNumbers,
 				1,
 				level,
+				true,
 				minPage,
 				maxPage);
 
@@ -342,10 +344,10 @@ void FTSInstance::initSearchRel(const char* sourceName, SearchRelPreCalcInfo* pS
 	uint32 minAllowedCount = 25;
 	uint32 maxAllowedCount = Info.CountWordsRAM / 10; //10%
 
+	uchar8* pLevelBuffer = 0;
+
 	if (Info.CountWordsRAM)
 	{
-		uchar8* pLevelBuffer = 0;
-
 		if (sourceName)
 		{
 			pLevelBuffer = new uchar8[Info.LastNameIDRAM + 1];
@@ -364,11 +366,6 @@ void FTSInstance::initSearchRel(const char* sourceName, SearchRelPreCalcInfo* pS
 		FilterWordsByDocumentsCount fillCountWords(pDocumentsBlockPool, pSearchRelPreCalcInfo, pLevelBuffer, minAllowedCount, maxAllowedCount, false, countKeySegments);
 		haWordsRAM.scanByVisitor(&fillCountWords);
 
-		if (pLevelBuffer)
-		{
-			delete[] pLevelBuffer;
-		}
-
 		//sort by count
 		HArrayFixPairUtils::sort(pSearchRelPreCalcInfo->CountDocuments,
 								 0,
@@ -385,14 +382,16 @@ void FTSInstance::initSearchRel(const char* sourceName, SearchRelPreCalcInfo* pS
 
 	for (uint32 i = 0; i < pSearchRelPreCalcInfo->CountWords; i++)
 	{
-		DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(pSearchRelPreCalcInfo->Words[i].Value);
+		uint32 countDocuments = pSearchRelPreCalcInfo->CountDocuments[i];
 
-		if (pDocumentsBlock->CountDocuments > step * 10)
+		if (countDocuments > step * 10)
 		{
 			uint32 id;
 			DocumentsBlock* pZoom = pDocumentsBlockPool->newObject(id);
 
-			pDocumentsBlock->makeZoom(pZoom, step, minDocID, maxDocID);
+			DocumentsBlock* pDocumentsBlock = pDocumentsBlockPool->getObject(pSearchRelPreCalcInfo->Words[i].Value);
+
+			pDocumentsBlock->makeZoom(pZoom, pLevelBuffer, 1, step, minDocID, maxDocID);
 
 			pSearchRelPreCalcInfo->Zooms[i] = pZoom;
 		}
@@ -401,11 +400,17 @@ void FTSInstance::initSearchRel(const char* sourceName, SearchRelPreCalcInfo* pS
 			pSearchRelPreCalcInfo->Zooms[i] = 0;
 		}
 	}
+
+	if (pLevelBuffer)
+	{
+		delete[] pLevelBuffer;
+	}
 }
 
 void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 	Dictionary* dics,
-	uint32 count,
+	uchar8* pLevelBuffer,
+	uint32 countWords,
 	uint32 minPage,
 	uint32 maxPage)
 {
@@ -417,21 +422,17 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 
 	//1. Parse phrase
 	int* pWeightBuffer = new int[Info.LastNameIDRAM + 1];
-	uchar8* pLevelBuffer = new uchar8[Info.LastNameIDRAM + 1];
-
 	memset(pWeightBuffer, 0, sizeof(int) * (Info.LastNameIDRAM + 1));
-	memset(pLevelBuffer, 0, Info.LastNameIDRAM + 1);
 
 	uint32 countUsedDocNumbers = 0;
 	uint32 countTotalDocuments = 0;
 
 	//mark first words
 	SearchRelPreCalcInfo* pSearchRelPreCalcInfo = 0;
-	uint32 level = 0;
-
+	
 	char* searchWord;
 
-	for (uint32 i = 0; i < count; i++, level++)
+	for (uint32 i = 0; i < countWords; i++)
 	{
 		char* word = dics[i].Words[0].Word;
 
@@ -448,7 +449,7 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 		markMatchDocuments(word,
 				pWeightBuffer,
 				pLevelBuffer,
-				level,
+				i,
 				countUsedDocNumbers,
 				countTotalDocuments,
 				minPage,
@@ -554,7 +555,7 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 			if (pSearchRelPreCalcInfo->Zooms[curr])
 			{
 				pSearchRelPreCalcInfo->Zooms[curr]->calcMatchDocuments(pLevelBuffer,
-												 level,
+												 countWords,
 												 equals,
 												 notEquals,
 												 minPage,
@@ -577,7 +578,7 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 
 				//calc original distance
 				pDocumentsBlock->calcMatchDocuments(pLevelBuffer,
-					level,
+					countWords,
 					equals,
 					notEquals,
 					minPage,
@@ -630,7 +631,6 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 	//fclose(file);
 
 	delete[] pWeightBuffer;
-	delete[] pLevelBuffer;
 
 	//HArrayFixPair::DeleteArray(pKeysAndValuesRAM);
 }
@@ -843,7 +843,8 @@ void FTSInstance::relevantMatch(Dictionary& dictionary)
 
 void FTSInstance::searchMatch(WordRaiting& docRaiting,
 	Dictionary& dictionary,
-	uint32 count,
+	uchar8* pLevelBuffer,
+	uint32 level,
 	uint32 minPage,
 	uint32 maxPage,
 	uchar8* excluded)
@@ -857,11 +858,9 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 	uint32 countUsedDocNumbers = 0;
 
 	int* pWeightBuffer = new int[Info.LastNameIDRAM];
-	uchar8* pLevelBuffer = new uchar8[Info.LastNameIDRAM];
-
+	
 	memset(pWeightBuffer, 0, sizeof(int) * Info.LastNameIDRAM);
-	memset(pLevelBuffer, 0, Info.LastNameIDRAM);
-
+	
 	/*
 	uint32 level;
 	for(level=0; level < count; level++)
@@ -893,7 +892,8 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 					pUsedDocNumbers,
 					countUsedDocNumbers,
 					dicWord.Weight,
-					0,
+					level,
+					false,
 					minPage,
 					maxPage);
 			}
@@ -944,6 +944,7 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 					countUsedDocNumbers,
 					dicWord.Weight,
 					0,
+					false,
 					minPage,
 					maxPage);
 
@@ -965,7 +966,7 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 		{
 			//pWeightBuffer[usedDocNumber] > maxWeight &&
 
-			if (pLevelBuffer[usedDocNumber] == 1)
+			if (pLevelBuffer[usedDocNumber] == level)
 			{
 				docRaiting.addWord(usedDocNumber, pWeightBuffer[usedDocNumber]);
 
@@ -993,7 +994,6 @@ void FTSInstance::searchMatch(WordRaiting& docRaiting,
 	pResult->Matches[0] = maxPage;*/
 
 	delete[] pWeightBuffer;
-	delete[] pLevelBuffer;
 }
 
 RelevantResult* FTSInstance::searchPhrase(const char* phrase,
@@ -1596,10 +1596,15 @@ RelevantResult* FTSInstance::searchPhraseRel(const char* phrase,
 	//2. Search distances
 	//for(uint32 i=0; i<countWords; i++)
 	//{
+
+	uchar8* pLevelBuffer = new uchar8[Info.LastNameIDRAM + 1];
+	memset(pLevelBuffer, 0, Info.LastNameIDRAM + 1);
+	
 	WordRaiting wordRaiting(25); //top 25 words
 
 	searchDistances(wordRaiting,
 		dics,
+		pLevelBuffer,
 		countWords,
 		minPage,
 		maxPage);
@@ -1620,12 +1625,16 @@ RelevantResult* FTSInstance::searchPhraseRel(const char* phrase,
 
 	searchMatch(docRaiting,
 		wordRaiting.dictionary,
+		pLevelBuffer,
 		countWords,
 		minPage,
 		maxPage,
 		0);
 
+	
 	docRaiting.dictionary.sortByWeight(false);
+
+	delete[] pLevelBuffer;
 
 	//4. Fill the result
 	/*for(uint32 i=0; i < wr.dictionary.Count; i++)
