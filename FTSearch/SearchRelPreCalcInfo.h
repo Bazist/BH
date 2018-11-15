@@ -16,7 +16,7 @@ public:
 	void init(const char* sourceName, uint32 countWords, uint32 countKeySegments)
 	{
 		strcpy(SourceName, sourceName);
-
+		
 		Words = HArrayFixPair::CreateArray(countWords, countKeySegments);
 		CountDocuments = new uint32[countWords];
 		Zooms = new DocumentsBlock*[countWords];

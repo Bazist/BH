@@ -40,37 +40,19 @@ namespace BH.BoobenRobot
         {
             List<Page> pages = new List<Page>();
 
-            for (int i = 401386; i < 421214; i++)
+            List<string> docs = ExtractByRegexp(page.HtmlContent, "id=\"post_(?<num>[0-9]+)\"");
+
+            List<string> labels = this.GetParts(page.HtmlContent, "<span class=\"post-stats__comments", "</span>");
+
+            if (docs.Count == labels.Count)
             {
-                string url = GetUrlByDocNumber(i.ToString(), 1, null);
+                for (int i = docs.Count - 1; i >= 0; i--)
+                {
+                    string url = GetUrlByDocNumber(docs[i], 1, null);
 
-                CheckLabelAndAddPage(pages, url, DateTime.Now.ToString());
+                    CheckLabelAndAddPage(pages, url, labels[i]);
+                }
             }
-
-            //List<string> docs = ExtractByRegexp(page.HtmlContent, "id=\"post_(?<num>[0-9]+)\"");
-
-            ////List<string> labels = ExtractByRegexp(page.HtmlContent, "<span class=\"all\">(?<num>[0-9а-яА-Я]+)</span>");
-
-            //List<string> parts = this.GetParts(page.HtmlContent, "<div class=\"post-comments\">", "</div>");
-
-            //if (docs.Count == parts.Count)
-            //{
-            //for (int i = docs.Count - 1; i >= 0; i--)
-            //    {
-            //        string url = GetUrlByDocNumber(docs[i], 1, null);
-
-                    //var labels = this.ExtractByRegexp(parts[i], ">(?<num>[0-9]+)<");
-
-                    //if (labels.Count > 0)
-                    //{
-                    //    CheckLabelAndAddPage(pages, url, labels[0]);
-                    //}
-                    //else
-                    //{
-                    //    CheckLabelAndAddPage(pages, url, "0");
-                    //}
-            //   }
-            //}
 
             return pages;
         }
@@ -79,7 +61,7 @@ namespace BH.BoobenRobot
         {
             //content
             page.FileContent = GetMessages("<article", "</article>", "article", page.HtmlContent);
-            
+
             page.FileContent += " " + GetMessages("<div class=\"comments-section\"", "</div>", "div", page.HtmlContent, out page.CountMessages);
 
             //check load next page

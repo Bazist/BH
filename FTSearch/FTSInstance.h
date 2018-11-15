@@ -539,6 +539,7 @@ private:
 	uint32 pAllKeysAndValuesRAMCount;
 
 	SearchRelPreCalcInfo* pSearchRelPreCalcInfos;
+	uint32 searchRelPreCalcInfosCount;
 
 	uint32 tempKey[25];
 
@@ -628,6 +629,7 @@ private:
 
 		pAllKeysAndValuesRAM = 0;
 		pSearchRelPreCalcInfos = 0;
+		searchRelPreCalcInfosCount = 0;
 		
 		Info.init(Configuration.WordsHeaderBase,
 			Configuration.DocmentNameSize,

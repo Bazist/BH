@@ -313,10 +313,7 @@ DocumentsBlock* FTSInstance::getDocumentsBlockByWord(const char* word)
 
 SearchRelPreCalcInfo* FTSInstance::getSearchRelPreCalcInfo(const char* sourceName)
 {
-	if(!sourceName)
-		return &pSearchRelPreCalcInfos[0];
-
-	for (uint32 i = 1; i < 2; i++)
+	for (uint32 i = 0; i < searchRelPreCalcInfosCount; i++)
 	{
 		if (!strcmp(pSearchRelPreCalcInfos[i].SourceName, sourceName))
 			return &pSearchRelPreCalcInfos[i];
@@ -327,11 +324,13 @@ SearchRelPreCalcInfo* FTSInstance::getSearchRelPreCalcInfo(const char* sourceNam
 
 void FTSInstance::initSearchRel()
 {
-	pSearchRelPreCalcInfos = new SearchRelPreCalcInfo[2];
+	pSearchRelPreCalcInfos = new SearchRelPreCalcInfo[3];
 
-	//initSearchRel(0, &pSearchRelPreCalcInfos[0]);
+	initSearchRel("full", &pSearchRelPreCalcInfos[0]);
 	initSearchRel("shabr", &pSearchRelPreCalcInfos[1]);
-	//initSearchRel("sdou", &pSearchRelPreCalcInfos[2]);
+	initSearchRel("sdou", &pSearchRelPreCalcInfos[2]);
+
+	searchRelPreCalcInfosCount = 3;
 }
 
 void FTSInstance::initSearchRel(const char* sourceName, SearchRelPreCalcInfo* pSearchRelPreCalcInfo)
@@ -436,13 +435,14 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 	{
 		char* word = dics[i].Words[0].Word;
 
-		if (!strcmp(word, "shabr") ||
-		    !strcmp(word, "sdou"))
+		SearchRelPreCalcInfo* pCurrSearchRelPreCalcInfo = getSearchRelPreCalcInfo(word);
+
+		if (pCurrSearchRelPreCalcInfo)
 		{
-			pSearchRelPreCalcInfo = getSearchRelPreCalcInfo(word);
+			pSearchRelPreCalcInfo = pCurrSearchRelPreCalcInfo;
 		}
 		else
-		{
+		{ 
 			searchWord = word;
 		}
 		
@@ -458,7 +458,7 @@ void FTSInstance::searchDistances(WordRaiting& wordRaiting,
 
 	if (!pSearchRelPreCalcInfo)
 	{
-		pSearchRelPreCalcInfo = getSearchRelPreCalcInfo(0);
+		pSearchRelPreCalcInfo = getSearchRelPreCalcInfo("full");
 	}
 
 	//pUsedDocNumbers;
