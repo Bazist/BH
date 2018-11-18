@@ -86,6 +86,7 @@ namespace BH.WinService
 
                 conf.SetIndexPath(directory);
                 conf.LimitUsedMemory = ulong.Parse(ConfigurationManager.AppSettings["LimitUsedMemory"]);
+                conf.MemoryMode = bool.Parse(ConfigurationManager.AppSettings["InMemoryMode"]) ? (uint)FTSearch.MemoryMode.InMemory : (uint)FTSearch.MemoryMode.HDD;
 
                 _fts.SetConfiguration(conf);
 

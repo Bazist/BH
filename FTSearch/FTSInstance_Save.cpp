@@ -1981,6 +1981,12 @@ void FTSInstance::saveIndex()
 
 				Info.clear();
 			}
+
+			pBlockMemoryPool->clear();
+			pDocumentsBlockPool->clear();
+			pDocumentsInfoPool->clear();
+			pRelevantResultPool->clear();
+			pPostSelectorPool->clear();
 		}
 
 		needSaveIndex = false;

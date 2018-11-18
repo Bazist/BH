@@ -29,22 +29,22 @@ namespace BH.BoobenRobot
 
             BH.BoobenRobot.Site.Sites = new List<Site>();
 
-            //BH.BoobenRobot.Site.Sites.Add(new PravdaSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new KhafSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new SearchengineSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new DouSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new GamedevSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new PravdaSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new KhafSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new SearchengineSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new DouSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new GamedevSite(service));
             BH.BoobenRobot.Site.Sites.Add(new HabrSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new GotaiSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new SqlSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new SevasSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new SkcSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new VeloSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new IxbtSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new AutouaSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new FinSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new GratisSite(service));
-            //BH.BoobenRobot.Site.Sites.Add(new CyberSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new GotaiSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new SqlSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new SevasSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new SkcSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new VeloSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new IxbtSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new AutouaSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new FinSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new GratisSite(service));
+            BH.BoobenRobot.Site.Sites.Add(new CyberSite(service));
         }
 
         private class IndexContent
@@ -531,38 +531,38 @@ namespace BH.BoobenRobot
             //IndexFiles();
 
             //index current period
-            //ThreadPool.QueueUserWorkItem(x =>
-            //{
-            //    var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            ThreadPool.QueueUserWorkItem(x =>
+            {
+                var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
-            //    DBHelpers.GetPages(IndexFile, null, startDate, startDate.AddMonths(1));
-            //});
+                DBHelpers.GetPages(IndexFile, null, startDate, startDate.AddMonths(1));
+            });
 
-            //Thread.Sleep(500);
+            Thread.Sleep(500);
 
-            //this.IndexEqueue();
+            this.IndexEqueue();
 
-            _service.InitSearchRel();
+            //_service.InitSearchRel();
 
-            //try
-            //{
-            //    //run spiders
-            //    foreach (Site site in BH.BoobenRobot.Site.Sites)
-            //    {
-            //        //site.LoadLabels();
+            try
+            {
+                //run spiders
+                foreach (Site site in BH.BoobenRobot.Site.Sites)
+                {
+                    //site.LoadLabels();
 
-            //        ThreadPool.QueueUserWorkItem(x => site.Run());
-            //    }
+                    ThreadPool.QueueUserWorkItem(x => site.Run());
+                }
 
-            //    //refresh interface
-            //    UpdateStat();
+                //refresh interface
+                UpdateStat();
 
-            //    ThreadPool.QueueUserWorkItem(new WaitCallback(this.UpdateStat));
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logError(ex.Message);
-            //}
+                ThreadPool.QueueUserWorkItem(new WaitCallback(this.UpdateStat));
+            }
+            catch (Exception ex)
+            {
+                _logError(ex.Message);
+            }
         }
 
         private void IndexPrevMonth()

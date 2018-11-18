@@ -483,17 +483,11 @@ public:
 			{
 				if (Configuration.MemoryMode == IN_MEMORY_MODE)
 				{
-					logWarning("WARNING: Limit of used memory exceed. InMemoryMode of the server is reset.");
-					Configuration.MemoryMode = HDD_BUFFERED_MEMORY_MODE;
+					logWarning("WARNING: Limit of used memory exceeded. InMemoryMode of the server is resetted.");
+					Configuration.MemoryMode = HDD_MEMORY_MODE;
 				}
 
 				this->saveIndex();
-
-				pBlockMemoryPool->clear();
-				pDocumentsBlockPool->clear();
-				pDocumentsInfoPool->clear();
-				pRelevantResultPool->clear();
-				pPostSelectorPool->clear();
 			}
 
 			return true;

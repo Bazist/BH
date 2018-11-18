@@ -522,6 +522,38 @@ namespace BH.WCF
         }
 
         [OperationContract]
+        public bool IndexFile(string documentName,
+                              string documentVersion,
+                              string filePath,
+                              string robotName)
+        {
+            return TryCatch<bool>(() =>
+            {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
+
+                var docName = new DocumentName(documentName, documentVersion, robotName);
+
+                var contentText = File.ReadAllText(filePath, Encoding.GetEncoding("windows-1251"));
+
+                if (contentText.Length > 65000)
+                {
+                    contentText = contentText.Substring(0, 65000);
+                }
+
+                return ActiveInstance.IndexContent(docName.ToString(), contentText, FTSearch.ContentType.Text);
+
+                //{
+                //    foreach (var file in IndexedFilesInMemory)
+                //    {
+                //        File.AppendAllText(string.Format(@"{0}\log.txt", Path),
+                //                           string.Format(@"[{0}] {1}", DateTime.Now.ToString(), file));
+                //    }
+                //}
+            });
+        }
+
+        [OperationContract]
         public void SaveIndex()
         {
             TryCatch(() =>
@@ -840,7 +872,7 @@ namespace BH.WCF
                 var basicHttpBinding = new BasicHttpBinding();
                 basicHttpBinding.MaxReceivedMessageSize = int.MaxValue;
                 basicHttpBinding.MaxBufferSize = int.MaxValue;
-
+                
                 var smb = new ServiceMetadataBehavior();
                 smb.HttpGetEnabled = true;
                 smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
