@@ -324,13 +324,15 @@ SearchRelPreCalcInfo* FTSInstance::getSearchRelPreCalcInfo(const char* sourceNam
 
 void FTSInstance::initSearchRel()
 {
-	pSearchRelPreCalcInfos = new SearchRelPreCalcInfo[3];
+	SearchRelPreCalcInfo* pNewSearchRelPreCalcInfos = new SearchRelPreCalcInfo[3];
 
 	initSearchRel("full", &pSearchRelPreCalcInfos[0]);
 	initSearchRel("shabr", &pSearchRelPreCalcInfos[1]);
 	initSearchRel("sdou", &pSearchRelPreCalcInfos[2]);
 
 	searchRelPreCalcInfosCount = 3;
+
+	pSearchRelPreCalcInfos = pNewSearchRelPreCalcInfos;
 }
 
 void FTSInstance::initSearchRel(const char* sourceName, SearchRelPreCalcInfo* pSearchRelPreCalcInfo)

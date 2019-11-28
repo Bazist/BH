@@ -399,6 +399,9 @@ namespace BH.WCF
         {
             return TryCatch(() =>
             {
+                if (phrase.Replace("shabr", "").Replace("sdou", "").Trim().Split(' ').Length > 1)
+                    throw new InvalidOperationException("Query format: shabr text OR sdou text OR text");
+
                 return GetPortion(ref skip,
                                       take,
                                       fts => fts.SearchPhraseRel(phrase,

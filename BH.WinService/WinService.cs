@@ -90,7 +90,14 @@ namespace BH.WinService
 
                 _fts.SetConfiguration(conf);
 
-                _fts.Start();
+                ThreadPool.QueueUserWorkItem
+                (
+                    x =>
+                    {
+                        _fts.Start();
+                        _fts.InitSearchRel();
+                    }
+                );
 
                 FTService.StartWebservice(_fts,
                                           ConfigurationManager.AppSettings["URL"],
