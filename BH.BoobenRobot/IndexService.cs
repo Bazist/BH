@@ -521,15 +521,8 @@ namespace BH.BoobenRobot
             }
         }
 
-        public void Run()
+        public void IndexCurrentMonth()
         {
-            //IndexPrevMonth();
-            //ArchivePrevMonth();
-            //return;
-
-            //index files
-            //IndexFiles();
-
             //index current period
             ThreadPool.QueueUserWorkItem(x =>
             {
@@ -538,12 +531,13 @@ namespace BH.BoobenRobot
                 DBHelpers.GetPages(IndexFile, null, startDate, startDate.AddMonths(1));
             });
 
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
             this.IndexEqueue();
+        }
 
-            //_service.InitSearchRel();
-
+        public void RunRobots()
+        {
             try
             {
                 //run spiders

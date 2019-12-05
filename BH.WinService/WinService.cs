@@ -95,7 +95,20 @@ namespace BH.WinService
                     x =>
                     {
                         _fts.Start();
-                        _fts.InitSearchRel();
+                        
+                        if (bool.Parse(ConfigurationManager.AppSettings["BoobenMode"]))
+                        {
+                            StartBoobenRobots();
+                        }
+                        else
+                        {
+                            StartRobots();
+                        }
+
+                        if (bool.Parse(ConfigurationManager.AppSettings["EnableRelSearch"]))
+                        {
+                            _fts.InitSearchRel();
+                        }
                     }
                 );
 
@@ -135,36 +148,39 @@ namespace BH.WinService
             }
         }
 
-        private static Thread _boobenJob;
         private void StartBoobenRobots()
         {
-            if (bool.Parse(ConfigurationManager.AppSettings["EnableRobots"]))
+            var enableRobots = bool.Parse(ConfigurationManager.AppSettings["EnableRobots"]);
+            var indexCurrentMonth = bool.Parse(ConfigurationManager.AppSettings["IndexCurrentMonth"]);
+
+            if (enableRobots || indexCurrentMonth)
             {
                 WriteLog("Start Job", EventLogEntryType.Information);
 
-                _boobenJob = new Thread(() =>
+                try
                 {
-                    try
-                    {
-                        IndexService indexService = new IndexService(_fts,
-                                                                     x => WriteLog(x, EventLogEntryType.Error),
-                                                                     x => Debug.WriteLine(x));
+                    IndexService indexService = new IndexService(_fts,
+                                                                 x => WriteLog(x, EventLogEntryType.Error),
+                                                                 x => Debug.WriteLine(x));
 
-                        indexService.Run();
+                    if (indexCurrentMonth)
+                    {
+                        indexService.IndexCurrentMonth();
                     }
-                    catch (Exception ex)
+
+                    if (enableRobots)
                     {
-                        WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
-
-                        Stop();
-
-                        throw ex;
+                        indexService.RunRobots();
                     }
                 }
-                );
+                catch (Exception ex)
+                {
+                    WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
 
-                _boobenJob.Start();
-                _boobenJob.IsBackground = true;
+                    Stop();
+
+                    throw ex;
+                }
 
                 WriteLog("Job Started.", EventLogEntryType.Information);
             }
@@ -192,15 +208,6 @@ namespace BH.WinService
         protected override void OnStart(string[] args)
         {
             StartService();
-
-            if (bool.Parse(ConfigurationManager.AppSettings["BoobenMode"]))
-            {
-                StartBoobenRobots();
-            }
-            else
-            {
-                StartRobots();
-            }
         }
 
         protected override void OnStop()
@@ -210,11 +217,6 @@ namespace BH.WinService
             //start web service
             try
             {
-                if (_boobenJob != null)
-                {
-                    _boobenJob.Abort();
-                }
-
                 if (_robots != null)
                 {
                     foreach (var robot in _robots)

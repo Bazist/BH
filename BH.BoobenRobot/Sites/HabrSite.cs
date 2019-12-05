@@ -40,19 +40,31 @@ namespace BH.BoobenRobot
         {
             List<Page> pages = new List<Page>();
 
-            List<string> docs = ExtractByRegexp(page.HtmlContent, "id=\"post_(?<num>[0-9]+)\"");
-
-            List<string> labels = this.GetParts(page.HtmlContent, "<span class=\"post-stats__comments", "</span>");
-
-            if (docs.Count == labels.Count)
+            for (int i = 17365; i < 478134; i++)
             {
-                for (int i = docs.Count - 1; i >= 0; i--)
+                pages.Add(new Page()
                 {
-                    string url = GetUrlByDocNumber(docs[i], 1, null);
-
-                    CheckLabelAndAddPage(pages, url, labels[i]);
-                }
+                    DashboardURL = null,
+                    DashboardID = null,
+                    URL = GetUrlByDocNumber(i.ToString(), 1, null),
+                    DocNumber = i.ToString(),
+                    PageNumber = 1
+                });
             }
+
+            //List<string> docs = ExtractByRegexp(page.HtmlContent, "id=\"post_(?<num>[0-9]+)\"");
+
+            //List<string> labels = this.GetParts(page.HtmlContent, "<span class=\"post-stats__comments", "</span>");
+
+            //if (docs.Count == labels.Count)
+            //{
+            //    for (int i = docs.Count - 1; i >= 0; i--)
+            //    {
+            //        string url = GetUrlByDocNumber(docs[i], 1, null);
+
+            //        CheckLabelAndAddPage(pages, url, labels[i]);
+            //    }
+            //}
 
             return pages;
         }
@@ -60,9 +72,11 @@ namespace BH.BoobenRobot
         protected override void OnPageLoaded(Page page)
         {
             //content
-            page.FileContent = GetMessages("<article", "</article>", "article", page.HtmlContent);
+            page.FileContent = GetMessages("<div class=\"post__body post__body_full\">", "</div>", "div", page.HtmlContent);
 
-            page.FileContent += " " + GetMessages("<div class=\"comments-section\"", "</div>", "div", page.HtmlContent, out page.CountMessages);
+            var comments = " " + GetMessages("<div class=\"comment__message \">", "</div>", "div", page.HtmlContent, out page.CountMessages);
+
+            page.FileContent += comments;
 
             //check load next page
             page.NeedLoadNextPage = false;

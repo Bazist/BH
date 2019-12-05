@@ -762,6 +762,7 @@ namespace BH.Tests
         private void button3_Click_1(object sender, EventArgs e)
         {
             var hs = new HabrSite(null);
+
             hs.Run();
         }
     }
