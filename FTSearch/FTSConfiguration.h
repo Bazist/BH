@@ -11,8 +11,7 @@ public:
 		AutoStemmingOn = 8; //change HArrayFixPair
 
 		WordsHeaderBase = 24;
-		DocmentNameSize = 64;
-
+		
 		IsUseUkranianAlphabet = true;
 		IsUseRussianAlphabet = true;
 		IsUseEnglishAlphabet = true;
@@ -106,8 +105,6 @@ public:
 
 	uint32 WordsHeaderBase;
 	
-	uint32 DocmentNameSize;
-
 	uint32 LimitTopResults;
 	ulong64 LimitUsedMemory;
 	

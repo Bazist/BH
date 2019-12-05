@@ -328,12 +328,12 @@ void FTSInstance::initSearchRel()
 
 	SearchRelPreCalcInfo* pNewSearchRelPreCalcInfos = new SearchRelPreCalcInfo[count];
 
-	initSearchRel("full", &pSearchRelPreCalcInfos[0]);
-	initSearchRel("shabr", &pSearchRelPreCalcInfos[1]);
-	initSearchRel("sdou", &pSearchRelPreCalcInfos[2]);
-	initSearchRel("spravda", &pSearchRelPreCalcInfos[3]);
-	initSearchRel("ssearch", &pSearchRelPreCalcInfos[4]);
-	initSearchRel("skhaf", &pSearchRelPreCalcInfos[5]);
+	initSearchRel("full", &pNewSearchRelPreCalcInfos[0]);
+	initSearchRel("shabr", &pNewSearchRelPreCalcInfos[1]);
+	initSearchRel("sdou", &pNewSearchRelPreCalcInfos[2]);
+	initSearchRel("spravda", &pNewSearchRelPreCalcInfos[3]);
+	initSearchRel("ssearch", &pNewSearchRelPreCalcInfos[4]);
+	initSearchRel("skhaf", &pNewSearchRelPreCalcInfos[5]);
 
 	searchRelPreCalcInfosCount = 6;
 
@@ -1344,7 +1344,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 	}
 	else
 	{
-		char* pPrevName = new char[Info.DocumentNameSize];
+		char* pPrevName = new char[1024];
 		char* pName = 0;
 
 		for (int i = 0; i < countResultDocNumbers; i++)
@@ -1353,7 +1353,7 @@ RelevantResult* FTSInstance::searchPhrase(const char* phrase,
 
 			pName = pResult->Matches[pResult->CountMatches];
 
-			getDocumentNameByID(id, pName, Info.DocumentNameSize);
+			getDocumentNameByID(id, pName, 1024);
 
 			if (templateNameLen == 0 || wildCardCompare(templateName, pName))
 			{
@@ -1652,7 +1652,7 @@ RelevantResult* FTSInstance::searchPhraseRel(const char* phrase,
 
 	for (uint32 i = 0; i < docRaiting.dictionary.Count; i++)
 	{
-		getDocumentNameByID(docRaiting.dictionary.Words[i].DocID, pResult->Matches[i], Info.DocumentNameSize);
+		getDocumentNameByID(docRaiting.dictionary.Words[i].DocID, pResult->Matches[i], MAX_DOC_NAME_LENGTH);
 
 		pResult->CountMatches++;
 	}

@@ -172,6 +172,8 @@ public:
 
 	const char* getFilePath();
 
+	void loadIntoRAM();
+
 	~BinaryFile();
 };
 

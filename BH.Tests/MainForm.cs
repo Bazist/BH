@@ -202,7 +202,7 @@ namespace BH.Tests
                                   "LastNameIDHDD: " + info.LastNameIDHDD.ToString() + "\n" +
                                   "CountWordsRAM: " + info.CountWordsRAM.ToString() + "\n" +
                                   "CountWordsHDD: " + info.CountWordsHDD.ToString() + "\n" +
-                                  "DocumentNameSize: " + info.DocumentNameSize.ToString() + "\n" +
+                                  //"DocumentNameSize: " + info.DocumentNameSize.ToString() + "\n" +
                                   "WordsHeaderBase: " + info.WordsHeaderBase.ToString() + "\n" +
                                   "LastErrorMessage: " + info.LastErrorMessage.ToString() + "\n";
 
@@ -219,9 +219,9 @@ namespace BH.Tests
         {
             bool res = false;
 
-            if (name.Length > FTSearch.DOC_NAME_LENGTH - 1)
+            if (name.Length > FTSearch.MAX_DOC_NAME_LENGTH - 1)
             {
-                name = name.Substring(0, FTSearch.DOC_NAME_LENGTH - 1);
+                name = name.Substring(0, FTSearch.MAX_DOC_NAME_LENGTH - 1);
             }
 
             try

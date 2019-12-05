@@ -375,7 +375,7 @@ namespace BH.BoobenRobot
                                   "LastNameIDHDD: " + info.LastNameIDHDD.ToString() + ";\r\n" +
                                   "CountWordsRAM: " + info.CountWordsRAM.ToString() + ";\r\n" +
                                   "CountWordsHDD: " + info.CountWordsHDD.ToString() + ";\r\n" +
-                                  "DocumentNameSize: " + info.DocumentNameSize.ToString() + ";\r\n" +
+                                  //"DocumentNameSize: " + info.DocumentNameSize.ToString() + ";\r\n" +
                                   "WordsHeaderBase: " + info.WordsHeaderBase.ToString() + ";\r\n" +
                                   "LastErrorMessage: " + info.LastErrorMessage.ToString() + ";\r\n";
                 }

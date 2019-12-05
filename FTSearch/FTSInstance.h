@@ -10,7 +10,7 @@
 #include "FTSConfiguration.h"
 #include "FTSInstanceInfo.h"
 #include "RelevantResult.h"
-#include "DocumentsName.h"
+#include "DocumentsNameTextFile.h"
 #include "DocumentsDict.h"
 #include "Dictionary.h"
 #include "WordRaiting.h"
@@ -301,10 +301,16 @@ public:
 		if (!checkStartedInstance(true))
 			return;
 
+		documentsName.getDocumentName(id, name, sizeName);
+
+		/*
+		uint32 docHeaderSize = getDocHeaderSize();
+
 		if (Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
-			uint32 offset = (id - 1) * Info.DocumentNameSize;
-			documentsName.getDocumentNameByOffset(name, offset, sizeName);
+			//uint32 offset = (id - docHeaderSize) * Info.DocumentNameSize;
+			//documentsName.getDocumentNameByOffset(name, offset, sizeName);
+
 		}
 		else
 		{
@@ -319,69 +325,75 @@ public:
 				else
 				{
 					//document on hdd
-					uint32 offset = (id - 1) * Info.DocumentNameSize + DOC_NAME_HEADER_SIZE;
+					uint32 offset = (id - docHeaderSize) * Info.DocumentNameSize + DOC_NAME_HEADER_SIZE;
 					pDocNameFile->read(name, offset, sizeName);
+
 				}
 			}
 		}
+		*/
 	}
 
-	bool hasDocumentNameHDD(const char* name, uint32 len, uint32 sizeName)
-	{
-		if (!checkStartedInstance(true))
-			return 0;
+	//bool hasDocumentNameHDD(const char* name, uint32 len, uint32 sizeName)
+	//{
+	//	if (!checkStartedInstance(true))
+	//		return 0;
 
-		uint32 offset = DOC_NAME_HEADER_SIZE;
+	//	uint32 offset = DOC_NAME_HEADER_SIZE;
 
-		for (uint32 i = 0; i < Info.LastNameIDHDD; i++)
-		{
-			pDocNameFile->read(pBuffer, offset, sizeName);
+	//	for (uint32 i = 0; i < Info.LastNameIDHDD; i++)
+	//	{
+	//		pDocNameFile->read(pBuffer, offset, sizeName);
 
-			//compare string
-			uint32 currIdx = 0;
-			for (; currIdx < len; currIdx++)
-			{
-				if (name[currIdx] != pBuffer[currIdx])
-				{
-					goto EXIT;
-				}
-			}
+	//		//compare string
+	//		uint32 currIdx = 0;
+	//		for (; currIdx < len; currIdx++)
+	//		{
+	//			if (name[currIdx] != pBuffer[currIdx])
+	//			{
+	//				goto EXIT;
+	//			}
+	//		}
 
-			//compare zeros
-			for (; currIdx < sizeName; currIdx++)
-			{
-				if (pBuffer[currIdx])
-				{
-					goto EXIT;
-				}
-			}
+	//		//compare zeros
+	//		for (; currIdx < sizeName; currIdx++)
+	//		{
+	//			if (pBuffer[currIdx])
+	//			{
+	//				goto EXIT;
+	//			}
+	//		}
 
-			return true;
+	//		return true;
 
-		EXIT:
+	//	EXIT:
 
-			offset += sizeName;
-		}
+	//		offset += sizeName;
+	//	}
 
-		return false;
-	}
+	//	return false;
+	//}
 
 	bool hasDocumentName(const char* name, uint32 len)
 	{
 		if (!checkStartedInstance(true))
 			return 0;
 
+		return documentsName.hasDocumentName(name, len);
+
+		/*
 		uint32 docHeaderSize = getDocHeaderSize();
 
 		if (Configuration.MemoryMode == IN_MEMORY_MODE)
 		{
-			return documentsName.hasDocumentName(name, len, Info.DocumentNameSize);
+
 		}
 		else
 		{
-			return documentsName.hasDocumentName(name, len, Info.DocumentNameSize)
-				|| hasDocumentNameHDD(name, len, Info.DocumentNameSize);
+			return documentsName.hasDocumentName(name, len)
+				//|| hasDocumentNameHDD(name, len);
 		}
+		*/
 	}
 
 	uint32 getDocHeaderSize()
@@ -524,10 +536,10 @@ private:
 	static RelevantResultPool* pRelevantResultPool;
 	static PostSelectorPool* pPostSelectorPool;
 
-	DocumentsName documentsName;
+	DocumentsNameTextFile documentsName;
 
 	BinaryFile* pDocFile;
-	BinaryFile* pDocNameFile;
+	//BinaryFile* pDocNameFile;
 
 	HArrayFixPair* pAllKeysAndValuesRAM;
 	uint32 pAllKeysAndValuesRAMCount;
@@ -619,14 +631,12 @@ private:
 		initAlphabet();
 
 		pDocFile = 0;
-		pDocNameFile = 0;
-
+		
 		pAllKeysAndValuesRAM = 0;
 		pSearchRelPreCalcInfos = 0;
 		searchRelPreCalcInfosCount = 0;
 		
 		Info.init(Configuration.WordsHeaderBase,
-			Configuration.DocmentNameSize,
 			Configuration.RelevantLevel,
 			Configuration.CountWordInPhrase,
 			LastErrorMessage);
@@ -642,6 +652,8 @@ private:
 		haWordsHDD.init(indexPath,
 			"",
 			Configuration.AutoStemmingOn / 4);
+
+		documentsName.init(indexPath, "");
 	}
 
 	inline void indexWord(char* word,
@@ -829,7 +841,7 @@ private:
 		return;
 	}
 
-	void moveDocNameFileBlocksToRAM(BinaryFile* pSourceDocNameFile,
+	/*void moveDocNameFileBlocksToRAM(BinaryFile* pSourceDocNameFile,
 		DocumentsName* pDocumentsName,
 		ulong64& sourceFilePosition,
 		uchar8* pBuffer,
@@ -852,7 +864,7 @@ private:
 		}
 
 		return;
-	}
+	}*/
 
 	//=========================== LOG ==================================
 	void logError(const char* text, const char* param);
@@ -896,7 +908,7 @@ private:
 		}
 	}
 
-	void openDocNameIndex()
+	/*void openDocNameIndex()
 	{
 		if (!pDocNameFile)
 		{
@@ -910,7 +922,7 @@ private:
 				pDocNameFile = 0;
 			}
 		}
-	}
+	}*/
 
 	void closeDicIndex()
 	{
@@ -929,7 +941,7 @@ private:
 		}
 	}
 
-	void closeDocNameIndex()
+	/*void closeDocNameIndex()
 	{
 		if (pDocNameFile)
 		{
@@ -939,7 +951,7 @@ private:
 
 			pDocNameFile = 0;
 		}
-	}
+	}*/
 
 	void initDictionaryRAM()
 	{
@@ -1007,7 +1019,9 @@ private:
 
 		closeDocIndex();
 
-		closeDocNameIndex();
+		//closeDocNameIndex();
+
+		documentsName.close();
 
 		haWordsRAM.destroy();
 		haWordsHDD.destroy();

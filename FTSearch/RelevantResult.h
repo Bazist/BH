@@ -19,7 +19,7 @@ public:
 
 	char* MatchWords;
 
-	char Matches[MAX_FOUND_DOCUMENTS_IN_QUERY][256];
+	char Matches[MAX_FOUND_DOCUMENTS_IN_QUERY][MAX_DOC_NAME_LENGTH];
 
 	uint32 CountMatches;
 	uint32 FullCountMatches;

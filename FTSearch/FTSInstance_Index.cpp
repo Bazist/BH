@@ -139,10 +139,10 @@ bool FTSInstance::indexText(const char* name,
 		}
 	}
 
-	documentsName.addName(name,
-						  nameLen,
-						  Info.LastNameIDRAM,
-						  Info.DocumentNameSize);
+	documentsName.addDocumentName(name,
+		nameLen,
+		Info.LastNameIDRAM);
+
 	
 	needSaveIndex = true;
 
@@ -264,10 +264,10 @@ bool FTSInstance::indexHtml(const char* name, uint32 nameLen, char* text, uint32
 	/*if(Info.LastNameID == 126472)
 		Info.LastNameID = 126472;*/
 
-	documentsName.addName(name,
-						  nameLen,
-						  Info.LastNameIDRAM, 
-						  Info.DocumentNameSize);
+	documentsName.addDocumentName(name,
+		nameLen,
+		Info.LastNameIDRAM);
+
 
 	needSaveIndex = true;
 

@@ -268,9 +268,9 @@ namespace BH.WinService
         //{
         //    bool res = false;
 
-        //    if (name.Length > FTSearch.DOC_NAME_LENGTH - 1)
+        //    if (name.Length > FTSearch.MAX_DOC_NAME_LENGTH - 1)
         //    {
-        //        name = name.Substring(0, FTSearch.DOC_NAME_LENGTH - 1);
+        //        name = name.Substring(0, FTSearch.MAX_DOC_NAME_LENGTH - 1);
         //    }
 
         //    _readBytes += text.Length;

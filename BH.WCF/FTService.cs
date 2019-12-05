@@ -49,7 +49,7 @@ namespace BH.WCF
 
             public uint WordsHeaderBase;
 
-            public uint DocumentNameSize;
+            //public uint DocumentNameSize;
 
             public string LastErrorMessage;
             public bool HasError;
@@ -172,7 +172,7 @@ namespace BH.WCF
                 conf.AutoStemmingOn = 8;
                 conf.MinLenWord = 3;
                 conf.MaxLenWord = 64;
-                conf.DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
+                //conf.DocumentNameSize = FTSearch.DOC_NAME_LENGTH;
                 conf.CountWordInPhrase = 1;
                 conf.IsUseNumberAlphabet = true;
 
@@ -477,7 +477,7 @@ namespace BH.WCF
 
                     result.CountWordsHDD += current.CountWordsHDD;
                     result.CountWordsRAM += current.CountWordsRAM;
-                    result.DocumentNameSize = current.DocumentNameSize;
+                    //result.DocumentNameSize = current.DocumentNameSize;
                     result.HasError = result.HasError || current.HasError;
                     result.LastErrorMessage += current.LastErrorMessage;
                     result.LastNameIDHDD += current.LastNameIDHDD;

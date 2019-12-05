@@ -1,25 +1,25 @@
 #include "StdAfx.h"
 #include "BinaryFile.h"
 
-BinaryFile::BinaryFile(const char* fileName, 
-					   bool isWritable, 
-					   bool isOverwrite)
+BinaryFile::BinaryFile(const char* fileName,
+	bool isWritable,
+	bool isOverwrite)
 {
 	init(fileName, isWritable, isOverwrite, 0);
 }
 
-BinaryFile::BinaryFile(const char* fileName, 
-					   bool isWritable, 
-					   bool isOverwrite,
-					   uint32 bufferSize)
+BinaryFile::BinaryFile(const char* fileName,
+	bool isWritable,
+	bool isOverwrite,
+	uint32 bufferSize)
 {
 	init(fileName, isWritable, isOverwrite, bufferSize);
 }
 
-void BinaryFile::init(const char* fileName, 
-					  bool isWritable, 
-				      bool isOverwrite,
-					  uint32 bufferSize)
+void BinaryFile::init(const char* fileName,
+	bool isWritable,
+	bool isOverwrite,
+	uint32 bufferSize)
 {
 	strcpy(m_fileName, fileName);
 
@@ -29,7 +29,7 @@ void BinaryFile::init(const char* fileName,
 	m_countReads = 0;
 	m_fileSize = 0;
 
-	if(bufferSize)
+	if (bufferSize)
 	{
 		m_countPages = 0;
 		m_maxCountPages = bufferSize / BIN_FILE_RIGHT_MASK + 1;
@@ -43,7 +43,7 @@ void BinaryFile::init(const char* fileName,
 	{
 		m_countPages = 0;
 		m_maxCountPages = 0;
-		
+
 		m_pagesSize = 0;
 		pPages = 0;
 	}
@@ -53,9 +53,9 @@ bool BinaryFile::open()
 {
 	errno_t r;
 
-	if(!m_isWritable)
+	if (!m_isWritable)
 		r = fopen_s(&m_file, m_fileName, "rb");
-	else if(!m_isOverwrite)
+	else if (!m_isOverwrite)
 		r = fopen_s(&m_file, m_fileName, "r+b");
 	else
 		r = fopen_s(&m_file, m_fileName, "w+b");
@@ -75,7 +75,7 @@ bool BinaryFile::open()
 bool BinaryFile::clear()
 {
 	close();
-	
+
 	BinaryFile::deleteFile(m_fileName);
 
 	m_isWritable = true;
@@ -86,9 +86,9 @@ bool BinaryFile::clear()
 
 void BinaryFile::close()
 {
-	if(m_file)
+	if (m_file)
 	{
-		if(m_countPages)
+		if (m_countPages)
 		{
 			deletePages(true);
 		}
@@ -101,7 +101,7 @@ void BinaryFile::close()
 
 uint32 BinaryFile::read(void* pData, ulong64 position, uint32 length)
 {
-	_fseeki64 (m_file , position , SEEK_SET);
+	_fseeki64(m_file, position, SEEK_SET);
 	uint32 n = fread(pData, 1, length, m_file);
 
 	return n;
@@ -122,16 +122,16 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 	}
 
 	//return read(pData, position, length);
-	
+
 	ulong64 page1 = (position >> BIN_FILE_RIGHT_BITS);
 	ulong64 page2 = ((position + length) >> BIN_FILE_RIGHT_BITS);
 
 	uint32 index = (position & BIN_FILE_RIGHT_MASK);
 
-	if(page1 == page2)
+	if (page1 == page2)
 	{
 		//reallocate page
-		if(page1 >= m_pagesSize)
+		if (page1 >= m_pagesSize)
 		{
 			reallocatePages(page1);
 		}
@@ -139,14 +139,14 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 		BinaryFilePage* pPage1 = pPages[page1];
 
 		//read page
-		if(!pPage1)
+		if (!pPage1)
 		{
 			//delete old pages
-			if(m_countPages >= m_maxCountPages)
+			if (m_countPages >= m_maxCountPages)
 			{
 				deletePages(false);
 			}
-			
+
 			pPage1 = new BinaryFilePage();
 
 			//printf("read: %d\n", (page1 << 16));
@@ -161,7 +161,7 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 		//read item
 		char* pDataChar = (char*)pData;
 
-		for(uint32 i=0; i<length; i++, index++)
+		for (uint32 i = 0; i < length; i++, index++)
 		{
 			pDataChar[i] = pPage1->pContent[index];
 		}
@@ -172,7 +172,7 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 	else
 	{
 		//reallocate page
-		if(page1 >= m_pagesSize)
+		if (page1 >= m_pagesSize)
 		{
 			reallocatePages(page1);
 		}
@@ -180,10 +180,10 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 		BinaryFilePage* pPage1 = pPages[page1];
 
 		//read first page
-		if(!pPage1)
+		if (!pPage1)
 		{
 			//delete old pages
-			if(m_countPages >= m_maxCountPages)
+			if (m_countPages >= m_maxCountPages)
 			{
 				deletePages(false);
 			}
@@ -202,9 +202,9 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 		//read item
 		char* pDataChar = (char*)pData;
 
-		uint32 i=0;
+		uint32 i = 0;
 
-		for(; index < BIN_FILE_RIGHT_MASK + 1; i++, index++)
+		for (; index < BIN_FILE_RIGHT_MASK + 1; i++, index++)
 		{
 			pDataChar[i] = pPage1->pContent[index];
 		}
@@ -213,7 +213,7 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 		m_countReads++;
 
 		//reallocate page
-		if(page2 >= m_pagesSize)
+		if (page2 >= m_pagesSize)
 		{
 			reallocatePages(page2);
 		}
@@ -221,10 +221,10 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 		BinaryFilePage* pPage2 = pPages[page2];
 
 		//read second page
-		if(!pPage2)
+		if (!pPage2)
 		{
 			//delete old pages
-			if(m_countPages >= m_maxCountPages)
+			if (m_countPages >= m_maxCountPages)
 			{
 				deletePages(false);
 			}
@@ -240,7 +240,7 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 			m_countPages++;
 		}
 
-		for(index = 0; i < length; i++, index++)
+		for (index = 0; i < length; i++, index++)
 		{
 			pDataChar[i] = pPage2->pContent[index];
 		}
@@ -248,7 +248,7 @@ uint32 BinaryFile::readBuffered(void* pData, ulong64 position, uint32 length)
 		pPage2->CountReads++;
 		m_countReads++;
 	}
-	
+
 	return length;
 }
 
@@ -261,7 +261,7 @@ uint32 BinaryFile::read(void* pData, uint32 length)
 
 uint32 BinaryFile::write(const void* pData, ulong64 position, uint32 length)
 {
-	uint32 n = _fseeki64 (m_file, position, SEEK_SET);
+	uint32 n = _fseeki64(m_file, position, SEEK_SET);
 	n = fwrite(pData, 1, length, m_file);
 
 	return n;
@@ -289,10 +289,10 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 
 	uint32 index = (position & BIN_FILE_RIGHT_MASK);
 
-	if(page1 == page2)
+	if (page1 == page2)
 	{
 		//reallocate page
-		if(page1 >= m_pagesSize)
+		if (page1 >= m_pagesSize)
 		{
 			reallocatePages(page1);
 		}
@@ -300,14 +300,14 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 		BinaryFilePage* pPage1 = pPages[page1];
 
 		//read page
-		if(!pPage1)
+		if (!pPage1)
 		{
 			//delete old pages
-			if(m_countPages >= m_maxCountPages)
+			if (m_countPages >= m_maxCountPages)
 			{
 				deletePages(false);
 			}
-			
+
 			pPage1 = new BinaryFilePage();
 
 			//printf("read: %d\n", (page1 << 16));
@@ -322,7 +322,7 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 		//save item
 		char* pDataChar = (char*)pData;
 
-		for(uint32 i=0; i<length; i++, index++)
+		for (uint32 i = 0; i < length; i++, index++)
 		{
 			pPage1->pContent[index] = pDataChar[i];
 		}
@@ -337,16 +337,16 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 		BinaryFilePage* pPage1 = pPages[page1];
 
 		//reallocate page
-		if(page1 >= m_pagesSize)
+		if (page1 >= m_pagesSize)
 		{
 			reallocatePages(page1);
 		}
 
 		//read first page
-		if(!pPage1)
+		if (!pPage1)
 		{
 			//delete old pages
-			if(m_countPages >= m_maxCountPages)
+			if (m_countPages >= m_maxCountPages)
 			{
 				deletePages(false);
 			}
@@ -365,9 +365,9 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 		//write item
 		char* pDataChar = (char*)pData;
 
-		uint32 i=0;
+		uint32 i = 0;
 
-		for(; index < BIN_FILE_RIGHT_MASK + 1; i++, index++)
+		for (; index < BIN_FILE_RIGHT_MASK + 1; i++, index++)
 		{
 			pPage1->pContent[index] = pDataChar[i];
 		}
@@ -378,7 +378,7 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 		m_countReads++;
 
 		//reallocate page
-		if(page2 >= m_pagesSize)
+		if (page2 >= m_pagesSize)
 		{
 			reallocatePages(page2);
 		}
@@ -386,10 +386,10 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 		BinaryFilePage* pPage2 = pPages[page2];
 
 		//read second page
-		if(!pPage2)
+		if (!pPage2)
 		{
 			//delete old pages
-			if(m_countPages >= m_maxCountPages)
+			if (m_countPages >= m_maxCountPages)
 			{
 				deletePages(false);
 			}
@@ -405,7 +405,7 @@ uint32 BinaryFile::writeBuffered(const void* pData, ulong64 position, uint32 len
 			m_countPages++;
 		}
 
-		for(index = 0; i < length; i++, index++)
+		for (index = 0; i < length; i++, index++)
 		{
 			pPage2->pContent[index] = pDataChar[i];
 		}
@@ -440,49 +440,49 @@ uint32 BinaryFile::writeZero(uint32 length)
 	}
 }
 
-bool BinaryFile::readInt(uint32* pValue, 
-						 ulong64 position)
+bool BinaryFile::readInt(uint32* pValue,
+	ulong64 position)
 {
-	_fseeki64 (m_file , position , SEEK_SET);
-	size_t n = fread (pValue, 4, 1, m_file);
+	_fseeki64(m_file, position, SEEK_SET);
+	size_t n = fread(pValue, 4, 1, m_file);
 
 	return (n > 0);
 }
 
-bool BinaryFile::readLong(ulong64* pValue, 
-						  ulong64 position)
+bool BinaryFile::readLong(ulong64* pValue,
+	ulong64 position)
 {
-	_fseeki64 (m_file , position , SEEK_SET);
-	size_t n = fread (pValue, 8, 1, m_file);
+	_fseeki64(m_file, position, SEEK_SET);
+	size_t n = fread(pValue, 8, 1, m_file);
 
 	return (n > 0);
 }
 
 bool BinaryFile::readInt(uint32* pValue)
 {
-	size_t n = fread (pValue, 4, 1, m_file);
+	size_t n = fread(pValue, 4, 1, m_file);
 
 	return (n > 0);
 }
 
 bool BinaryFile::readLong(ulong64* pValue)
 {
-	size_t n = fread (pValue, 8, 1, m_file);
+	size_t n = fread(pValue, 8, 1, m_file);
 
 	return (n > 0);
 }
 
-bool BinaryFile::readInts(uint32* pValues, 
-						  uint32 length)
+bool BinaryFile::readInts(uint32* pValues,
+	uint32 length)
 {
-	size_t n = fread (pValues, 4, length, m_file);
+	size_t n = fread(pValues, 4, length, m_file);
 
 	return (n > 0);
 }
 
 void BinaryFile::writeInt(const uint32* pValue)
 {
-	fwrite (pValue, 4, 1, m_file);
+	fwrite(pValue, 4, 1, m_file);
 }
 
 void BinaryFile::writeByte(const uchar8* pValue)
@@ -492,46 +492,46 @@ void BinaryFile::writeByte(const uchar8* pValue)
 
 void BinaryFile::writeLong(const ulong64* pValue)
 {
-	fwrite (pValue, 8, 1, m_file);
+	fwrite(pValue, 8, 1, m_file);
 }
 
-void BinaryFile::writeInt(const uint32* pValue, 
-						  const ulong64 position)
+void BinaryFile::writeInt(const uint32* pValue,
+	const ulong64 position)
 {
-	_fseeki64 (m_file , position , SEEK_SET);
-	fwrite (pValue, 4, 1, m_file);
+	_fseeki64(m_file, position, SEEK_SET);
+	fwrite(pValue, 4, 1, m_file);
 }
 
-void BinaryFile::writeLong(const ulong64* pValue, 
-						   const ulong64 position)
+void BinaryFile::writeLong(const ulong64* pValue,
+	const ulong64 position)
 {
-	_fseeki64 (m_file , position , SEEK_SET);
-	fwrite (pValue, 8, 1, m_file);
+	_fseeki64(m_file, position, SEEK_SET);
+	fwrite(pValue, 8, 1, m_file);
 }
 
-void BinaryFile::writeInts(const uint32* pValues, 
-						   const uint32 length)
+void BinaryFile::writeInts(const uint32* pValues,
+	const uint32 length)
 {
-	fwrite (pValues, 4, length, m_file);
+	fwrite(pValues, 4, length, m_file);
 }
 
 void BinaryFile::deletePages(bool isAll)
 {
 	//printf("flush: ");
 
-	if(m_countPages)
+	if (m_countPages)
 	{
 		uint32 averageCountReads = m_countReads / m_countPages;
 
-		for(ulong64 i=0; i < m_pagesSize; i++)
+		for (ulong64 i = 0; i < m_pagesSize; i++)
 		{
 			BinaryFilePage* pPage = pPages[i];
 
-			if(pPage)
+			if (pPage)
 			{
-				if((pPage->CountReads <= averageCountReads) || isAll)
+				if ((pPage->CountReads <= averageCountReads) || isAll)
 				{
-					if(pPage->NeedSave)
+					if (pPage->NeedSave)
 					{
 						//printf("%d ", page);
 
@@ -561,20 +561,20 @@ void BinaryFile::reallocatePages(uint32 page)
 {
 	uint32 newSizeContentPages = m_pagesSize;
 
-	while(page >= newSizeContentPages)
+	while (page >= newSizeContentPages)
 	{
 		newSizeContentPages *= 2;
 	}
 
 	BinaryFilePage** pTempPages = new BinaryFilePage*[newSizeContentPages];
-		
-	uint32 j=0;
-	for(; j < m_pagesSize ; j++)
+
+	uint32 j = 0;
+	for (; j < m_pagesSize; j++)
 	{
 		pTempPages[j] = pPages[j];
 	}
 
-	for(; j < newSizeContentPages ; j++)
+	for (; j < newSizeContentPages; j++)
 	{
 		pTempPages[j] = 0;
 	}
@@ -587,7 +587,7 @@ void BinaryFile::reallocatePages(uint32 page)
 
 void BinaryFile::setPosition(ulong64 position)
 {
-	_fseeki64 (m_file, position, SEEK_SET);
+	_fseeki64(m_file, position, SEEK_SET);
 }
 
 ulong64 BinaryFile::getPosition()
@@ -600,9 +600,35 @@ const char* BinaryFile::getFilePath()
 	return m_fileName;
 }
 
+void BinaryFile::loadIntoRAM()
+{
+	for (ulong64 page = 0; ; page++)
+	{
+		if (page >= m_pagesSize)
+		{
+			reallocatePages(page);
+		}
+
+		BinaryFilePage* pPage = new BinaryFilePage();
+
+		uint32 n = read(pPage->pContent, page << BIN_FILE_RIGHT_BITS, BIN_FILE_RIGHT_MASK + 1);
+
+		if (!n)
+		{
+			delete pPage;
+
+			break;
+		}
+
+		pPages[page] = pPage;
+
+		m_countPages++;
+	}
+}
+
 BinaryFile::~BinaryFile()
 {
-	if(m_countPages)
+	if (m_countPages)
 	{
 		deletePages(true);
 	}

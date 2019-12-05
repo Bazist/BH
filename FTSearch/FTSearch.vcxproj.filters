@@ -58,9 +58,6 @@
     <ClInclude Include="DocumentsBlock.h">
       <Filter>Header Files\Document</Filter>
     </ClInclude>
-    <ClInclude Include="DocumentsName.h">
-      <Filter>Header Files\Document</Filter>
-    </ClInclude>
     <ClInclude Include="FTSInstance.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
@@ -153,6 +150,9 @@
     </ClInclude>
     <ClInclude Include="SearchRelPreCalcInfo.h">
       <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentsNameTextFile.h">
+      <Filter>Header Files\Document</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -51,7 +51,7 @@ namespace BH.WCF
 
             public uint WordsHeaderBase;
 
-            public uint DocumentNameSize;
+            //public uint DocumentNameSize;
 
             public string LastErrorMessage;
             public bool HasError;
@@ -165,7 +165,7 @@ namespace BH.WCF
 
             public System.UInt32 WordsHeaderBase;
 
-            public System.UInt32 DocumentNameSize;
+            //public System.UInt32 DocumentNameSize;
             
             public System.UInt32 LimitTopResults;
             public System.UInt64 LimitUsedMemory;
@@ -219,7 +219,7 @@ namespace BH.WCF
 
             public System.UInt32 WordsHeaderBase;
 
-            public System.UInt32 DocumentNameSize;
+            //public System.UInt32 DocumentNameSize;
 
             public IntPtr LastErrorMessage;
 
@@ -239,7 +239,7 @@ namespace BH.WCF
         [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct RelevantResultNameDLL
         {
-            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = DOC_NAME_LENGTH)]
+            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = MAX_DOC_NAME_LENGTH)]
             public string Name;
         }
 
@@ -271,8 +271,8 @@ namespace BH.WCF
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] Name = new byte[128];
 
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = DOC_NAME_LENGTH)]
-            public byte[] FilePath = new byte[DOC_NAME_LENGTH];
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_DOC_NAME_LENGTH)]
+            public byte[] FilePath = new byte[MAX_DOC_NAME_LENGTH];
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] MinBound = new byte[128];
@@ -305,8 +305,8 @@ namespace BH.WCF
         {
             public System.UInt32 DocNumber;
 
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = DOC_NAME_LENGTH)]
-            public byte[] DocName = new byte[DOC_NAME_LENGTH];
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_DOC_NAME_LENGTH)]
+            public byte[] DocName = new byte[MAX_DOC_NAME_LENGTH];
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] Text = new byte[128];
@@ -433,7 +433,7 @@ namespace BH.WCF
 
         #region Members
 
-        public const int DOC_NAME_LENGTH = 256;
+        public const int MAX_DOC_NAME_LENGTH = 256;
         public static Encoding Encoding = Encoding.GetEncoding("windows-1251");
 
         #endregion
@@ -643,11 +643,11 @@ namespace BH.WCF
         //TODO make another method to load portion of names in one call
         public unsafe string GetDocumentNameByID(uint id)
         {
-            byte[] nameBytes = new byte[DOC_NAME_LENGTH];
+            byte[] nameBytes = new byte[MAX_DOC_NAME_LENGTH];
 
             fixed (Byte* pName = nameBytes)
             {
-                getDocumentNameByIDDLL(InstanceNumber, id, pName, DOC_NAME_LENGTH);
+                getDocumentNameByIDDLL(InstanceNumber, id, pName, MAX_DOC_NAME_LENGTH);
 
                 return Encoding.GetString(nameBytes).Replace("\0", "");
             }
@@ -668,14 +668,14 @@ namespace BH.WCF
 
             List<Result> results = new List<Result>();
 
-            byte[] nameBytes = new byte[DOC_NAME_LENGTH];
+            byte[] nameBytes = new byte[MAX_DOC_NAME_LENGTH];
 
             fixed (Byte* pName = nameBytes)
             {
                 foreach (uint id in ids.Distinct())
                 {
                     //get name of document
-                    getDocumentNameByIDDLL(InstanceNumber, id, pName, DOC_NAME_LENGTH);
+                    getDocumentNameByIDDLL(InstanceNumber, id, pName, MAX_DOC_NAME_LENGTH);
 
                     Result result = new Result();
 
@@ -691,7 +691,7 @@ namespace BH.WCF
         public unsafe List<uint> SearchIDByPhrase(string phrase, string templateName, uint minPage, uint maxPage)
         {
             List<uint> results = new List<uint>();
-            byte[] nameBytes = new byte[DOC_NAME_LENGTH];
+            byte[] nameBytes = new byte[MAX_DOC_NAME_LENGTH];
 
             fixed (Byte* pPhrase = Encoding.GetBytes(phrase),
                          pTemplateName = Encoding.GetBytes(templateName),
@@ -923,7 +923,7 @@ namespace BH.WCF
             QueryResultDLL queryResultDLL = (QueryResultDLL)Marshal.PtrToStructure(pQueryResult, typeof(QueryResultDLL));
             int rowSize = Marshal.SizeOf(typeof(QueryRowDLL));
 
-            byte[] nameBytes = new byte[DOC_NAME_LENGTH];
+            byte[] nameBytes = new byte[MAX_DOC_NAME_LENGTH];
 
             fixed (Byte* pName = nameBytes)
             {
@@ -1019,7 +1019,7 @@ namespace BH.WCF
 
             info.WordsHeaderBase = dllInfo.WordsHeaderBase;
 
-            info.DocumentNameSize = dllInfo.DocumentNameSize;
+            //info.DocumentNameSize = dllInfo.DocumentNameSize;
 
             info.LastErrorMessage = Marshal.PtrToStringAnsi(dllInfo.LastErrorMessage);
             info.HasError = dllInfo.HasError;
