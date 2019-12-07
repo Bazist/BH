@@ -252,6 +252,10 @@ void FTSInstance::updateIndex()
 	if (!checkStartedInstance(true))
 		return;
 
+	closeDicIndex();
+
+	closeDocIndex();
+
 	//init
 	HArrayTextFile haWordsHDDTemp;
 	uchar8* pSourceBuffer = 0;
@@ -1311,7 +1315,7 @@ void FTSInstance::importIndex(const char* importPath)
 	documentsName.append(&documentsNameImport);
 
 	//save info
-	//haWordsHDDTemp.flush();
+	haWordsHDDTemp.flush();
 
 	if (Configuration.MemoryMode != IN_MEMORY_MODE)
 	{
