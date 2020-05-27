@@ -94,6 +94,8 @@ namespace BH.WinService
                 (
                     x =>
                     {
+                        WriteLog("Start FTS Service", EventLogEntryType.Information);
+
                         _fts.Start();
                         
                         if (bool.Parse(ConfigurationManager.AppSettings["BoobenMode"]))
@@ -165,11 +167,15 @@ namespace BH.WinService
 
                     if (indexCurrentMonth)
                     {
+                        WriteLog("Index current month", EventLogEntryType.Information);
+
                         indexService.IndexCurrentMonth();
                     }
 
                     if (enableRobots)
                     {
+                        WriteLog("Start Booben robots", EventLogEntryType.Information);
+
                         indexService.RunRobots();
                     }
                 }
