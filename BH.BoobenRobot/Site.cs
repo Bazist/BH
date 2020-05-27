@@ -541,7 +541,10 @@ namespace BH.BoobenRobot
                 //    }
                 //}
 
-                Thread.Sleep(this.SiteDelay);
+                while(DateTime.Now < this.NextUpdate)
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(5));
+                }
             }
             else
             {
