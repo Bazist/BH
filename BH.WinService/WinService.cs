@@ -19,14 +19,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
-using BH.WCF;
 using System.IO;
 using System.Configuration;
 using BH.BaseRobot;
@@ -58,7 +54,7 @@ namespace BH.WinService
             WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
         }
 
-        private static FTService _fts = new FTService();
+        private static FTService _fts;
         private static IEnumerable<IBaseRobot> _robots;
         private string CurrentDirectory => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
@@ -93,7 +89,13 @@ namespace BH.WinService
             //start web service
             try
             {
-                var conf = FTService.GetDefaultConfiguration();
+                _fts = new FTService(LoadDocumentContent,
+                                          ex =>
+                                          {
+                                              WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+                                          });
+
+                var conf = _fts.GetDefaultConfiguration();
 
                 var directory = ConfigurationManager.AppSettings["IndexPath"];
 
@@ -137,12 +139,7 @@ namespace BH.WinService
                 );
 
                 FTService.StartWebservice(_fts,
-                                          ConfigurationManager.AppSettings["URL"],
-                                          LoadDocumentContent,
-                                          ex =>
-                                          {
-                                              WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
-                                          });
+                                          ConfigurationManager.AppSettings["URL"]);
 
                 WriteLog("Service started.", EventLogEntryType.Information);
             }

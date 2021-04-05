@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FTSearchWCF.Stemmers
+namespace BH.FTServer.Stemmer
 {
     public class EnglishStemmer : StemmerOperations
     {

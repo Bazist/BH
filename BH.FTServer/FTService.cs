@@ -16,34 +16,17 @@
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using FTSearchWCF.Stemmers;
+using BH.FTServer.Stemmer;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Principal;
-using System.ServiceModel;
-using System.ServiceModel.Description;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace BH.WCF
+namespace BH.FTServer
 {
-    
-
-    [ServiceContract]
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class FTService
     {
-        #region Constructors
-        public FTService()
-        {
-
-        }
-        #endregion
-
         #region Classes
 
         public struct Info
@@ -113,32 +96,34 @@ namespace BH.WCF
 
         private static FTSearch.ConfigurationDLL _configuration;
 
-        private static ServiceHost _host;
-
         private static object _lockObj = new object();
 
         public const string DEFAULT_FTS_PATH = @"c:\FTS";
 
-        private static Action<Exception> _errorHandler = null;
+        public Action<Exception> _errorHandler { get; set; }
 
-        private static Func<string, string, string, string> _documentContentResolver = null;
+        public Func<string, string, string, string> _documentContentResolver { get; set; }
 
         #endregion
 
         #region Constructors
 
-        static FTService()
+        public FTService(Action<Exception> errorHandler,
+                         Func<string, string, string, string> documentContentResolver)
         {
             Instances = new List<FTSearch>();
 
             _configuration = GetDefaultConfiguration();
+
+            _errorHandler = errorHandler;
+
+            _documentContentResolver = documentContentResolver;
         }
 
         #endregion
 
         #region Methods
 
-        [OperationContract]
         public bool IsStarted()
         {
             return TryCatch(() =>
@@ -165,7 +150,6 @@ namespace BH.WCF
             return dirsLenSort.ToArray();
         }
 
-        [OperationContract]
         public FTSearch.ConfigurationDLL GetConfiguration()
         {
             return TryCatch(() =>
@@ -174,8 +158,7 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
-        public static FTSearch.ConfigurationDLL GetDefaultConfiguration()
+        public FTSearch.ConfigurationDLL GetDefaultConfiguration()
         {
             return TryCatch(() =>
             {
@@ -210,7 +193,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public void SetConfiguration(FTSearch.ConfigurationDLL configuration)
         {
             TryCatch(() =>
@@ -219,7 +201,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public void Start(int instanceNumber = 0)
         {
             TryCatch(() =>
@@ -277,27 +258,26 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public FTSearch.SearchResult SearchPhrase(string phrase,
                                                   string templateName,
                                                   int skip,
                                                   int take)
         {
             return TryCatch(() =>
-             {
-                 if (!IsStarted())
-                     throw new Exception("Service is not started.");
+            {
+                if (!IsStarted())
+                    throw new Exception("Service is not started.");
 
-                 return GetPortion(ref skip,
-                                   take,
-                                   fts => fts.SearchPhrase(phrase,
-                                                           templateName,
-                                                           0,
-                                                           int.MaxValue,
-                                                           skip));
-             });
+                return GetPortion(ref skip,
+                                  take,
+                                  fts => fts.SearchPhrase(phrase,
+                                                          templateName,
+                                                          0,
+                                                          int.MaxValue,
+                                                          skip));
+            });
         }
-        
+
         public IDictionary<string, string> ReadDocumentVersions(IEnumerable<string> fileNames)
         {
             return TryCatch(() =>
@@ -348,7 +328,7 @@ namespace BH.WCF
             foreach (var fts in Instances)
             {
                 //fts.SearchQuery()
-                var sr = searchFunc(fts); 
+                var sr = searchFunc(fts);
 
                 if (skip > sr.FullCountMatches) //skip all results
                 {
@@ -386,7 +366,6 @@ namespace BH.WCF
             return result;
         }
 
-        [OperationContract]
         public FTSearch.SearchResult SearchQuery(List<FTSearch.Selector> selectors,
                                                  int minPage,
                                                  int maxPage,
@@ -412,7 +391,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public FTSearch.SearchResult SearchPhraseRel(string phrase, int minPage, int maxPage, int skip, int take)
         {
             return TryCatch(() =>
@@ -425,7 +403,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public void InitSearchRel()
         {
             TryCatch(() =>
@@ -440,16 +417,14 @@ namespace BH.WCF
         private static RussianStemmer _rusStemmer = new RussianStemmer();
         private static EnglishStemmer _engStemmer = new EnglishStemmer();
 
-        [OperationContract]
         public string StemContent(string contentText)
         {
             contentText = _rusStemmer.StemContent(contentText);
             contentText = _engStemmer.StemContent(contentText);
-            
+
             return contentText.ToLower();
         }
 
-        [OperationContract]
         public string LoadDocumentContent(string documentName,
                                           string documentVersion,
                                           string robotName)
@@ -467,7 +442,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public string CalculateTrend(string phrase, int count, int minPage, int maxPage)
         {
             return TryCatch(() =>
@@ -479,7 +453,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public Info GetInfo()
         {
             return TryCatch<Info>(() =>
@@ -514,7 +487,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public bool IndexText(string documentName,
                               string documentVersion,
                               string contentText,
@@ -539,7 +511,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public bool IndexFile(string documentName,
                               string documentVersion,
                               string filePath,
@@ -571,7 +542,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public void SaveIndex()
         {
             TryCatch(() =>
@@ -583,7 +553,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public void MergeIndexes()
         {
             TryCatch(() =>
@@ -640,7 +609,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public void Stop()
         {
             TryCatch(() =>
@@ -660,7 +628,6 @@ namespace BH.WCF
             });
         }
 
-        [OperationContract]
         public void CheckIndexes()
         {
             TryCatch(() =>
@@ -833,7 +800,7 @@ namespace BH.WCF
         //    });
         //}
 
-        private static T TryCatch<T>(Func<T> action)
+        private T TryCatch<T>(Func<T> action)
         {
             try
             {
@@ -853,7 +820,7 @@ namespace BH.WCF
             }
         }
 
-        private static void TryCatch(Action action)
+        private void TryCatch(Action action)
         {
             try
             {
@@ -871,47 +838,6 @@ namespace BH.WCF
 
                 throw;
             }
-        }
-
-        public static void StartWebservice(FTService service,
-                                           string url,
-                                           Func<string, string, string, string> documentContentResolver = null,
-                                           Action<Exception> errorHandler = null)
-        {
-            _documentContentResolver = documentContentResolver;
-            _errorHandler = errorHandler;
-
-            TryCatch(() =>
-            {
-                Uri serviceUri = new Uri(url);
-
-                _host = new ServiceHost(service, serviceUri);
-
-                var basicHttpBinding = new BasicHttpBinding();
-                basicHttpBinding.MaxReceivedMessageSize = int.MaxValue;
-                basicHttpBinding.MaxBufferSize = int.MaxValue;
-                
-                var smb = new ServiceMetadataBehavior();
-                smb.HttpGetEnabled = true;
-                smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
-
-                _host.Description.Behaviors.Add(smb);
-
-                Type serviceType = typeof(FTService);
-                _host.AddServiceEndpoint(serviceType, basicHttpBinding, serviceUri);
-                _host.Open();
-            });
-        }
-
-        public static void StopWebService()
-        {
-            TryCatch(() =>
-            {
-                if (_host != null)
-                {
-                    _host.Abort();
-                }
-            });
         }
 
         public void ClearInstance()

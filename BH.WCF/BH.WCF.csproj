@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BH.WCF</RootNamespace>
     <AssemblyName>BH.WCF</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -64,13 +64,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FTSearch.cs" />
-    <Compile Include="FTService.cs" />
+    <Compile Include="WCFService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Stemmer\Among.cs" />
-    <Compile Include="Stemmer\EnglishStemmer.cs" />
-    <Compile Include="Stemmer\RussianStemmer.cs" />
-    <Compile Include="Stemmer\StemmerOperations.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BH.FTServer\BH.FTServer.csproj">
+      <Project>{1FD73282-509E-4797-BAA8-C0CCE8F44D34}</Project>
+      <Name>BH.FTServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

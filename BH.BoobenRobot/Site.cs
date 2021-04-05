@@ -18,14 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
 using System.IO;
 using System.Threading;
 using System.Text.RegularExpressions;
-using System.Xml;
-using BH.WCF;
+using BH.FTServer;
 
 namespace BH.BoobenRobot
 {

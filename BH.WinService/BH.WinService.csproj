@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BH.WinService</RootNamespace>
     <AssemblyName>BH.WinService</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -115,6 +115,10 @@
     <ProjectReference Include="..\BH.BoobenRobot\BH.BoobenRobot.csproj">
       <Project>{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}</Project>
       <Name>BH.BoobenRobot</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BH.FTServer\BH.FTServer.csproj">
+      <Project>{1FD73282-509E-4797-BAA8-C0CCE8F44D34}</Project>
+      <Name>BH.FTServer</Name>
     </ProjectReference>
     <ProjectReference Include="..\BH.WCF\BH.WCF.csproj">
       <Project>{34f64742-db2e-434a-ba1c-1c9474e501bf}</Project>

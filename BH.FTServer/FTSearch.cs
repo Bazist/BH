@@ -23,9 +23,8 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Net;
-using System.ServiceModel;
 
-namespace BH.WCF
+namespace BH.FTServer
 {
     public class FTSearch
     {

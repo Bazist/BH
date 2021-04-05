@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace FTSearchWCF.Stemmers
+namespace BH.FTServer.Stemmer
 {
     public class RussianStemmer : StemmerOperations
     {

@@ -11,7 +11,7 @@ using System.Text;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace FTSearchWCF.Stemmers
+namespace BH.FTServer.Stemmer
 {
     public abstract class StemmerOperations
     {

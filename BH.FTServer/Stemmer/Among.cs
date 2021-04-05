@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FTSearchWCF.Stemmers
+namespace BH.FTServer.Stemmer
 {
     internal class Among
     {
