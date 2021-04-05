@@ -99,7 +99,11 @@ namespace BH.WinService
 
                 if (!Directory.Exists(directory))
                 {
+                    WriteLog($"IndexPath = {directory} in config file is not found.", EventLogEntryType.Warning);
+
                     directory = Path.Combine(CurrentDirectory, directory);
+
+                    WriteLog($"IndexPath built as {directory}.", EventLogEntryType.Warning);
                 }
 
                 conf.SetIndexPath(directory);
