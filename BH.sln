@@ -15,15 +15,15 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BH.SetupWebSite", "BH.Setup
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.REST", "BH.REST\BH.REST.csproj", "{81C391DD-13D9-4259-BAD6-71304C40D5F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.WorkerService", "BH.WorkerService\BH.WorkerService.csproj", "{FC43F996-3023-4F07-88AB-A6D96EC18CC1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.FTServer", "BH.FTServer\BH.FTServer.csproj", "{E0305C65-49BF-4922-B433-B507464E5127}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.BaseRobot", "BH.BaseRobot\BH.BaseRobot.csproj", "{8A9B7914-E0E9-443C-B9E1-BE373BE96A95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.BoobenRobot", "BH.BoobenRobot\BH.BoobenRobot.csproj", "{405F9C80-932F-42F9-8ECF-E36B87C9CACC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.BoobenRobot", "BH.BoobenRobot\BH.BoobenRobot.csproj", "{405F9C80-932F-42F9-8ECF-E36B87C9CACC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.ExampleRobot", "BH.ExampleRobot\BH.ExampleRobot.csproj", "{9B85EA06-8EF9-4C4A-BE53-0352D01622E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.ExampleRobot", "BH.ExampleRobot\BH.ExampleRobot.csproj", "{9B85EA06-8EF9-4C4A-BE53-0352D01622E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.WorkerService", "BH.WorkerService\BH.WorkerService.csproj", "{6227E696-467B-4350-A5B6-5E66CB7E8297}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,14 +71,6 @@ Global
 		{81C391DD-13D9-4259-BAD6-71304C40D5F8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81C391DD-13D9-4259-BAD6-71304C40D5F8}.Release|x64.ActiveCfg = Release|Any CPU
 		{81C391DD-13D9-4259-BAD6-71304C40D5F8}.Release|x64.Build.0 = Release|Any CPU
-		{FC43F996-3023-4F07-88AB-A6D96EC18CC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FC43F996-3023-4F07-88AB-A6D96EC18CC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FC43F996-3023-4F07-88AB-A6D96EC18CC1}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{FC43F996-3023-4F07-88AB-A6D96EC18CC1}.Debug|x64.Build.0 = Debug|Any CPU
-		{FC43F996-3023-4F07-88AB-A6D96EC18CC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FC43F996-3023-4F07-88AB-A6D96EC18CC1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FC43F996-3023-4F07-88AB-A6D96EC18CC1}.Release|x64.ActiveCfg = Release|Any CPU
-		{FC43F996-3023-4F07-88AB-A6D96EC18CC1}.Release|x64.Build.0 = Release|Any CPU
 		{E0305C65-49BF-4922-B433-B507464E5127}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E0305C65-49BF-4922-B433-B507464E5127}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0305C65-49BF-4922-B433-B507464E5127}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -111,6 +103,14 @@ Global
 		{9B85EA06-8EF9-4C4A-BE53-0352D01622E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B85EA06-8EF9-4C4A-BE53-0352D01622E4}.Release|x64.ActiveCfg = Release|Any CPU
 		{9B85EA06-8EF9-4C4A-BE53-0352D01622E4}.Release|x64.Build.0 = Release|Any CPU
+		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Debug|x64.Build.0 = Debug|Any CPU
+		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Release|x64.ActiveCfg = Release|Any CPU
+		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

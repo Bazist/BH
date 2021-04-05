@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using BH.BaseRobot;
 using BH.FTServer;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -208,12 +209,12 @@ namespace BH.WorkerService
             }
         }
 
-        protected override void OnStart(string[] args)
+        protected void OnStart(string[] args)
         {
             StartService();
         }
 
-        protected override void OnStop()
+        protected void OnStop()
         {
             WriteLog("Stop Service", EventLogEntryType.Information);
 
@@ -254,14 +255,26 @@ namespace BH.WorkerService
             }
             else
             {
-                ((ISupportInitialize)(this.EventLog)).BeginInit();
-                if (!EventLog.SourceExists(this.EventLog.Source))
+                switch(eventType)
                 {
-                    EventLog.CreateEventSource(this.EventLog.Source, this.EventLog.Log);
+                    case EventLogEntryType.Error:
+                        {
+                            _logger.LogError(message);
+                            break;
+                        }
+                    case EventLogEntryType.Warning:
+                        {
+                            _logger.LogWarning(message);
+                            break;
+                        }
+                    case EventLogEntryType.Information:
+                        {
+                            _logger.LogInformation(message);
+                            break;
+                        }
+                    default:
+                        throw new NotImplementedException();
                 }
-                ((ISupportInitialize)(this.EventLog)).EndInit();
-
-                this.EventLog.WriteEntry(message, eventType);
             }
         }
 
