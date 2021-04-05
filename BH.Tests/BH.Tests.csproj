@@ -127,9 +127,17 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BH.BaseRobot\BH.BaseRobot.csproj">
+      <Project>{8a9b7914-e0e9-443c-b9e1-be373be96a95}</Project>
+      <Name>BH.BaseRobot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BH.BoobenRobot\BH.BoobenRobot.csproj">
       <Project>{405f9c80-932f-42f9-8ecf-e36b87c9cacc}</Project>
       <Name>BH.BoobenRobot</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BH.FTServer\BH.FTServer.csproj">
+      <Project>{e0305c65-49bf-4922-b433-b507464e5127}</Project>
+      <Name>BH.FTServer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
