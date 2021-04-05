@@ -1,97 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B2AEF7AC-0E77-4BA7-8270-2FF637223AE1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BH.BoobenRobot</RootNamespace>
-    <AssemblyName>BH.BoobenRobot</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\Bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\Bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Archive.cs" />
-    <Compile Include="DBHelpers.cs" />
-    <Compile Include="IndexService.cs" />
-    <Compile Include="Page.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Site.cs" />
-    <Compile Include="Sites\AutouaSite.cs" />
-    <Compile Include="Sites\CyberSite.cs" />
-    <Compile Include="Sites\DouSite.cs" />
-    <Compile Include="Sites\FinSite.cs" />
-    <Compile Include="Sites\GamedevSite.cs" />
-    <Compile Include="Sites\GotaiSite.cs" />
-    <Compile Include="Sites\GratisSite.cs" />
-    <Compile Include="Sites\HabrSite.cs" />
-    <Compile Include="Sites\IxbtSite.cs" />
-    <Compile Include="Sites\KhafSite.cs" />
-    <Compile Include="Sites\PravdaSite.cs" />
-    <Compile Include="Sites\SearchengineSite.cs" />
-    <Compile Include="Sites\SevasSite.cs" />
-    <Compile Include="Sites\SkcSite.cs" />
-    <Compile Include="Sites\SqlSite.cs" />
-    <Compile Include="Sites\VeloSite.cs" />
+    <ProjectReference Include="..\BH.BaseRobot\BH.BaseRobot.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BH.BaseRobot\BH.BaseRobot.csproj">
-      <Project>{a996adc9-2a42-48b9-aa74-532b2866c8c0}</Project>
-      <Name>BH.BaseRobot</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BH.FTServer\BH.FTServer.csproj">
-      <Project>{1FD73282-509E-4797-BAA8-C0CCE8F44D34}</Project>
-      <Name>BH.FTServer</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

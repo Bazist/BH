@@ -16,7 +16,7 @@
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using BH.WCF;
+using BH.FTServer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

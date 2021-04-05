@@ -108,8 +108,8 @@ namespace BH.FTServer
 
         #region Constructors
 
-        public FTService(Action<Exception> errorHandler,
-                         Func<string, string, string, string> documentContentResolver)
+        public FTService(Func<string, string, string, string> documentContentResolver, 
+                         Action<Exception> errorHandler)
         {
             Instances = new List<FTSearch>();
 

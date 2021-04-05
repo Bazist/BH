@@ -127,21 +127,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BH.BaseRobot\BH.BaseRobot.csproj">
-      <Project>{a996adc9-2a42-48b9-aa74-532b2866c8c0}</Project>
-      <Name>BH.BaseRobot</Name>
-    </ProjectReference>
     <ProjectReference Include="..\BH.BoobenRobot\BH.BoobenRobot.csproj">
-      <Project>{b2aef7ac-0e77-4ba7-8270-2ff637223ae1}</Project>
+      <Project>{405f9c80-932f-42f9-8ecf-e36b87c9cacc}</Project>
       <Name>BH.BoobenRobot</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BH.FTServer\BH.FTServer.csproj">
-      <Project>{1FD73282-509E-4797-BAA8-C0CCE8F44D34}</Project>
-      <Name>BH.FTServer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BH.WCF\BH.WCF.csproj">
-      <Project>{34f64742-db2e-434a-ba1c-1c9474e501bf}</Project>
-      <Name>BH.WCF</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

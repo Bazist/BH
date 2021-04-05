@@ -16,43 +16,26 @@
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using BH.FTServer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BH.BaseRobot;
+using System.IO;
 
-namespace BH.BaseRobot
+namespace BH.ExampleRobot
 {
-    public class Document
+    public class ExampleRobot : BaseRobot.BaseRobot
     {
-        public Document(Folder folder,
-                        string name,
-                        string content = null)
+        protected override IEnumerable<Document> GetDocuments(Folder folder)
         {
-            Folder = folder;
-            Name = name;
-            Content = content;
-        }
-
-        public Folder Folder { get; private set; }
-
-        public string Name { get; }
-
-        public string Content { get; set; }
-
-        public bool HasContent => !string.IsNullOrEmpty(Content);
-
-        public bool HasVersion => !string.IsNullOrEmpty(Version);
-
-        public string FullPath => $"{Folder.FullPath}\\{Name}";
-
-        public string Version { get; set; }
-
-        public override string ToString()
-        {
-            return FullPath;
+            return new Document[]
+            {
+                new Document(folder, "GreenDoc", "Green"),
+                new Document(folder, "RedDoc", "Red"),
+                new Document(folder, "YelloDoc", "Yellow"),
+            };
         }
     }
 }
