@@ -24,7 +24,7 @@ namespace BH.WorkerService
 
         private FTService _fts;
         private static IEnumerable<IBaseRobot> _robots;
-        
+
         private string CurrentDirectory => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
         public Worker(IOptionsMonitor<WorkerOptions> options, ILogger<Worker> logger)
@@ -32,7 +32,7 @@ namespace BH.WorkerService
             _options = options.CurrentValue;
 
             _logger = logger;
-            
+
             //this.ServiceName = @"BH.FTSearch";
             //this.EventLog.Source = this.ServiceName;
             //this.EventLog.Log = "Application";
@@ -49,12 +49,10 @@ namespace BH.WorkerService
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            StartService();
-
             return Task.CompletedTask;
         }
 
-        private void StartService()
+        public override Task StartAsync(CancellationToken cancellationToken)
         {
             WriteLog("Start Service", EventLogEntryType.Information);
 
@@ -120,6 +118,39 @@ namespace BH.WorkerService
 
                 throw ex;
             }
+
+            return Task.CompletedTask;
+        }
+
+        public override Task StopAsync(CancellationToken cancellationToken)
+        {
+            WriteLog("Stop Service", EventLogEntryType.Information);
+
+            //start web service
+            try
+            {
+                if (_robots != null)
+                {
+                    foreach (var robot in _robots)
+                    {
+                        robot.Stop();
+                    }
+                }
+
+                //FTService.StopWebService();
+
+                _fts.Stop();
+
+                WriteLog("Service stoped.", EventLogEntryType.Information);
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
+
+                throw ex;
+            }
+
+            return Task.CompletedTask;
         }
 
         private string LoadDocumentContent(string documentName,
@@ -197,67 +228,31 @@ namespace BH.WorkerService
             }
         }
 
-        //protected void OnStop()
-        //{
-        //    WriteLog("Stop Service", EventLogEntryType.Information);
-
-        //    //start web service
-        //    try
-        //    {
-        //        if (_robots != null)
-        //        {
-        //            foreach (var robot in _robots)
-        //            {
-        //                robot.Stop();
-        //            }
-        //        }
-
-        //        FTService.StopWebService();
-
-        //        _fts.Stop();
-
-        //        WriteLog("Service stoped.", EventLogEntryType.Information);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
-
-        //        throw ex;
-        //    }
-        //}
-
         private void WriteLog(string message, EventLogEntryType eventType)
         {
             message = $"[{DateTime.Now.ToString()}] {message}; Memory: {System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024} mb.\r\n";
 
             File.AppendAllText(Path.Combine(CurrentDirectory, "log.txt"), message);
 
-            if (Environment.UserInteractive)
+            switch (eventType)
             {
-                Trace.WriteLine(message);
-            }
-            else
-            {
-                switch(eventType)
-                {
-                    case EventLogEntryType.Error:
-                        {
-                            _logger.LogError(message);
-                            break;
-                        }
-                    case EventLogEntryType.Warning:
-                        {
-                            _logger.LogWarning(message);
-                            break;
-                        }
-                    case EventLogEntryType.Information:
-                        {
-                            _logger.LogInformation(message);
-                            break;
-                        }
-                    default:
-                        throw new NotImplementedException();
-                }
+                case EventLogEntryType.Error:
+                    {
+                        _logger.LogError(message);
+                        break;
+                    }
+                case EventLogEntryType.Warning:
+                    {
+                        _logger.LogWarning(message);
+                        break;
+                    }
+                case EventLogEntryType.Information:
+                    {
+                        _logger.LogInformation(message);
+                        break;
+                    }
+                default:
+                    throw new NotImplementedException();
             }
         }
 

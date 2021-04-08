@@ -28,8 +28,11 @@ namespace BH.FTServer
 {
     public class FTSearch
     {
-        public FTSearch()
+        static FTSearch()
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            Encoding = Encoding.GetEncoding("windows-1251");
         }
 
         private System.UInt32 InstanceNumber { get; set; }
@@ -356,9 +359,9 @@ namespace BH.FTServer
         #region DLL Import
 
 #if DEBUG
-        const string DLL_PATH = @"FTSearch.dll";
+        const string DLL_PATH = @"..\\FTSearch.dll";
 #else
-        const string DLL_PATH = @"FTSearch.dll";
+        const string DLL_PATH = @"..\\FTSearch.dll";
 #endif
 
         //[DllImport(DLL_PATH, EntryPoint = "startDefaultInstance", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
@@ -451,7 +454,7 @@ namespace BH.FTServer
         #region Members
 
         public const int DOC_NAME_LENGTH = 256;
-        public static Encoding Encoding = Encoding.GetEncoding("windows-1251");
+        public static Encoding Encoding;
 
         #endregion
 
