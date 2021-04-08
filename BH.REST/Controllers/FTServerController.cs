@@ -11,10 +11,10 @@ namespace BH.REST.Controllers
     {
         private readonly ILogger<FTServerController> _logger;
 
-        public FTServerController(ILogger<FTServerController> logger)
+        public FTServerController(FTService ftService, ILogger<FTServerController> logger)
         {
             _logger = logger;
-            _ftService = new FTService(null, null);
+            _ftService = ftService;
         }
 
         #region Members

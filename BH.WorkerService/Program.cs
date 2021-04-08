@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace BH.WorkerService
 {
@@ -49,6 +47,13 @@ namespace BH.WorkerService
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+            .ConfigureLogging(logging =>
+            {
+                logging.AddEventLog(eventLogSettings =>
+                {
+                    eventLogSettings.SourceName = "BH";
+                });
+            })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();

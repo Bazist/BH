@@ -7,32 +7,32 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using BH.BaseRobot;
+using BH.BoobenRobot;
 using BH.FTServer;
+using BH.REST;
+using BH.WorkerService.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BH.WorkerService
 {
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
+        private readonly WorkerOptions _options;
 
-        public Worker(ILogger<Worker> logger)
+        private FTService _fts;
+        private static IEnumerable<IBaseRobot> _robots;
+        
+        private string CurrentDirectory => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+        public Worker(IOptionsMonitor<WorkerOptions> options, ILogger<Worker> logger)
         {
+            _options = options.CurrentValue;
+
             _logger = logger;
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            //while (!stoppingToken.IsCancellationRequested)
-            //{
-            //    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            //    await Task.Delay(1000, stoppingToken);
-            //}
-        }
-
-        public Worker()
-        {
+            
             //this.ServiceName = @"BH.FTSearch";
             //this.EventLog.Source = this.ServiceName;
             //this.EventLog.Log = "Application";
@@ -47,18 +47,11 @@ namespace BH.WorkerService
             WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
         }
 
-        private static FTService _fts;
-        private static IEnumerable<IBaseRobot> _robots;
-        private string CurrentDirectory => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-
-        public void TestStart()
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            OnStart(null);
-        }
+            StartService();
 
-        public void TestStop()
-        {
-            OnStop();
+            return Task.CompletedTask;
         }
 
         private void StartService()
@@ -76,7 +69,7 @@ namespace BH.WorkerService
 
                 var conf = _fts.GetDefaultConfiguration();
 
-                var directory = ConfigurationManager.AppSettings["IndexPath"];
+                var directory = _options.IndexPath;
 
                 if (!Directory.Exists(directory))
                 {
@@ -88,8 +81,8 @@ namespace BH.WorkerService
                 }
 
                 conf.SetIndexPath(directory);
-                conf.LimitUsedMemory = ulong.Parse(ConfigurationManager.AppSettings["LimitUsedMemory"]);
-                conf.MemoryMode = bool.Parse(ConfigurationManager.AppSettings["InMemoryMode"]) ? (uint)FTSearch.MemoryMode.InMemory : (uint)FTSearch.MemoryMode.HDD;
+                conf.LimitUsedMemory = _options.LimitUsedMemory;
+                conf.MemoryMode = _options.InMemoryMode ? (uint)FTSearch.MemoryMode.InMemory : (uint)FTSearch.MemoryMode.HDD;
 
                 _fts.SetConfiguration(conf);
 
@@ -101,7 +94,7 @@ namespace BH.WorkerService
 
                         _fts.Start();
 
-                        if (bool.Parse(ConfigurationManager.AppSettings["BoobenMode"]))
+                        if (_options.BoobenMode)
                         {
                             StartBoobenRobots();
                         }
@@ -110,23 +103,20 @@ namespace BH.WorkerService
                             StartRobots();
                         }
 
-                        if (bool.Parse(ConfigurationManager.AppSettings["EnableRelSearch"]))
+                        if (_options.EnableRelSearch)
                         {
                             _fts.InitSearchRel();
                         }
                     }
                 );
 
-                WCFService.StartWebservice(_fts,
-                                          ConfigurationManager.AppSettings["URL"]);
+                RESTService.StartWebService(_fts);
 
                 WriteLog("Service started.", EventLogEntryType.Information);
             }
             catch (Exception ex)
             {
                 WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
-
-                Stop();
 
                 throw ex;
             }
@@ -150,8 +140,8 @@ namespace BH.WorkerService
 
         private void StartBoobenRobots()
         {
-            var enableRobots = bool.Parse(ConfigurationManager.AppSettings["EnableRobots"]);
-            var indexCurrentMonth = bool.Parse(ConfigurationManager.AppSettings["IndexCurrentMonth"]);
+            var enableRobots = _options.EnableRobots;
+            var indexCurrentMonth = _options.IndexCurrentMonth;
 
             if (enableRobots || indexCurrentMonth)
             {
@@ -181,8 +171,6 @@ namespace BH.WorkerService
                 {
                     WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
 
-                    Stop();
-
                     throw ex;
                 }
 
@@ -192,7 +180,7 @@ namespace BH.WorkerService
 
         private void StartRobots()
         {
-            if (bool.Parse(ConfigurationManager.AppSettings["EnableRobots"]))
+            if (_options.EnableRobots)
             {
                 WriteLog("Start Robots", EventLogEntryType.Information);
 
@@ -209,39 +197,34 @@ namespace BH.WorkerService
             }
         }
 
-        protected void OnStart(string[] args)
-        {
-            StartService();
-        }
+        //protected void OnStop()
+        //{
+        //    WriteLog("Stop Service", EventLogEntryType.Information);
 
-        protected void OnStop()
-        {
-            WriteLog("Stop Service", EventLogEntryType.Information);
+        //    //start web service
+        //    try
+        //    {
+        //        if (_robots != null)
+        //        {
+        //            foreach (var robot in _robots)
+        //            {
+        //                robot.Stop();
+        //            }
+        //        }
 
-            //start web service
-            try
-            {
-                if (_robots != null)
-                {
-                    foreach (var robot in _robots)
-                    {
-                        robot.Stop();
-                    }
-                }
+        //        FTService.StopWebService();
 
-                FTService.StopWebService();
+        //        _fts.Stop();
 
-                _fts.Stop();
+        //        WriteLog("Service stoped.", EventLogEntryType.Information);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
 
-                WriteLog("Service stoped.", EventLogEntryType.Information);
-            }
-            catch (Exception ex)
-            {
-                WriteLog(ex.Message + ex.StackTrace, EventLogEntryType.Error);
-
-                throw ex;
-            }
-        }
+        //        throw ex;
+        //    }
+        //}
 
         private void WriteLog(string message, EventLogEntryType eventType)
         {
