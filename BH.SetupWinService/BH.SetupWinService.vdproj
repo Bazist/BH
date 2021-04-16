@@ -100,13 +100,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_307D4E2030D9224B8BC7208C35D284C7"
+        "OwnerKey" = "8:_B8530D673D584CC7A8663CB2882DA7A7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B8530D673D584CC7A8663CB2882DA7A7"
+        "OwnerKey" = "8:_307D4E2030D9224B8BC7208C35D284C7"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -149,7 +149,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\BH.SetupWinService.msi"
+        "OutputFilename" = "8:..\\Install\\Server\\BH.SetupWinService.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -483,7 +483,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:BH.FTSearch"
         "ProductCode" = "8:{4464FB08-9DAA-4792-84A1-35F7728B9543}"
-        "PackageCode" = "8:{5D70BFEB-D795-429E-9608-25A2F36B2A61}"
+        "PackageCode" = "8:{4E5381D2-98FB-4909-AC64-74A96FC2810C}"
         "UpgradeCode" = "8:{1BCB6A4D-58B5-42A7-8DE0-52F7868B1ADA}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1307,7 +1307,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_018C6C3EA84E4C98BEA82988696F1691"
             {
-            "SourcePath" = "8:..\\Bin\\Debug\\FTSearch.dll"
+            "SourcePath" = "8:..\\Bin\\Release\\FTSearch.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_EF726C694ECF4EFBBBA8AF47A7D3013A"
@@ -1391,7 +1391,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0FCF35FBE0CE40D1AB6861305F7F7BEF"
             {
-            "SourcePath" = "8:..\\BH.WorkerService\\obj\\Debug\\netcoreapp3.1\\BH.WorkerService.dll"
+            "SourcePath" = "8:..\\BH.WorkerService\\obj\\Release\\netcoreapp3.1\\BH.WorkerService.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_EF726C694ECF4EFBBBA8AF47A7D3013A"
@@ -1867,7 +1867,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_4D7DC36BEBA34BC7A59AFD1ECFDD1F1F"
             {
-            "SourcePath" = "8:..\\BH.ExampleRobot\\obj\\Debug\\netstandard2.0\\BH.ExampleRobot.dll"
+            "SourcePath" = "8:..\\BH.ExampleRobot\\obj\\Release\\netstandard2.0\\BH.ExampleRobot.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_483947BB24B24F508A57AA0CFD377FCD"
@@ -1923,7 +1923,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_513FFC20D4D3414187D11C7F4F98DCA8"
             {
-            "SourcePath" = "8:..\\BH.WorkerService\\obj\\Debug\\netcoreapp3.1\\BH.WorkerService.exe"
+            "SourcePath" = "8:..\\BH.WorkerService\\obj\\Release\\netcoreapp3.1\\BH.WorkerService.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_EF726C694ECF4EFBBBA8AF47A7D3013A"
@@ -2315,7 +2315,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_839451AD9D934A87A8B14D86BB27B082"
             {
-            "SourcePath" = "8:..\\BH.WorkerService\\obj\\Debug\\netcoreapp3.1\\BH.WorkerService.exe"
+            "SourcePath" = "8:..\\BH.WorkerService\\obj\\Release\\netcoreapp3.1\\BH.WorkerService.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_EF726C694ECF4EFBBBA8AF47A7D3013A"
@@ -2707,7 +2707,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B8530D673D584CC7A8663CB2882DA7A7"
             {
-            "SourcePath" = "8:..\\BH.SetupWinService.RunBatFile\\obj\\Debug\\BH.SetupWinService.RunBatFile.exe"
+            "SourcePath" = "8:..\\BH.SetupWinService.RunBatFile\\obj\\Release\\BH.SetupWinService.RunBatFile.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_EF726C694ECF4EFBBBA8AF47A7D3013A"
@@ -2763,7 +2763,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B99D0A2A46DF4FF7994CC8D8BF4C522D"
             {
-            "SourcePath" = "8:..\\BH.ExampleRobot\\obj\\Debug\\netstandard2.0\\BH.ExampleRobot.dll"
+            "SourcePath" = "8:..\\BH.ExampleRobot\\obj\\Release\\netstandard2.0\\BH.ExampleRobot.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_483947BB24B24F508A57AA0CFD377FCD"
@@ -2987,7 +2987,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D4B5A3AF84C6446CAC1DEF16AA8482FE"
             {
-            "SourcePath" = "8:..\\BH.WorkerService\\obj\\Debug\\netcoreapp3.1\\BH.WorkerService.dll"
+            "SourcePath" = "8:..\\BH.WorkerService\\obj\\Release\\netcoreapp3.1\\BH.WorkerService.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_EF726C694ECF4EFBBBA8AF47A7D3013A"
