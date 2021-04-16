@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using BH.FTServer;
+using BH.REST.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using BH.FTServer;
 
 namespace BH.REST.Controllers
 {
@@ -29,35 +30,35 @@ namespace BH.REST.Controllers
         public bool IsStarted() => _ftService.IsStarted();
 
         [HttpGet("GetConfiguration")]
-        public FTSearch.ConfigurationDLL GetConfiguration() => _ftService.GetConfiguration();
+        public Configuration GetConfiguration() => Configuration.From(_ftService.GetConfiguration());
 
         [HttpGet("GetDefaultConfiguration")]
-        public FTSearch.ConfigurationDLL GetDefaultConfiguration() => _ftService.GetDefaultConfiguration();
+        public Configuration GetDefaultConfiguration() => Configuration.From(_ftService.GetDefaultConfiguration());
 
         [HttpPost("SetConfiguration")]
-        public void SetConfiguration(FTSearch.ConfigurationDLL configuration) => _ftService.SetConfiguration(configuration);
+        public void SetConfiguration(Configuration configuration) => _ftService.SetConfiguration(configuration.ToConfigurationDLL());
 
         [HttpPost("Start")]
         public void Start(int instanceNumber = 0) => _ftService.Start(instanceNumber);
 
         [HttpGet("SearchPhrase")]
-        public FTSearch.SearchResult SearchPhrase(string phrase,
-                                                  string templateName,
-                                                  int skip,
-                                                  int take) => _ftService.SearchPhrase(phrase, templateName, skip, take);
+        public SearchResult SearchPhrase(string phrase,
+                                         string templateName,
+                                         int skip,
+                                         int take) => SearchResult.From(_ftService.SearchPhrase(phrase, templateName, skip, take));
 
         [HttpGet("SearchQuery")]
-        public FTSearch.SearchResult SearchQuery(List<FTSearch.Selector> selectors,
+        public SearchResult SearchQuery(List<FTSearch.Selector> selectors,
                                                  int minPage,
                                                  int maxPage,
                                                  int skip,
-                                                 bool agregateBySubject) => _ftService.SearchQuery(selectors, minPage, maxPage, skip, agregateBySubject);
+                                                 bool agregateBySubject) => SearchResult.From(_ftService.SearchQuery(selectors, minPage, maxPage, skip, agregateBySubject));
         [HttpGet("SearchPhraseRel")]
-        public FTSearch.SearchResult SearchPhraseRel(string phrase,
-                                                     int minPage,
-                                                     int maxPage,
-                                                     int skip,
-                                                     int take) => _ftService.SearchPhraseRel(phrase, minPage, maxPage, skip, take);
+        public SearchResult SearchPhraseRel(string phrase,
+                                            int minPage,
+                                            int maxPage,
+                                            int skip,
+                                            int take) => SearchResult.From(_ftService.SearchPhraseRel(phrase, minPage, maxPage, skip, take));
 
         [HttpPost("InitSearchRel")]
         public void InitSearchRel() => _ftService.InitSearchRel();
@@ -77,7 +78,7 @@ namespace BH.REST.Controllers
                                      int maxPage) => _ftService.CalculateTrend(phrase, count, minPage, maxPage);
 
         [HttpGet("GetInfo")]
-        public BH.FTServer.FTService.Info GetInfo() => _ftService.GetInfo();
+        public Info GetInfo() => Info.From(_ftService.GetInfo());
 
         [HttpPost("IndexText")]
         public bool IndexText(string documentName,
