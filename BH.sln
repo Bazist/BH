@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.Web", "BH.Web\BH.Web.csp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FTSearch", "FTSearch\FTSearch.vcxproj", "{69A1675E-C3BB-4E6A-9E40-094F383A5D26}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BH.SetupWinService", "BH.SetupWinService\BH.SetupWinService.vdproj", "{56347025-279F-4FD4-B804-4908F2D46892}"
-EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BH.SetupWebSite", "BH.SetupWebSite\BH.SetupWebSite.vdproj", "{D9DDF83C-A8F6-4FB9-BEEC-8F4160CA75CC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.REST", "BH.REST\BH.REST.csproj", "{81C391DD-13D9-4259-BAD6-71304C40D5F8}"
@@ -24,6 +22,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.ExampleRobot", "BH.ExampleRobot\BH.ExampleRobot.csproj", "{9B85EA06-8EF9-4C4A-BE53-0352D01622E4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.WorkerService", "BH.WorkerService\BH.WorkerService.csproj", "{6227E696-467B-4350-A5B6-5E66CB7E8297}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BH.SetupWinService", "BH.SetupWinService\BH.SetupWinService.vdproj", "{021B129D-B261-4F01-927E-A099E680643B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,10 +55,6 @@ Global
 		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Release|Any CPU.ActiveCfg = Release|Win32
 		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Release|x64.ActiveCfg = Release|x64
 		{69A1675E-C3BB-4E6A-9E40-094F383A5D26}.Release|x64.Build.0 = Release|x64
-		{56347025-279F-4FD4-B804-4908F2D46892}.Debug|Any CPU.ActiveCfg = Debug
-		{56347025-279F-4FD4-B804-4908F2D46892}.Debug|x64.ActiveCfg = Debug
-		{56347025-279F-4FD4-B804-4908F2D46892}.Release|Any CPU.ActiveCfg = Release
-		{56347025-279F-4FD4-B804-4908F2D46892}.Release|x64.ActiveCfg = Release
 		{D9DDF83C-A8F6-4FB9-BEEC-8F4160CA75CC}.Debug|Any CPU.ActiveCfg = Debug
 		{D9DDF83C-A8F6-4FB9-BEEC-8F4160CA75CC}.Debug|x64.ActiveCfg = Debug
 		{D9DDF83C-A8F6-4FB9-BEEC-8F4160CA75CC}.Release|Any CPU.ActiveCfg = Release
@@ -111,6 +107,10 @@ Global
 		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Release|x64.ActiveCfg = Release|Any CPU
 		{6227E696-467B-4350-A5B6-5E66CB7E8297}.Release|x64.Build.0 = Release|Any CPU
+		{021B129D-B261-4F01-927E-A099E680643B}.Debug|Any CPU.ActiveCfg = Debug
+		{021B129D-B261-4F01-927E-A099E680643B}.Debug|x64.ActiveCfg = Debug
+		{021B129D-B261-4F01-927E-A099E680643B}.Release|Any CPU.ActiveCfg = Release
+		{021B129D-B261-4F01-927E-A099E680643B}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
