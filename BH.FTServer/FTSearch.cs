@@ -359,9 +359,9 @@ namespace BH.FTServer
         #region DLL Import
 
 #if DEBUG
-        const string DLL_PATH = @"..\\FTSearch.dll";
+        const string DLL_PATH = @"FTSearch.dll";
 #else
-        const string DLL_PATH = @"..\\FTSearch.dll";
+        const string DLL_PATH = @"FTSearch.dll";
 #endif
 
         //[DllImport(DLL_PATH, EntryPoint = "startDefaultInstance", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]

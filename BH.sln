@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BH.WorkerService", "BH.Work
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BH.SetupWinService", "BH.SetupWinService\BH.SetupWinService.vdproj", "{021B129D-B261-4F01-927E-A099E680643B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BH.SetupWinService.RunBatFile", "BH.SetupWinService.RunBatFile\BH.SetupWinService.RunBatFile.csproj", "{12BF8126-4A0C-4F99-8868-33D16F5883A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,14 @@ Global
 		{021B129D-B261-4F01-927E-A099E680643B}.Debug|x64.ActiveCfg = Debug
 		{021B129D-B261-4F01-927E-A099E680643B}.Release|Any CPU.ActiveCfg = Release
 		{021B129D-B261-4F01-927E-A099E680643B}.Release|x64.ActiveCfg = Release
+		{12BF8126-4A0C-4F99-8868-33D16F5883A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12BF8126-4A0C-4F99-8868-33D16F5883A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12BF8126-4A0C-4F99-8868-33D16F5883A2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{12BF8126-4A0C-4F99-8868-33D16F5883A2}.Debug|x64.Build.0 = Debug|Any CPU
+		{12BF8126-4A0C-4F99-8868-33D16F5883A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12BF8126-4A0C-4F99-8868-33D16F5883A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12BF8126-4A0C-4F99-8868-33D16F5883A2}.Release|x64.ActiveCfg = Release|Any CPU
+		{12BF8126-4A0C-4F99-8868-33D16F5883A2}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -26,7 +26,7 @@
 FTSInstance* instances[256];
 uint32 countInstances = 0;
 
-void startInstance(FTSConfiguration configuration, bool onlyCheckIndex)
+void __stdcall startInstance(FTSConfiguration configuration, bool onlyCheckIndex)
 {
 	if (!countInstances)
 	{
@@ -65,7 +65,7 @@ void startInstance(FTSConfiguration configuration, bool onlyCheckIndex)
 //	startInstance(configuration, false);
 //}
 
-RelevantResult* searchPhrase(uint32 instanceNumber,
+RelevantResult* __stdcall searchPhrase(uint32 instanceNumber,
 	const char* phrase,
 	uint32 phraseLen,
 	const char* templateName,
@@ -89,7 +89,7 @@ RelevantResult* searchPhrase(uint32 instanceNumber,
 	}
 }
 
-RelevantResult* searchPhraseRel(uint32 instanceNumber,
+RelevantResult* __stdcall searchPhraseRel(uint32 instanceNumber,
 	const char* phrase,
 	uint32 phraseLen,
 	uint32 minPage,
@@ -104,7 +104,7 @@ RelevantResult* searchPhraseRel(uint32 instanceNumber,
 	}
 }
 
-void initSearchRel(uint32 instanceNumber)
+void __stdcall initSearchRel(uint32 instanceNumber)
 {
 	
 
@@ -117,7 +117,7 @@ void initSearchRel(uint32 instanceNumber)
 	}
 }
 
-QueryResult* searchQuery(uint32 instanceNumber,
+QueryResult* __stdcall searchQuery(uint32 instanceNumber,
 	Selector** selectors,
 	uint32 countSelectors,
 	uint32 minPage,
@@ -154,7 +154,7 @@ QueryResult* searchQuery(uint32 instanceNumber,
 	}
 }
 
-RelevantResult* searchNewMems(uint32 instanceNumber,
+RelevantResult* __stdcall searchNewMems(uint32 instanceNumber,
 	uint32 startDate1Year,
 	uint32 startDate1Month,
 	uint32 startDate2Year,
@@ -182,7 +182,7 @@ RelevantResult* searchNewMems(uint32 instanceNumber,
 	}
 }
 
-void calculateTrend(uint32 instanceNumber,
+void __stdcall calculateTrend(uint32 instanceNumber,
 	const char* phrase,
 	uint32 phraseLen,
 	uint32* points,
@@ -204,7 +204,7 @@ void calculateTrend(uint32 instanceNumber,
 	}
 }
 
-RelevantResult* searchHtmlSeldomWords(uint32 instanceNumber, char* text, uint32 textLen)
+RelevantResult* __stdcall searchHtmlSeldomWords(uint32 instanceNumber, char* text, uint32 textLen)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -215,7 +215,7 @@ RelevantResult* searchHtmlSeldomWords(uint32 instanceNumber, char* text, uint32 
 	}
 }
 
-void releaseRelevantResult(uint32 instanceNumber, RelevantResult* pRelevantResult)
+void __stdcall releaseRelevantResult(uint32 instanceNumber, RelevantResult* pRelevantResult)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -226,7 +226,7 @@ void releaseRelevantResult(uint32 instanceNumber, RelevantResult* pRelevantResul
 	}
 }
 
-void releaseQueryResult(uint32 instanceNumber, QueryResult* pQueryResult)
+void __stdcall releaseQueryResult(uint32 instanceNumber, QueryResult* pQueryResult)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -237,7 +237,7 @@ void releaseQueryResult(uint32 instanceNumber, QueryResult* pQueryResult)
 	}
 }
 
-FTSInstanceInfo* getInfo(uint32 instanceNumber)
+FTSInstanceInfo* __stdcall getInfo(uint32 instanceNumber)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -248,7 +248,7 @@ FTSInstanceInfo* getInfo(uint32 instanceNumber)
 	}
 }
 
-bool indexText(uint32 instanceNumber, const char* name, uint32 nameLen, char* text, uint32 textLen)
+bool __stdcall indexText(uint32 instanceNumber, const char* name, uint32 nameLen, char* text, uint32 textLen)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -259,7 +259,7 @@ bool indexText(uint32 instanceNumber, const char* name, uint32 nameLen, char* te
 	}
 }
 
-bool indexHtml(uint32 instanceNumber, const char* name, uint32 nameLen, char* text, uint32 textLen)
+bool __stdcall indexHtml(uint32 instanceNumber, const char* name, uint32 nameLen, char* text, uint32 textLen)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -270,7 +270,7 @@ bool indexHtml(uint32 instanceNumber, const char* name, uint32 nameLen, char* te
 	}
 }
 
-void getDocumentNameByID(uint32 instanceNumber, uint32 id, char* name, uint32 sizeName)
+void __stdcall getDocumentNameByID(uint32 instanceNumber, uint32 id, char* name, uint32 sizeName)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -323,7 +323,7 @@ void migrate(char* path)
 	HArrayFixPair::DeleteArray(pairs);
 }
 
-void clearInstance()
+void __stdcall clearInstance()
 {
 	/*HArrayTextFile file;
 
@@ -451,7 +451,7 @@ void clearInstance()
 	//importIndex(1, "C:\\FTS\\Inst2", false);
 }
 
-void saveIndex(uint32 instanceNumber)
+void __stdcall saveIndex(uint32 instanceNumber)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{
@@ -464,7 +464,7 @@ void saveIndex(uint32 instanceNumber)
 	}
 }
 
-void importIndex(uint32 instanceNumber,
+void __stdcall importIndex(uint32 instanceNumber,
 	const char* importPath,
 	const bool isDeleteImportedIndex)
 {
@@ -479,7 +479,7 @@ void importIndex(uint32 instanceNumber,
 	}
 }
 
-void stopInstance(uint32 instanceNumber)
+void __stdcall stopInstance(uint32 instanceNumber)
 {
 	for (uint32 i = 0; i < countInstances; i++)
 	{

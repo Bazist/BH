@@ -12,11 +12,6 @@ namespace BH.WorkerService
 {
     public class Program
     {
-        public static void Install()
-        {
-            File.WriteAllText(@"c:\fts\ok.txt", "ok");
-        }
-
         public static void Main(string[] args)
         {
             if (args.Length > 0)
